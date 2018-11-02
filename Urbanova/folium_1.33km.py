@@ -308,7 +308,7 @@ folium.raster_layers.VideoOverlay(video_url=video4,bounds = extents,name='PM_smo
 folium.LayerControl().add_to(m)
 
 # Save and show the created map. Use Jupyter to see the map within your console
-m.save('folium_files/folium_ozone_pm_map.html')
+m.save(output_dir+'folium_ozone_pm_map.html')
 m
 print('done')
 
