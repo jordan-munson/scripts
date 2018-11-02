@@ -1,1 +1,1 @@
-# Jordan Munson Reasearch Scripts
+# Jordan Munson Research Scripts
