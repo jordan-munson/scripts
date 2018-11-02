@@ -20,6 +20,9 @@ import os
 from subprocess import check_call 
 from mpl_toolkits.basemap import Basemap
 
+# Set file paths
+base_dir=r'G:/Research/Urbanova_Jordan/'
+output_dir = r'G:/Research/scripts/folium_files/' # Git repository
 # Set times
 start_year = 2018
 start_month = 1
@@ -30,8 +33,7 @@ end_month = 1
 #end_day = monthrange(end_year, end_month)[1]
 end_day = 31
 
-# Set file paths
-base_dir=r'G:/Research/Urbanova_Jordan/'
+
 
 # set start and end date
 start = datetime.datetime(start_year, start_month, start_day, hour=0)
@@ -39,11 +41,9 @@ end = datetime.datetime(end_year, end_month, end_day, hour=23)
 timezone = pytz.timezone("utc")
 start = timezone.localize(start)
 end = timezone.localize(end)
-# set layer
-layer=0
 
 # Load data
-name = '1p33_'+start.strftime("%Y%m%d")+'_'+end.strftime("%Y%m%d")
+name =base_dir+ '1p33_'+start.strftime("%Y%m%d")+'_'+end.strftime("%Y%m%d")
 
 def load_obj(name ):
     with open(name + '.pkl', 'rb') as f:
@@ -183,8 +183,8 @@ for i, sp in enumerate(var_list):
 
 # Attempt to run ffmpeg 
 os.chdir('G:/Research/Urbanova_Jordan')
-check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_PMIJ_%05d.png','-b:v','5000k', 'G:/Research/Urbanova_Jordan/maps/daily_basemap/movie_PMIJ_output.webm'])
-check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_O3_%05d.png','-b:v','5000k', 'G:/Research/Urbanova_Jordan/maps/daily_basemap/movie_O3_output.webm'])
+check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_PMIJ_%05d.png','-b:v','5000k', output_dir+'movie_PMIJ_output.webm'])
+check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_O3_%05d.png','-b:v','5000k', output_dir+'movie_O3_output.webm'])
 print('Videos made')
 #%%
 
@@ -260,8 +260,8 @@ for i, sp in enumerate(var_list):
 
 # Attempt to run ffmpeg 
 os.chdir('G:/Research/Urbanova_Jordan')
-check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_smooth_PMIJ_%05d.png','-b:v','5000k', 'G:/Research/Urbanova_Jordan/maps/daily_basemap/movie_PMIJ_smooth_output.webm'])
-check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_smooth_O3_%05d.png','-b:v','5000k', 'G:/Research/Urbanova_Jordan/maps/daily_basemap/movie_O3_smooth_output.webm'])
+check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_smooth_PMIJ_%05d.png','-b:v','5000k', output_dir+'movie_PMIJ_smooth_output.webm'])
+check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_smooth_O3_%05d.png','-b:v','5000k', output_dir+'movie_O3_smooth_output.webm'])
 print('Videos made')
 
 #%%
