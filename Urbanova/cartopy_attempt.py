@@ -94,6 +94,7 @@ plt.savefig(r'C:\Users\Jordan\Desktop/coastlines.png')
 
 plt.show()
 
+
 #%%
 
 m= folium.Map(location=[47.6588, -117.4260],zoom_start=9.25) # Create the plot
