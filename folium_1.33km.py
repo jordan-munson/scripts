@@ -22,7 +22,8 @@ from mpl_toolkits.basemap import Basemap
 
 # Set file paths
 base_dir=r'G:/Research/Urbanova_Jordan/'
-output_dir = r'G:/Research/scripts/folium_files/' # Git repository
+output_dir = r'G:/Research/scripts/folium_files/'
+git_dir = 'https://github.com/jordan-munson/scripts/raw/master/folium_files/'
 # Set times
 start_year = 2018
 start_month = 1
@@ -284,18 +285,22 @@ png1 = base_dir+'maps/urbanova_basemap_1_O3.png'
 png2 = base_dir+'maps/urbanova_basemap_1_PMIJ.png'
 
 # Set paths to videos
-video1 = base_dir+'maps/daily_basemap/movie_O3_output.webm'
-video2 = base_dir+'maps/daily_basemap/movie_PMIJ_output.webm'
-video3 = base_dir+'maps/daily_basemap/movie_O3_smooth_output.webm'
-video4 = base_dir+'maps/daily_basemap/movie_PMIJ_smooth_output.webm'
+video1 = git_dir+'movie_O3_output.webm'
+video2 = git_dir+'movie_PMIJ_output.webm'
+video3 = git_dir+'movie_O3_smooth_output.webm'
+video4 = git_dir+'movie_PMIJ_smooth_output.webm'
+#video1 = output_dir+'movie_O3_output.webm'
+#video2 = output_dir+'movie_PMIJ_output.webm'
+#video3 = output_dir+'movie_O3_smooth_output.webm'
+#video4 = output_dir+'movie_PMIJ_smooth_output.webm'
 
 # Add monthly average maps to Folium
 folium.raster_layers.ImageOverlay(png1,bounds = extents,name='Ozone',opacity = 0.5, show = False).add_to(m)
 folium.raster_layers.ImageOverlay(png2,bounds = extents,name='PM',opacity = 0.5,show = False).add_to(m) #Unchecks the PM layer so that only ozone is seen
 
 # Add videos to Folium
-folium.raster_layers.VideoOverlay(video_url=video1,bounds = extents,name='O3_video',opacity = 0.5,attr = 'O3_video_map',show = False,autoplay=True).add_to(m)
-folium.raster_layers.VideoOverlay(video_url=video2,bounds = extents,name='PM_video',opacity = 0.5,attr = 'pm_video_map',show = True,autoplay=True).add_to(m)
+folium.raster_layers.VideoOverlay(video_url=video1,bounds = extents,name='O3_video',opacity = 0.5,attr = 'O3_video_map',show = True,autoplay=True).add_to(m)
+folium.raster_layers.VideoOverlay(video_url=video2,bounds = extents,name='PM_video',opacity = 0.5,attr = 'pm_video_map',show = False,autoplay=True).add_to(m)
 folium.raster_layers.VideoOverlay(video_url=video3,bounds = extents,name='O3_smooth_video',opacity = 0.5,attr = 'O3_smooth_video_map',show = False,autoplay=True).add_to(m)
 folium.raster_layers.VideoOverlay(video_url=video4,bounds = extents,name='PM_smooth_video',opacity = 0.5,attr = 'pm_smooth_video_map',show = False,autoplay=True).add_to(m)
 
@@ -303,7 +308,7 @@ folium.raster_layers.VideoOverlay(video_url=video4,bounds = extents,name='PM_smo
 folium.LayerControl().add_to(m)
 
 # Save and show the created map. Use Jupyter to see the map within your console
-m.save('folium_ozone_pm_map.html')
+m.save('folium_files/folium_ozone_pm_map.html')
 m
 print('done')
 
