@@ -134,8 +134,6 @@ m = Basemap(projection='merc',
               resolution='h',
               area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
 x,y = m(lon,lat)
-var_list = ["CO", "PM10"]
-unit_list = ["moles/s", "$g/s$"]
 ############################################
 # hourly domain basemaps, this takes lots of time if doing hourly. Switch to daily could be prudent over a long timespan
 ############################################
@@ -204,8 +202,6 @@ m = Basemap(projection='merc',
               resolution='h',
               area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
 x,y = m(lon,lat)
-var_list = ["CO", "PM10"]
-unit_list = ["moles/s", "$g/s$"]
 ############################################
 # hourly domain basemaps, this takes lots of time if doing hourly. Switch to daily could be prudent over a long timespan
 ############################################
@@ -288,29 +284,20 @@ lat_max=np.amax(airpact['lat'])
 
 extents = [[lat_min, lon_min], [lat_max, lon_max]]
 
-# Set paths to monthly average maps
-png1 = base_dir+'maps/urbanova_emissions_basemap_1_CO.png'
-png2 = base_dir+'maps/urbanova_emissions_basemap_1_PM10.png'
-
-# Set paths to videos
-video1 = git_dir+'movie_CO_output.webm'
-video2 = git_dir+'movie_PM10_output.webm'
-videCO = git_dir+'movie_CO_smooth_output.webm'
-video4 = git_dir+'movie_PM10_smooth_output.webm'
-#video1 = output_dir+'movie_CO_output.webm'
-#video2 = output_dir+'movie_PM10_output.webm'
-#videCO = output_dir+'movie_CO_smooth_output.webm'
-#video4 = output_dir+'movie_PM10_smooth_output.webm'
-
-# Add monthly average maps to Folium
-folium.raster_layers.ImageOverlay(png1,bounds = extents,name='Ozone',opacity = 0.5, show = False).add_to(m)
-folium.raster_layers.ImageOverlay(png2,bounds = extents,name='PM',opacity = 0.5,show = False).add_to(m) #Unchecks the PM layer so that only ozone is seen
-
-# Add videos to Folium
-folium.raster_layers.VideoOverlay(video_url=video1,bounds = extents,name='CO_video',opacity = 0.5,attr = 'CO_video_map',show = True,autoplay=True).add_to(m)
-folium.raster_layers.VideoOverlay(video_url=video2,bounds = extents,name='PM_video',opacity = 0.5,attr = 'pm_video_map',show = False,autoplay=True).add_to(m)
-folium.raster_layers.VideoOverlay(video_url=videCO,bounds = extents,name='CO_smooth_video',opacity = 0.5,attr = 'CO_smooth_video_map',show = False,autoplay=True).add_to(m)
-folium.raster_layers.VideoOverlay(video_url=video4,bounds = extents,name='PM_smooth_video',opacity = 0.5,attr = 'pm_smooth_video_map',show = False,autoplay=True).add_to(m)
+for sp in var_list:
+    print('Plotting '+sp+' to Folium map')
+    # Name variables
+    png = base_dir+'maps/urbanova_emissions_basemap_1_'+sp+'.png'
+    video1 = git_dir+'movie_'+sp+'_output.webm'
+    video2 = git_dir+'movie_'+sp+'_smooth_output.webm'
+    
+    #Plot average map
+    folium.raster_layers.ImageOverlay(png,bounds = extents,name=sp,opacity = 0.5, show = False).add_to(m)
+    
+    #Plot countourf video
+    folium.raster_layers.VideoOverlay(video_url=video1,bounds = extents,name=sp+'_video',opacity = 0.5,attr = sp+'_video_map',show = False,autoplay=True).add_to(m)
+    #Plot colormap video
+    folium.raster_layers.VideoOverlay(video_url=video2,bounds = extents,name=sp+'_smooth_video',opacity = 0.5,attr = sp+'_smooth_video_map',show = False,autoplay=True).add_to(m)
 
 # Add ability to move between layers
 folium.LayerControl().add_to(m)
