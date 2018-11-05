@@ -302,8 +302,8 @@ for i, sp in enumerate(var_list):
         cbticks = True
         cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
         cbar.set_label(cblabel)
-        if cbticks:
-            cbar.set_ticks(clevs)
+        #if cbticks:
+        #    cbar.set_ticks(clevs)
         
         # print the surface-layer mean on the map plot
         plt.annotate("mean: " + str(airpact[sp][t,:,:].mean()) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0, 0.98), xycoords='axes fraction')
