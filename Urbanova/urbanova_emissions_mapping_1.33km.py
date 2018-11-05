@@ -1,15 +1,11 @@
 # Script modified off of Kai Fans script
 import matplotlib
 matplotlib.use('Agg')  # Uncomment this when using in Kamiak/Aeolus
-import pandas as pd
-import numpy as np
 import datetime
 from datetime import timedelta
 import pytz
 import os
 from netCDF4 import Dataset
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
 import pickle
 #pd.show_versions()
 
@@ -17,22 +13,22 @@ import pickle
 #import simplekml
 
 # Set file paths
-# =============================================================================
-# base_dir=r'E:/Research/Urbanova_Jordan/'
-# data_dir= base_dir + '/Urbanova_ref_site_comparison/Urbanova/'
-# grid_dir_4km=base_dir + '/Urbanova_ref_site_comparison/AIRPACT/2018/2018011100/MCIP37/'
-# grid_dir_urb=base_dir + '/Urbanova_ref_site_comparison/Urbanova/2018/2018011100/MCIP37/'
-# urb_path = data_dir
-# airpact_path = base_dir + '/Urbanova_ref_site_comparison/AIRPACT/'
-# =============================================================================
+base_dir=r'G:/Research/Urbanova_Jordan/'
+data_dir= base_dir + '/Urbanova_ref_site_comparison/Urbanova/'
+#grid_dir_4km=base_dir + '/Urbanova_ref_site_comparison/AIRPACT/2018/2018011100/MCIP37/'
+grid_dir_urb=base_dir + '/Urbanova_ref_site_comparison/Urbanova/2018/2018011100/MCIP37/'
+urb_path = data_dir
+#airpact_path = base_dir + '/Urbanova_ref_site_comparison/AIRPACT/'
 
 
-base_dir = '/data/lar/users/jmunson/'
-data_dir = '/data/lar/projects/Urbanova/'
-grid_dir_urb = '/data/lar/projects/Urbanova/2018/2018011100/MCIP37/'
-grid_dir_4km='/data/airpact5/AIRRUN/2018/2018011100/MCIP37/'
-urb_path = '/data/lar/projects/Urbanova/'
-airpact_path = '/data/airpact5/saved/'
+# =============================================================================
+# base_dir = '/data/lar/users/jmunson/'
+# data_dir = '/data/lar/projects/Urbanova/'
+# grid_dir_urb = '/data/lar/projects/Urbanova/2018/2018011100/MCIP37/'
+# grid_dir_4km='/data/airpact5/AIRRUN/2018/2018011100/MCIP37/'
+# urb_path = '/data/lar/projects/Urbanova/'
+# airpact_path = '/data/airpact5/saved/'
+# =============================================================================
 
 start_year = 2018
 start_month = 1
@@ -41,9 +37,9 @@ start_day = 11
 end_year = 2018
 end_month = 1
 #end_day = monthrange(end_year, end_month)[1]
-end_day = 31
+end_day = 13
 
-exec(open(base_dir + "/airpact_functions.py").read())
+exec(open("G:/Research/scripts/Urbanova/airpact_emissions_functions.py").read())
 # set start and end date
 start = datetime.datetime(start_year, start_month, start_day, hour=0)
 end = datetime.datetime(end_year, end_month, end_day, hour=23)
@@ -61,21 +57,22 @@ now = start
 
 # Start time loop
 modeloutputs = []
-modeloutputs.append(data_dir + now.strftime('%Y')+'/'+ now.strftime('%Y%m%d')+'00'+'/POST/CCTM/'+'combined_' + now.strftime('%Y%m%d')+'.ncf')
+modeloutputs.append(data_dir + now.strftime('%Y')+'/'+ now.strftime('%Y%m%d')+'00'+'/EMISSION/merged/emis2d4plot.ncf')
 print(modeloutputs)
 now += timedelta(hours=24)
 # For loop to find the combined3D files for specified time period
 for t in range(0, date_diff):
     
     # Handles missing days
-    if os.path.isfile(data_dir + now.strftime('%Y')+'/'+ now.strftime('%Y%m%d')+'00'+'/POST/CCTM/'+'combined_' + now.strftime('%Y%m%d')+'.ncf'):
+    if os.path.isfile(data_dir + now.strftime('%Y')+'/'+ now.strftime('%Y%m%d')+'00'+'/EMISSION/merged/emis2d4plot.ncf'):
         # set a directory containing Urbanova data
-        modeloutputs.append(data_dir + now.strftime('%Y')+'/'+ now.strftime('%Y%m%d')+'00'+'/POST/CCTM/'+'combined_' + now.strftime('%Y%m%d')+'.ncf')
+        modeloutputs.append(data_dir + now.strftime('%Y')+'/'+ now.strftime('%Y%m%d')+'00'+'/EMISSION/merged/emis2d4plot.ncf')
         #Changes day to next
         now += timedelta(hours=24)            
     else:
         print('adding 24 hours')
         now += timedelta(hours=24)
+        continue
 
 # =============================================================================
 #     if os.path.isfile(regrid_path + 'combined_' + now.strftime('%Y%m%d')+'.regrid4km.ncf'):
@@ -123,5 +120,6 @@ def save_obj(obj, name ):
     with open(name + '.pkl', 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
     
-name = '1p33_'+start.strftime("%Y%m%d")+'_'+end.strftime("%Y%m%d")
+name = base_dir+'1p33_emissions_'+start.strftime("%Y%m%d")+'_'+end.strftime("%Y%m%d")
 save_obj(airpact,name)    
+print('Dictionary saved')

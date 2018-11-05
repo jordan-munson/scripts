@@ -18,7 +18,7 @@ import time
 #Read AIRPACT gas species
 def readAIRPACTgas(infile,layer):
     #gaslist = ['NO','NO2','SO2','O3','ISOP','CO','NH3','FORM']  # Feb 16 2017 - add more VOC species to evaluate MOSAIC
-    gaslist = ['O3']
+    gaslist = ['CO','BENZENE','NO','NO2']
     airpactgas = {}
     for k in gaslist:
         airpactgas[k] = infile.variables[k][:,layer,:,:]
@@ -26,7 +26,7 @@ def readAIRPACTgas(infile,layer):
 
 def readAIRPACTaerosol(infile, layer):
     #aerlist = ['ASO4I','ASO4J','ASO4K','ANO3I','ANO3J','ANO3K','ANH4I','ANH4J','ANH4K','AECI','AECJ','APOCI','APOCJ','APNCOMI','APNCOMJ']
-    aerlist = ['PMIJ']
+    aerlist = ['PM10','PMFINE']
     airpactaerosol = {}
     #airpactaero = {}
     for k in aerlist:
@@ -91,7 +91,7 @@ def get_airpact_DF(start, end, layer):
             else:
                 h=start.hour-8
             for i in list(modelarray0.keys()):
-                modelarray[i]=modelarray0[i][h:,:,:]
+                modelarray[i]=modelarray0[i][h:23,:,:]
             #modelmet = readairpactmet(nc)
             #modelarray.update(modelmet)
             
@@ -193,7 +193,7 @@ def get_AQS_AIRPACT_data(start, end):
     endyr=end.strftime("%Y")
     endmon=start.strftime("%m")
     
-    # get aqsstie information
+    # get aqs site information
     url = 'http://lar.wsu.edu/airpact/airnow_sites/aqsid' +start.strftime("%Y%m%d") + '.csv'
     print(url)
     aqs_sites = pd.read_csv(url)
