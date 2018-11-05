@@ -38,7 +38,7 @@ end_month = 1
 #end_day = monthrange(end_year, end_month)[1]
 end_day = 31
 
-exec(open("G:/Research/scripts/Urbanova/airpact_emissions_functions.py").read())
+exec(open("airpact_emissions_functions.py").read())
 # set start and end date
 start = datetime.datetime(start_year, start_month, start_day, hour=0)
 end = datetime.datetime(end_year, end_month, end_day, hour=23)
