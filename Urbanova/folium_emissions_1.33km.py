@@ -56,6 +56,14 @@ airpact['NOX'] = airpact['NO2']+airpact['NO']
 # obtain model lat and lon - needed for AQS eval and basemap
 lat = airpact['lat'][0]
 lon = airpact['lon'][0]
+
+# Create list of species to iterate over in the for loops
+var_list = ["CO", "PM10", 'BENZENE','PMFINE','NOX']
+unit_list = ["moles/h", "$g/h$","moles/h","$g/h$","moles/h"]
+
+#Convert from units/second to units/hour to make visualization easier
+for sp in var_list:
+    airpact[sp] = airpact[sp]*3600
 #%%
 #base map
 m = Basemap(projection='merc',
@@ -64,12 +72,7 @@ m = Basemap(projection='merc',
               resolution='h',
               area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
 x,y = m(lon,lat)
-var_list = ["CO", "PM10", 'BENZENE','PMFINE','NOX']
-unit_list = ["moles/h", "$g/h$","moles/h","$g/h$","moles/h"]
 
-#Convert from units/second to units/hour to make visualization easier
-for sp in var_list:
-    airpact[sp] = airpact[sp]*3600
 ############################################
 # Averaged domain basemaps       
 ############################################
@@ -106,23 +109,30 @@ with PdfPages(base_dir+'maps/urbanova_emissions_avg_basemap_' + '_'+ start.strft
         # compute auto color-scale using maximum concentrations
         down_scale = np.percentile(airpact[sp], 5)
         up_scale = np.percentile(airpact[sp], 95)
+        vmin = 0
         if sp == "CO":
             clevs = CO_bins
+            vmax = CO_max
         elif sp == 'BENZENE':
             clevs = benz_bins
+            vmax = benz_max
         elif sp == 'PMFINE':
             clevs = pmf_bins
+            vmax = pmf_max
         elif sp == 'NOX':
             clevs = nox_bins
+            vmax = nox_max
         else:
             clevs = pm_bins
+            vmax = pm_max
         #clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10),3)
         print("debug clevs", clevs, sp)
         
-
-        cs = m.contourf(x,y,airpact[sp].mean(axis=0),clevs,cmap=plt.get_cmap('jet'), extend='both')
-        cs.cmap.set_under('cyan')
-        cs.cmap.set_over('black')
+        cmap = plt.get_cmap('jet')
+        colormesh = m.pcolormesh(x, y, airpact[sp][:,:,:].mean(axis=0), vmin = vmin,vmax=vmax, cmap=cmap)
+        #cs = m.contourf(x,y,airpact[sp].mean(axis=0),clevs,cmap=plt.get_cmap('jet'), extend='both')
+        #cs.cmap.set_under('cyan')
+        #cs.cmap.set_over('black')
         
         #m.drawcoastlines()
         #m.drawstates()
@@ -149,75 +159,83 @@ with PdfPages(base_dir+'maps/urbanova_emissions_avg_basemap_' + '_'+ start.strft
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
         plt.show()
 #%%
-#base map
-m = Basemap(projection='merc',
-              llcrnrlon = lon[0,0], urcrnrlon = lon[90-1,90 -1], 
-              llcrnrlat = lat[0,0], urcrnrlat = lat[90-1,90-1],
-              resolution='h',
-              area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
-x,y = m(lon,lat)
-os.chdir('G:/Research/Urbanova_Jordan') # needed for ffmpeg
-############################################
-# hourly domain basemaps, this takes lots of time if doing hourly. Switch to daily could be prudent over a long timespan
-############################################
-#save maps into the pdf file (two maps in single page)
-
-for i, sp in enumerate(var_list):
-    
-    for t in range(0, len(airpact[sp])): 
-            
-        outpng = base_dir +'maps/daily_basemap/airpact_emissions_hourly_basemap_' + sp + '_%05d.png' % t
-        print(outpng)
-        
-        fig = plt.figure(figsize=(14,10))
-        #plt.title('at ' + airpact["DateTime"][t,0,0])
-        
-        #CO_bins = np.arange(0, 45, 5)
-        #pm_bins = np.arange(0, 12, 1.2)
-        # compute auto color-scale using maximum concentrations
-        down_scale = np.percentile(airpact[sp], 5)
-        up_scale = np.percentile(airpact[sp], 95)
-        if sp == "CO":
-            clevs = CO_bins
-        else:
-            clevs = pm_bins
-        #clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10),3)
-        print("debug clevs", clevs, sp)
-        
-        print(unit_list[i], sp, t)
-
-        cs = m.contourf(x,y,airpact[sp][t,:,:],clevs,cmap=plt.get_cmap('jet'), extend='both')
-        cs.cmap.set_under('cyan')
-        cs.cmap.set_over('black')
-        
-        #m.drawcoastlines()
-        #m.drawstates()
-        #m.drawcountries()
-        
-        cblabel = sp + ' (' + unit_list[i] +')'
-        cbticks = True
-        cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
-        cbar.set_label(cblabel)
-        if cbticks:
-            cbar.set_ticks(clevs)
-        
-        # print the surface-layer mean on the map plot
-        plt.annotate("mean: " + str(airpact[sp][t,:,:].mean()) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0, 0.98), xycoords='axes fraction')
-        
-        plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False) 
-        plt.show()
-    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_output.webm'])
-
-# This requires ffmpeg program, which is not easy to install in aeolus/kamiak
-# To make a video, download all the pngs in your computer and execute the command below
-# "ffmpeg -y -framerate 10 -i G:\Research\Urbanova_Jordan\maps\daily_basemap\airpact_hourly_basemap_PM10_%05d.png -b:v 5000k G:\Research\Urbanova_Jordan\maps\daily_basemap\movie_PM10_output.webm" 
-# "ffmpeg -y -framerate 10 -i G:\Research\Urbanova_Jordan\maps\daily_basemap\airpact_hourly_basemap_CO_%05d.png -b:v 5000k G:\Research\Urbanova_Jordan\maps\daily_basemap\movie_CO_output.webm" 
-
-# Attempt to run ffmpeg 
-
-#check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_PM10_%05d.png','-b:v','5000k', output_dir+'movie_PM10_output.webm'])
-#check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_CO_%05d.png','-b:v','5000k', output_dir+'movie_CO_output.webm'])
-print('Contourf done')
+# =============================================================================
+# #base map
+# m = Basemap(projection='merc',
+#               llcrnrlon = lon[0,0], urcrnrlon = lon[90-1,90 -1], 
+#               llcrnrlat = lat[0,0], urcrnrlat = lat[90-1,90-1],
+#               resolution='h',
+#               area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
+# x,y = m(lon,lat)
+# os.chdir('G:/Research/Urbanova_Jordan') # needed for ffmpeg
+# ############################################
+# # hourly domain basemaps, this takes lots of time if doing hourly. Switch to daily could be prudent over a long timespan
+# ############################################
+# #save maps into the pdf file (two maps in single page)
+# 
+# for i, sp in enumerate(var_list):
+#     
+#     for t in range(0, len(airpact[sp])): 
+#             
+#         outpng = base_dir +'maps/daily_basemap/airpact_emissions_hourly_basemap_' + sp + '_%05d.png' % t
+#         print(outpng)
+#         
+#         fig = plt.figure(figsize=(14,10))
+#         #plt.title('at ' + airpact["DateTime"][t,0,0])
+#         
+#         #CO_bins = np.arange(0, 45, 5)
+#         #pm_bins = np.arange(0, 12, 1.2)
+#         # compute auto color-scale using maximum concentrations
+#         down_scale = np.percentile(airpact[sp], 5)
+#         up_scale = np.percentile(airpact[sp], 95)
+#         if sp == "CO":
+#             clevs = CO_bins
+#         elif sp == 'BENZENE':
+#             clevs = benz_bins
+#         elif sp == 'PMFINE':
+#             clevs = pmf_bins
+#         elif sp == 'NOX':
+#             clevs = nox_bins
+#         else:
+#             clevs = pm_bins
+#         #clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10),3)
+#         print("debug clevs", clevs, sp)
+#         
+#         print(unit_list[i], sp, t)
+# 
+#         cs = m.contourf(x,y,airpact[sp][t,:,:],clevs,cmap=plt.get_cmap('jet'), extend='both')
+#         cs.cmap.set_under('cyan')
+#         cs.cmap.set_over('black')
+#         
+#         #m.drawcoastlines()
+#         #m.drawstates()
+#         #m.drawcountries()
+#         
+#         cblabel = sp + ' (' + unit_list[i] +')'
+#         cbticks = True
+#         cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
+#         cbar.set_label(cblabel)
+#         if cbticks:
+#             cbar.set_ticks(clevs)
+#         
+#         # print the surface-layer mean on the map plot
+#         plt.annotate("mean: " + str(airpact[sp][t,:,:].mean()) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0, 0.98), xycoords='axes fraction')
+#         
+#         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False) 
+#         plt.show()
+#     check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_output.webm'])
+# 
+# # This requires ffmpeg program, which is not easy to install in aeolus/kamiak
+# # To make a video, download all the pngs in your computer and execute the command below
+# # "ffmpeg -y -framerate 10 -i G:\Research\Urbanova_Jordan\maps\daily_basemap\airpact_hourly_basemap_PM10_%05d.png -b:v 5000k G:\Research\Urbanova_Jordan\maps\daily_basemap\movie_PM10_output.webm" 
+# # "ffmpeg -y -framerate 10 -i G:\Research\Urbanova_Jordan\maps\daily_basemap\airpact_hourly_basemap_CO_%05d.png -b:v 5000k G:\Research\Urbanova_Jordan\maps\daily_basemap\movie_CO_output.webm" 
+# 
+# # Attempt to run ffmpeg 
+# 
+# #check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_PM10_%05d.png','-b:v','5000k', output_dir+'movie_PM10_output.webm'])
+# #check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_CO_%05d.png','-b:v','5000k', output_dir+'movie_CO_output.webm'])
+# print('Contourf done')
+# =============================================================================
 #%%
 
 #base map
@@ -236,7 +254,7 @@ for i, sp in enumerate(var_list):
     
     for t in range(0, len(airpact[sp])): 
             
-        outpng = base_dir +'maps/daily_basemap/airpact_emissions_hourly_basemap_smooth_' + sp + '_%05d.png' % t
+        outpng = base_dir +'maps/daily_basemap/airpact_emissions_hourly_basemap_tiled_' + sp + '_%05d.png' % t
         print(outpng)
         
         fig = plt.figure(figsize=(14,10))
@@ -251,6 +269,15 @@ for i, sp in enumerate(var_list):
         if sp == "CO":
             clevs = CO_bins
             vmax = CO_max
+        elif sp == 'BENZENE':
+            clevs = benz_bins
+            vmax = benz_max
+        elif sp == 'PMFINE':
+            clevs = pmf_bins
+            vmax = pmf_max
+        elif sp == 'NOX':
+            clevs = nox_bins
+            vmax = nox_max
         else:
             clevs = pm_bins
             vmax = pm_max
@@ -267,7 +294,7 @@ for i, sp in enumerate(var_list):
         #m.drawstates()
         #m.drawcountries()
 
-        # These two lines below change the map to continuos. However this muddles the image
+        # These two lines below change the map colormesh, which shows the grid
         cmap = plt.get_cmap('jet')
         colormesh = m.pcolormesh(x, y, airpact[sp][t,:,:], vmin = vmin,vmax=vmax, cmap=cmap)
         
@@ -283,7 +310,7 @@ for i, sp in enumerate(var_list):
         
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False) 
         plt.show()
-    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_smooth_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_smooth_output.webm'])
+    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_tiled_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_tiled_output.webm'])
 
 # This requires ffmpeg program, which is not easy to install in aeolus/kamiak
 # To make a video, download all the pngs in your computer and execute the command below
@@ -292,8 +319,8 @@ for i, sp in enumerate(var_list):
 
 # Attempt to run ffmpeg 
 #os.chdir('G:/Research/Urbanova_Jordan')
-#check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_smooth_PM10_%05d.png','-b:v','5000k', output_dir+'movie_PM10_smooth_output.webm'])
-#check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_smooth_CO_%05d.png','-b:v','5000k', output_dir+'movie_CO_smooth_output.webm'])
+#check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_tiled_PM10_%05d.png','-b:v','5000k', output_dir+'movie_PM10_tiled_output.webm'])
+#check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_tiled_CO_%05d.png','-b:v','5000k', output_dir+'movie_CO_tiled_output.webm'])
 print('Colormesh done')
 
 #%%
@@ -314,9 +341,11 @@ extents = [[lat_min, lon_min], [lat_max, lon_max]]
 for sp in var_list:
     print('Plotting '+sp+' to Folium map')
     # Name variables
+#    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_output.webm'])
+#    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_tiled_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_tiled_output.webm'])
     png = base_dir+'maps/urbanova_emissions_basemap_1_'+sp+'.png'
     video1 = git_dir+'movie_'+sp+'_output.webm'
-    video2 = git_dir+'movie_'+sp+'_smooth_output.webm'
+    video2 = git_dir+'movie_'+sp+'_tiled_output.webm'
     
     #Plot average map
     folium.raster_layers.ImageOverlay(png,bounds = extents,name=sp,opacity = 0.5, show = False).add_to(m)
@@ -324,7 +353,7 @@ for sp in var_list:
     #Plot countourf video
     folium.raster_layers.VideoOverlay(video_url=video1,bounds = extents,name=sp+'_video',opacity = 0.5,attr = sp+'_video_map',show = False,autoplay=True).add_to(m)
     #Plot colormap video
-    folium.raster_layers.VideoOverlay(video_url=video2,bounds = extents,name=sp+'_smooth_video',opacity = 0.5,attr = sp+'_smooth_video_map',show = False,autoplay=True).add_to(m)
+    folium.raster_layers.VideoOverlay(video_url=video2,bounds = extents,name=sp+'_tiled_video',opacity = 0.5,attr = sp+'_tiled_video_map',show = False,autoplay=True).add_to(m)
 
 # Add ability to move between layers
 folium.LayerControl().add_to(m)
