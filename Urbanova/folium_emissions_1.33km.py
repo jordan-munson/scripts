@@ -108,7 +108,7 @@ with PdfPages(base_dir+'maps/urbanova_emissions_avg_basemap_' + '_'+ start.strft
         #m.drawcounties()
         #m.drawrivers()
 
-        cblabel = unit_list[i]
+        cblabel = sp + ' ' + unit_list[i]
         cbticks = True
         cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
         cbar.set_label(cblabel)
@@ -173,7 +173,7 @@ for i, sp in enumerate(var_list):
         #m.drawstates()
         #m.drawcountries()
         
-        cblabel = unit_list[i]
+        cblabel = sp + ' ' + unit_list[i]
         cbticks = True
         cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
         cbar.set_label(cblabel)
@@ -250,7 +250,7 @@ for i, sp in enumerate(var_list):
         cmap = plt.get_cmap('jet')
         colormesh = m.pcolormesh(x, y, airpact[sp][t,:,:], vmin = vmin,vmax=vmax, cmap=cmap)
         
-        cblabel = unit_list[i]
+        cblabel = sp + ' ' + unit_list[i]
         cbticks = True
         cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
         cbar.set_label(cblabel)
