@@ -13,21 +13,21 @@ import pickle
 #import simplekml
 
 # Set file paths
-# =============================================================================
-# base_dir=r'G:/Research/Urbanova_Jordan/'
-# data_dir= base_dir + '/Urbanova_ref_site_comparison/Urbanova/'
-# #grid_dir_4km=base_dir + '/Urbanova_ref_site_comparison/AIRPACT/2018/2018011100/MCIP37/'
-# grid_dir_urb=base_dir + '/Urbanova_ref_site_comparison/Urbanova/2018/2018011100/MCIP37/'
-# urb_path = data_dir
-# #airpact_path = base_dir + '/Urbanova_ref_site_comparison/AIRPACT/'
-# =============================================================================
+base_dir=r'G:/Research/Urbanova_Jordan/'
+data_dir= base_dir + '/Urbanova_ref_site_comparison/Urbanova/'
+#grid_dir_4km=base_dir + '/Urbanova_ref_site_comparison/AIRPACT/2018/2018011100/MCIP37/'
+grid_dir_urb=base_dir + '/Urbanova_ref_site_comparison/Urbanova/2018/2018011100/MCIP37/'
+urb_path = data_dir
+#airpact_path = base_dir + '/Urbanova_ref_site_comparison/AIRPACT/'
 
-base_dir = '/data/lar/users/jmunson/'
-data_dir = '/data/lar/projects/Urbanova/'
-grid_dir_urb = '/data/lar/projects/Urbanova/2018/2018011100/MCIP37/'
-grid_dir_4km='/data/airpact5/AIRRUN/2018/2018011100/MCIP37/'
-urb_path = '/data/lar/projects/Urbanova/'
-airpact_path = '/data/airpact5/saved/'
+# =============================================================================
+# base_dir = '/data/lar/users/jmunson/'
+# data_dir = '/data/lar/projects/Urbanova/'
+# grid_dir_urb = '/data/lar/projects/Urbanova/2018/2018011100/MCIP37/'
+# grid_dir_4km='/data/airpact5/AIRRUN/2018/2018011100/MCIP37/'
+# urb_path = '/data/lar/projects/Urbanova/'
+# airpact_path = '/data/airpact5/saved/'
+# =============================================================================
 
 start_year = 2018
 start_month = 1
@@ -36,7 +36,7 @@ start_day = 11
 end_year = 2018
 end_month = 1
 #end_day = monthrange(end_year, end_month)[1]
-end_day = 31
+end_day = 13
 
 exec(open("airpact_emissions_functions.py").read())
 # set start and end date

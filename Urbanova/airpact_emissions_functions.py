@@ -21,7 +21,7 @@ def readAIRPACTgas(infile,layer):
     gaslist = ['CO','BENZENE','NO','NO2']
     airpactgas = {}
     for k in gaslist:
-        airpactgas[k] = infile.variables[k][:,layer,:,:]
+        airpactgas[k] = infile.variables[k][:24,layer,:,:]
     return airpactgas
 
 def readAIRPACTaerosol(infile, layer):
@@ -30,7 +30,7 @@ def readAIRPACTaerosol(infile, layer):
     airpactaerosol = {}
     #airpactaero = {}
     for k in aerlist:
-        airpactaerosol[k] = infile.variables[k][:,layer,:,:] # 0 is for surface layer
+        airpactaerosol[k] = infile.variables[k][:24,layer,:,:] # 0 is for surface layer
     #airpactaero['ASO4IJ'] = np.add(airpactaerosol['ASO4I'],airpactaerosol['ASO4J'])
     #airpactaero['ANO3IJ'] = np.add(airpactaerosol['ANO3I'], airpactaerosol['ASO4J'])
     #airpactaero['ANH4IJ'] = np.add(airpactaerosol['ANH4I'], airpactaerosol['ASO4J'])
@@ -91,7 +91,7 @@ def get_airpact_DF(start, end, layer):
             else:
                 h=start.hour-8
             for i in list(modelarray0.keys()):
-                modelarray[i]=modelarray0[i][h:23,:,:]
+                modelarray[i]=modelarray0[i][h:,:,:]
             #modelmet = readairpactmet(nc)
             #modelarray.update(modelmet)
             

@@ -33,7 +33,7 @@ start_day = 11
 end_year = 2018
 end_month = 1
 #end_day = monthrange(end_year, end_month)[1]
-end_day = 13
+end_day = 31
 
 # set start and end date
 start = datetime.datetime(start_year, start_month, start_day, hour=0)
@@ -67,6 +67,18 @@ unit_list = ["moles/s", "$g/s$"]
 ############################################
 # Averaged domain basemaps       
 ############################################
+
+# Set the colorbar values
+CO_max = np.amax(airpact['CO']) # find max conc value
+pm_max = np.amax(airpact['PM10'])
+
+intervals = 12 # set desired interval number
+
+CO_steps = CO_max/intervals # Calculate necessary step amount to get correct interval
+pm_steps = pm_max/intervals
+CO_bins = np.arange(0, CO_max, CO_steps) # create the bins the colorbars are made from using previous calculated variables
+pm_bins = np.arange(0, pm_max, pm_steps)
+
 #save maps into the pdf file (two maps in single page)
 with PdfPages(base_dir+'maps/urbanova_emissions_avg_basemap_' + '_'+ start.strftime("%Y%m%d") + '-' +  end.strftime("%Y%m%d") + '.pdf') as pdf:
     
@@ -74,10 +86,7 @@ with PdfPages(base_dir+'maps/urbanova_emissions_avg_basemap_' + '_'+ start.strft
         
         fig = plt.figure(figsize=(14,10))
         #plt.title(sp)
-        CO_max = 5
-        pm_max = 5
-        CO_bins = np.arange(0, CO_max, .5)
-        pm_bins = np.arange(0, pm_max, .5)
+
         # compute auto color-scale using maximum concentrations
         down_scale = np.percentile(airpact[sp], 5)
         up_scale = np.percentile(airpact[sp], 95)
