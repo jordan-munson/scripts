@@ -50,6 +50,9 @@ def load_obj(name ):
         return pickle.load(f)
 airpact = load_obj(name)
 
+# Create NOX from NO and NO2
+airpact['NOX'] = airpact['NO2']+airpact['NO']
+
 # obtain model lat and lon - needed for AQS eval and basemap
 lat = airpact['lat'][0]
 lon = airpact['lon'][0]
@@ -61,9 +64,12 @@ m = Basemap(projection='merc',
               resolution='h',
               area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
 x,y = m(lon,lat)
-var_list = ["CO", "PM10"]
-unit_list = ["moles/s", "$g/s$"]
+var_list = ["CO", "PM10", 'BENZENE','PMFINE','NOX']
+unit_list = ["moles/h", "$g/h$","moles/h","$g/h$","moles/h"]
 
+#Convert from units/second to units/hour to make visualization easier
+for sp in var_list:
+    airpact[sp] = airpact[sp]*3600
 ############################################
 # Averaged domain basemaps       
 ############################################
@@ -71,13 +77,23 @@ unit_list = ["moles/s", "$g/s$"]
 # Set the colorbar values
 CO_max = np.amax(airpact['CO']) # find max conc value
 pm_max = np.amax(airpact['PM10'])
+benz_max = np.amax(airpact['BENZENE'])
+pmf_max = np.amax(airpact['PMFINE'])
+nox_max = np.amax(airpact['NOX'])
 
 intervals = 12 # set desired interval number
 
 CO_steps = CO_max/intervals # Calculate necessary step amount to get correct interval
 pm_steps = pm_max/intervals
+benz_steps = benz_max/intervals
+pmf_steps = pmf_max/intervals
+nox_steps = nox_max/intervals
+
 CO_bins = np.arange(0, CO_max, CO_steps) # create the bins the colorbars are made from using previous calculated variables
 pm_bins = np.arange(0, pm_max, pm_steps)
+benz_bins = np.arange(0, benz_max, benz_steps)
+pmf_bins = np.arange(0, pmf_max, pmf_steps)
+nox_bins = np.arange(0, nox_max, nox_steps)
 
 #save maps into the pdf file (two maps in single page)
 with PdfPages(base_dir+'maps/urbanova_emissions_avg_basemap_' + '_'+ start.strftime("%Y%m%d") + '-' +  end.strftime("%Y%m%d") + '.pdf') as pdf:
@@ -92,6 +108,12 @@ with PdfPages(base_dir+'maps/urbanova_emissions_avg_basemap_' + '_'+ start.strft
         up_scale = np.percentile(airpact[sp], 95)
         if sp == "CO":
             clevs = CO_bins
+        elif sp == 'BENZENE':
+            clevs = benz_bins
+        elif sp == 'PMFINE':
+            clevs = pmf_bins
+        elif sp == 'NOX':
+            clevs = nox_bins
         else:
             clevs = pm_bins
         #clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10),3)
@@ -108,7 +130,7 @@ with PdfPages(base_dir+'maps/urbanova_emissions_avg_basemap_' + '_'+ start.strft
         #m.drawcounties()
         #m.drawrivers()
 
-        cblabel = sp + ' ' + unit_list[i]
+        cblabel = sp + ' (' + unit_list[i] +')'
         cbticks = True
         cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
         cbar.set_label(cblabel)
@@ -171,7 +193,7 @@ for i, sp in enumerate(var_list):
         #m.drawstates()
         #m.drawcountries()
         
-        cblabel = sp + ' ' + unit_list[i]
+        cblabel = sp + ' (' + unit_list[i] +')'
         cbticks = True
         cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
         cbar.set_label(cblabel)
@@ -246,7 +268,7 @@ for i, sp in enumerate(var_list):
         cmap = plt.get_cmap('jet')
         colormesh = m.pcolormesh(x, y, airpact[sp][t,:,:], vmin = vmin,vmax=vmax, cmap=cmap)
         
-        cblabel = sp + ' ' + unit_list[i]
+        cblabel = sp + ' (' + unit_list[i] +')'
         cbticks = True
         cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
         cbar.set_label(cblabel)
