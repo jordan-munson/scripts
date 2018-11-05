@@ -68,7 +68,7 @@ unit_list = ["moles/s", "$g/s$"]
 # Averaged domain basemaps       
 ############################################
 #save maps into the pdf file (two maps in single page)
-with PdfPages(base_dir+'maps/urbanova_avg_basemap_' + '_'+ start.strftime("%Y%m%d") + '-' +  end.strftime("%Y%m%d") + '.pdf') as pdf:
+with PdfPages(base_dir+'maps/urbanova_emissions_avg_basemap_' + '_'+ start.strftime("%Y%m%d") + '-' +  end.strftime("%Y%m%d") + '.pdf') as pdf:
     
     for i, sp in enumerate(var_list):
         
@@ -112,7 +112,7 @@ with PdfPages(base_dir+'maps/urbanova_avg_basemap_' + '_'+ start.strftime("%Y%m%
             #plt.annotate("mean: " + str(airpact[sp].mean(axis=0).mean()) +" moles/s", xy=(0, 1.02), xycoords='axes fraction')
         #else:
             #plt.annotate("mean: " + str(airpact[sp].mean(axis=0).mean()) +" $g/s$", xy=(0, 1.02), xycoords='axes fraction')
-        outpng = base_dir +'maps/urbanova_basemap_' +str(end_month)+'_'+ sp + '.png'
+        outpng = base_dir +'maps/urbanova_emissions_basemap_' +str(end_month)+'_'+ sp + '.png'
         print(outpng)
         #fig.savefig(fig) 
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
@@ -137,7 +137,7 @@ with PdfPages(base_dir+'maps/urbanova_avg_basemap_' + '_'+ start.strftime("%Y%m%
 #     
 #     for t in range(0, len(airpact[sp])): 
 #             
-#         outpng = base_dir +'maps/daily_basemap/airpact_hourly_basemap_' + sp + '_%05d.png' % t
+#         outpng = base_dir +'maps/daily_basemap/airpact_emissions_hourly_basemap_' + sp + '_%05d.png' % t
 #         print(outpng)
 #         
 #         fig = plt.figure(figsize=(14,10))
@@ -184,8 +184,8 @@ with PdfPages(base_dir+'maps/urbanova_avg_basemap_' + '_'+ start.strftime("%Y%m%
 # 
 # # Attempt to run ffmpeg 
 # os.chdir('G:/Research/Urbanova_Jordan')
-# check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_PM10_%05d.png','-b:v','5000k', output_dir+'movie_PM10_output.webm'])
-# check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_CO_%05d.png','-b:v','5000k', output_dir+'movie_CO_output.webm'])
+# check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_PM10_%05d.png','-b:v','5000k', output_dir+'movie_PM10_output.webm'])
+# check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_CO_%05d.png','-b:v','5000k', output_dir+'movie_CO_output.webm'])
 # print('Videos made')
 # #%%
 # 
@@ -207,7 +207,7 @@ with PdfPages(base_dir+'maps/urbanova_avg_basemap_' + '_'+ start.strftime("%Y%m%
 #     
 #     for t in range(0, len(airpact[sp])): 
 #             
-#         outpng = base_dir +'maps/daily_basemap/airpact_hourly_basemap_smooth_' + sp + '_%05d.png' % t
+#         outpng = base_dir +'maps/daily_basemap/airpact_emissions_hourly_basemap_smooth_' + sp + '_%05d.png' % t
 #         print(outpng)
 #         
 #         fig = plt.figure(figsize=(14,10))
@@ -261,8 +261,8 @@ with PdfPages(base_dir+'maps/urbanova_avg_basemap_' + '_'+ start.strftime("%Y%m%
 # 
 # # Attempt to run ffmpeg 
 # os.chdir('G:/Research/Urbanova_Jordan')
-# check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_smooth_PM10_%05d.png','-b:v','5000k', output_dir+'movie_PM10_smooth_output.webm'])
-# check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_smooth_CO_%05d.png','-b:v','5000k', output_dir+'movie_CO_smooth_output.webm'])
+# check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_smooth_PM10_%05d.png','-b:v','5000k', output_dir+'movie_PM10_smooth_output.webm'])
+# check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_smooth_CO_%05d.png','-b:v','5000k', output_dir+'movie_CO_smooth_output.webm'])
 # print('Videos made')
 # 
 # =============================================================================
@@ -282,8 +282,8 @@ lat_max=np.amax(airpact['lat'])
 extents = [[lat_min, lon_min], [lat_max, lon_max]]
 
 # Set paths to monthly average maps
-png1 = base_dir+'maps/urbanova_basemap_1_CO.png'
-png2 = base_dir+'maps/urbanova_basemap_1_PM10.png'
+png1 = base_dir+'maps/urbanova_emissions_basemap_1_CO.png'
+png2 = base_dir+'maps/urbanova_emissions_basemap_1_PM10.png'
 
 # Set paths to videos
 video1 = git_dir+'movie_CO_output.webm'
@@ -309,7 +309,7 @@ folium.raster_layers.VideoOverlay(video_url=video4,bounds = extents,name='PM_smo
 folium.LayerControl().add_to(m)
 
 # Save and show the created map. Use Jupyter to see the map within your console
-m.save(output_dir+'folium_ozone_pm_map.html')
+m.save(output_dir+'folium_emissions_map.html')
 m
 print('done')
 
