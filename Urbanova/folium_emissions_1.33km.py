@@ -156,6 +156,7 @@ m = Basemap(projection='merc',
               resolution='h',
               area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
 x,y = m(lon,lat)
+os.chdir('G:/Research/Urbanova_Jordan') # needed for ffmpeg
 ############################################
 # hourly domain basemaps, this takes lots of time if doing hourly. Switch to daily could be prudent over a long timespan
 ############################################
@@ -205,16 +206,18 @@ for i, sp in enumerate(var_list):
         
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False) 
         plt.show()
+    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_output.webm'])
+
 # This requires ffmpeg program, which is not easy to install in aeolus/kamiak
 # To make a video, download all the pngs in your computer and execute the command below
 # "ffmpeg -y -framerate 10 -i G:\Research\Urbanova_Jordan\maps\daily_basemap\airpact_hourly_basemap_PM10_%05d.png -b:v 5000k G:\Research\Urbanova_Jordan\maps\daily_basemap\movie_PM10_output.webm" 
 # "ffmpeg -y -framerate 10 -i G:\Research\Urbanova_Jordan\maps\daily_basemap\airpact_hourly_basemap_CO_%05d.png -b:v 5000k G:\Research\Urbanova_Jordan\maps\daily_basemap\movie_CO_output.webm" 
 
 # Attempt to run ffmpeg 
-os.chdir('G:/Research/Urbanova_Jordan')
-check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_PM10_%05d.png','-b:v','5000k', output_dir+'movie_PM10_output.webm'])
-check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_CO_%05d.png','-b:v','5000k', output_dir+'movie_CO_output.webm'])
-print('Videos made')
+
+#check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_PM10_%05d.png','-b:v','5000k', output_dir+'movie_PM10_output.webm'])
+#check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_CO_%05d.png','-b:v','5000k', output_dir+'movie_CO_output.webm'])
+print('Contourf done')
 #%%
 
 #base map
@@ -280,16 +283,18 @@ for i, sp in enumerate(var_list):
         
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False) 
         plt.show()
+    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_smooth_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_smooth_output.webm'])
+
 # This requires ffmpeg program, which is not easy to install in aeolus/kamiak
 # To make a video, download all the pngs in your computer and execute the command below
 # "ffmpeg -y -framerate 10 -i G:\Research\Urbanova_Jordan\maps\daily_basemap\airpact_hourly_basemap_PM10_%05d.png -b:v 5000k G:\Research\Urbanova_Jordan\maps\daily_basemap\movie_PM10_output.webm" 
 # "ffmpeg -y -framerate 10 -i G:\Research\Urbanova_Jordan\maps\daily_basemap\airpact_hourly_basemap_CO_%05d.png -b:v 5000k G:\Research\Urbanova_Jordan\maps\daily_basemap\movie_CO_output.webm" 
 
 # Attempt to run ffmpeg 
-os.chdir('G:/Research/Urbanova_Jordan')
-check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_smooth_PM10_%05d.png','-b:v','5000k', output_dir+'movie_PM10_smooth_output.webm'])
-check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_smooth_CO_%05d.png','-b:v','5000k', output_dir+'movie_CO_smooth_output.webm'])
-print('Videos made')
+#os.chdir('G:/Research/Urbanova_Jordan')
+#check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_smooth_PM10_%05d.png','-b:v','5000k', output_dir+'movie_PM10_smooth_output.webm'])
+#check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_smooth_CO_%05d.png','-b:v','5000k', output_dir+'movie_CO_smooth_output.webm'])
+print('Colormesh done')
 
 #%%
 ######################################
