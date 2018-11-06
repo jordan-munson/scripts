@@ -71,7 +71,7 @@ unit_list = ["ppb", "$ug/m^3$"]
 with PdfPages(base_dir+'maps/urbanova_avg_basemap_' + '_'+ start.strftime("%Y%m%d") + '-' +  end.strftime("%Y%m%d") + '.pdf') as pdf:
     
     for i, sp in enumerate(var_list):
-        
+        plt.style.use("dark_background")
         fig = plt.figure(figsize=(14,10))
         #plt.title(sp)
         o3_max = 45
@@ -206,7 +206,8 @@ with PdfPages(base_dir+'maps/urbanova_avg_basemap_' + '_'+ start.strftime("%Y%m%
 # for i, sp in enumerate(var_list):
 #     
 #     for t in range(0, len(airpact[sp])): 
-#             
+#         plt.style.use("dark_background")
+#            
 #         outpng = base_dir +'maps/daily_basemap/airpact_hourly_basemap_smooth_' + sp + '_%05d.png' % t
 #         print(outpng)
 #         
