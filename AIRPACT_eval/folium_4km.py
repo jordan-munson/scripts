@@ -28,12 +28,12 @@ git_dir = 'https://github.com/jordan-munson/scripts/raw/master/folium_files/'
 # Set times
 start_year = 2018
 start_month = 1
-start_day = 11
+start_day = 1
 
 end_year = 2018
 end_month = 1
 #end_day = monthrange(end_year, end_month)[1]
-end_day = 13
+end_day = 31
 
 # set start and end date
 start = datetime.datetime(start_year, start_month, start_day, hour=0)

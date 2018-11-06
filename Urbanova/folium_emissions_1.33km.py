@@ -151,7 +151,7 @@ with PdfPages(base_dir+'maps/urbanova_emissions_avg_basemap_' + '_'+ start.strft
         #cbaxes=fig.add_axes([0.8,0.1,0.03,0.8])
         #cbaxes.tick_params(axis='both', colors='white')
      
-        plt.annotate("mean: " + str(round(airpact[sp].mean(),2)) + " "+ unit_list[i], xy=(0, 0.98), xycoords='axes fraction')
+        plt.annotate("mean: " + str(round(airpact[sp].mean(),2)) + " "+ unit_list[i], xy=(0.02, 0.98), xycoords='axes fraction')
         outpng = base_dir +'maps/urbanova_emissions_basemap_' +str(end_month)+'_'+ sp + '.png'
         print(outpng)
         #fig.savefig(fig) 
@@ -218,7 +218,7 @@ for i, sp in enumerate(var_list):
             cbar.set_ticks(clevs)
         
         # print the surface-layer mean on the map plot
-        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0, 0.98), xycoords='axes fraction')
+        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0.02, 0.98), xycoords='axes fraction')
         
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False) 
         plt.show()
@@ -304,7 +304,7 @@ for i, sp in enumerate(var_list):
         #    cbar.set_ticks(clevs)
         
         # print the surface-layer mean on the map plot
-        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0, 0.98), xycoords='axes fraction')
+        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0.02, 0.98), xycoords='axes fraction')
         
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False) 
         plt.show()
