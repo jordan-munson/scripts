@@ -194,8 +194,8 @@ for i, sp in enumerate(var_list):
 
 # Attempt to run ffmpeg 
 os.chdir('G:/Research/Urbanova_Jordan')
-check_call(['ffmpeg', '-y', '-framerate','8', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_PMIJ_%05d.png','-b:v','5000k', output_dir+'movie_PMIJ_output.webm'])
-check_call(['ffmpeg', '-y', '-framerate','8', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_O3_%05d.png','-b:v','5000k', output_dir+'movie_O3_output.webm'])
+check_call(['ffmpeg', '-y', '-framerate','5', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_PMIJ_%05d.png','-b:v','5000k', output_dir+'movie_PMIJ_output.webm'])
+check_call(['ffmpeg', '-y', '-framerate','5', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_O3_%05d.png','-b:v','5000k', output_dir+'movie_O3_output.webm'])
 print('Videos made')
 #%%
 
@@ -277,8 +277,8 @@ for i, sp in enumerate(var_list):
 
 # Attempt to run ffmpeg 
 os.chdir('G:/Research/Urbanova_Jordan')
-check_call(['ffmpeg', '-y', '-framerate','8', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_tiled_PMIJ_%05d.png','-b:v','5000k', output_dir+'movie_PMIJ_tiled_output.webm'])
-check_call(['ffmpeg', '-y', '-framerate','8', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_tiled_O3_%05d.png','-b:v','5000k', output_dir+'movie_O3_tiled_output.webm'])
+check_call(['ffmpeg', '-y', '-framerate','5', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_tiled_PMIJ_%05d.png','-b:v','5000k', output_dir+'movie_PMIJ_tiled_output.webm'])
+check_call(['ffmpeg', '-y', '-framerate','5', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_tiled_O3_%05d.png','-b:v','5000k', output_dir+'movie_O3_tiled_output.webm'])
 print('Videos made')
 
 #%%
@@ -305,10 +305,6 @@ video1 = git_dir+'movie_O3_output.webm'
 video2 = git_dir+'movie_PMIJ_output.webm'
 video3 = git_dir+'movie_O3_tiled_output.webm'
 video4 = git_dir+'movie_PMIJ_tiled_output.webm'
-#video1 = output_dir+'movie_O3_output.webm'
-#video2 = output_dir+'movie_PMIJ_output.webm'
-#video3 = output_dir+'movie_O3_tiled_output.webm'
-#video4 = output_dir+'movie_PMIJ_tiled_output.webm'
 
 # Add monthly average maps to Folium
 folium.raster_layers.ImageOverlay(png1,bounds = extents,name='Ozone',opacity = 0.5, show = False).add_to(m)
