@@ -19,6 +19,8 @@ import folium
 import os
 from subprocess import check_call 
 from mpl_toolkits.basemap import Basemap
+from pytz import timezone
+from datetime import timedelta
 
 # Set file paths
 base_dir=r'G:/Research/Urbanova_Jordan/'
@@ -152,7 +154,7 @@ with PdfPages(base_dir+'maps/urbanova_emissions_avg_basemap_' + '_'+ start.strft
         #cbaxes.tick_params(axis='both', colors='white')
      
         plt.annotate("mean: " + str(round(airpact[sp].mean(),2)) + " "+ unit_list[i], xy=(0.02, 0.98), xycoords='axes fraction')
-        outpng = base_dir +'maps/urbanova_emissions_basemap_' +str(end_month)+'_'+ sp + '.png'
+        outpng = output_dir +'urbanova_emissions_basemap_' +str(end_month)+'_'+ sp + '.png'
         print(outpng)
         #fig.savefig(fig) 
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
@@ -217,12 +219,17 @@ for i, sp in enumerate(var_list):
         if cbticks:
             cbar.set_ticks(clevs)
         
+        # Convert to PST
+        try:
+            datetime_object = str(datetime.datetime.strptime(airpact["DateTime"][t,0,0], '%Y%m%d %H:%M %Z') - timedelta(hours=8))
+        except ValueError:
+            pass
         # print the surface-layer mean on the map plot
-        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0.02, 0.98), xycoords='axes fraction')
+        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + datetime_object + ' PST', xy=(0.04, 0.98), xycoords='axes fraction')
         
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False) 
         plt.show()
-    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_output.webm'])
+    check_call(['ffmpeg', '-y', '-framerate','8', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_output.webm'])
 
 # This requires ffmpeg program, which is not easy to install in aeolus/kamiak
 # To make a video, download all the pngs in your computer and execute the command below
@@ -303,12 +310,17 @@ for i, sp in enumerate(var_list):
         #if cbticks:
         #    cbar.set_ticks(clevs)
         
+        # Convert to PST
+        try:
+            datetime_object = str(datetime.datetime.strptime(airpact["DateTime"][t,0,0], '%Y%m%d %H:%M %Z') - timedelta(hours=8))
+        except ValueError:
+            pass
         # print the surface-layer mean on the map plot
-        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0.02, 0.98), xycoords='axes fraction')
+        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + datetime_object + ' PST', xy=(0.04, 0.98), xycoords='axes fraction')
         
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False) 
         plt.show()
-    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_tiled_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_tiled_output.webm'])
+    check_call(['ffmpeg', '-y', '-framerate','8', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_tiled_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_tiled_output.webm'])
 
 # This requires ffmpeg program, which is not easy to install in aeolus/kamiak
 # To make a video, download all the pngs in your computer and execute the command below
@@ -341,7 +353,7 @@ for sp in var_list:
     # Name variables
 #    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_output.webm'])
 #    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_tiled_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_tiled_output.webm'])
-    png = base_dir+'maps/urbanova_emissions_basemap_1_'+sp+'.png'
+    png = git_dir+'urbanova_emissions_basemap_1_'+sp+'.png'
     video1 = git_dir+'movie_'+sp+'_output.webm'
     video2 = git_dir+'movie_'+sp+'_tiled_output.webm'
     

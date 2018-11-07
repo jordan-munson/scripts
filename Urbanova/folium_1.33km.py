@@ -20,7 +20,7 @@ import os
 from subprocess import check_call 
 from mpl_toolkits.basemap import Basemap
 from pytz import timezone
-from datetime import datetime
+from datetime import timedelta
 
 # Set file paths
 base_dir=r'G:/Research/Urbanova_Jordan/'
@@ -55,9 +55,6 @@ airpact = load_obj(name)
 # obtain model lat and lon - needed for AQS eval and basemap
 lat = airpact['lat'][0]
 lon = airpact['lon'][0]
-
-airpact['DateTime'] = airpact['DateTime'] - 8
-airpact['DateTime'] = airpact['DateTime'].astimezone(timezone('US/Pacific'))
 
 #%%
 #base map
@@ -121,7 +118,7 @@ with PdfPages(base_dir+'maps/urbanova_avg_basemap_' + '_'+ start.strftime("%Y%m%
             #plt.annotate("mean: " + str(airpact[sp].mean(axis=0).mean()) +" ppb", xy=(0, 1.02), xycoords='axes fraction')
         #else:
             #plt.annotate("mean: " + str(airpact[sp].mean(axis=0).mean()) +" $ug/m^3$", xy=(0, 1.02), xycoords='axes fraction')
-        outpng = base_dir +'maps/urbanova_basemap_' +str(end_month)+'_'+ sp + '.png'
+        outpng = output_dir +'urbanova_basemap_' +str(end_month)+'_'+ sp + '.png'
         print(outpng)
         #fig.savefig(fig) 
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
@@ -179,11 +176,14 @@ for i, sp in enumerate(var_list):
         cbar.set_label(cblabel)
         if cbticks:
             cbar.set_ticks(clevs)
-            
-        #datetime_object = datetime.strptime(str(airpact["DateTime"][t,0,0]), '%Y%m%d %I:%M')
-
+        
+        # Convert to PST
+        try:
+            datetime_object = str(datetime.datetime.strptime(airpact["DateTime"][t,0,0], '%Y%m%d %H:%M %Z') - timedelta(hours=8))
+        except ValueError:
+            pass
         # print the surface-layer mean on the map plot
-        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0.04, 0.98), xycoords='axes fraction')
+        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + datetime_object + ' PST', xy=(0.04, 0.98), xycoords='axes fraction')
         
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False) 
         plt.show()
@@ -194,8 +194,8 @@ for i, sp in enumerate(var_list):
 
 # Attempt to run ffmpeg 
 os.chdir('G:/Research/Urbanova_Jordan')
-check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_PMIJ_%05d.png','-b:v','5000k', output_dir+'movie_PMIJ_output.webm'])
-check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_O3_%05d.png','-b:v','5000k', output_dir+'movie_O3_output.webm'])
+check_call(['ffmpeg', '-y', '-framerate','8', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_PMIJ_%05d.png','-b:v','5000k', output_dir+'movie_PMIJ_output.webm'])
+check_call(['ffmpeg', '-y', '-framerate','8', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_O3_%05d.png','-b:v','5000k', output_dir+'movie_O3_output.webm'])
 print('Videos made')
 #%%
 
@@ -259,9 +259,14 @@ for i, sp in enumerate(var_list):
         cbar.set_label(cblabel)
         if cbticks:
             cbar.set_ticks(clevs)
-        
+            
+        # Convert to PST
+        try:
+            datetime_object = str(datetime.datetime.strptime(airpact["DateTime"][t,0,0], '%Y%m%d %H:%M %Z') - timedelta(hours=8))
+        except ValueError:
+            pass
         # print the surface-layer mean on the map plot
-        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0.04, 0.98), xycoords='axes fraction')
+        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + datetime_object + ' PST', xy=(0.04, 0.98), xycoords='axes fraction')
         
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False) 
         plt.show()
@@ -272,8 +277,8 @@ for i, sp in enumerate(var_list):
 
 # Attempt to run ffmpeg 
 os.chdir('G:/Research/Urbanova_Jordan')
-check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_tiled_PMIJ_%05d.png','-b:v','5000k', output_dir+'movie_PMIJ_tiled_output.webm'])
-check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_tiled_O3_%05d.png','-b:v','5000k', output_dir+'movie_O3_tiled_output.webm'])
+check_call(['ffmpeg', '-y', '-framerate','8', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_tiled_PMIJ_%05d.png','-b:v','5000k', output_dir+'movie_PMIJ_tiled_output.webm'])
+check_call(['ffmpeg', '-y', '-framerate','8', '-i',base_dir+'maps/daily_basemap/airpact_hourly_basemap_tiled_O3_%05d.png','-b:v','5000k', output_dir+'movie_O3_tiled_output.webm'])
 print('Videos made')
 
 #%%
@@ -292,8 +297,8 @@ lat_max=np.amax(airpact['lat'])
 extents = [[lat_min, lon_min], [lat_max, lon_max]]
 
 # Set paths to monthly average maps
-png1 = base_dir+'maps/urbanova_basemap_1_O3.png'
-png2 = base_dir+'maps/urbanova_basemap_1_PMIJ.png'
+png1 = git_dir+'urbanova_basemap_1_O3.png'
+png2 = git_dir+'urbanova_basemap_1_PMIJ.png'
 
 # Set paths to videos
 video1 = git_dir+'movie_O3_output.webm'
