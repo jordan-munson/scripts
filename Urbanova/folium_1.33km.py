@@ -19,6 +19,8 @@ import folium
 import os
 from subprocess import check_call 
 from mpl_toolkits.basemap import Basemap
+from pytz import timezone
+from datetime import datetime
 
 # Set file paths
 base_dir=r'G:/Research/Urbanova_Jordan/'
@@ -53,6 +55,10 @@ airpact = load_obj(name)
 # obtain model lat and lon - needed for AQS eval and basemap
 lat = airpact['lat'][0]
 lon = airpact['lon'][0]
+
+airpact['DateTime'] = airpact['DateTime'] - 8
+airpact['DateTime'] = airpact['DateTime'].astimezone(timezone('US/Pacific'))
+
 #%%
 #base map
 m = Basemap(projection='merc',
@@ -75,9 +81,9 @@ with PdfPages(base_dir+'maps/urbanova_avg_basemap_' + '_'+ start.strftime("%Y%m%
         fig = plt.figure(figsize=(14,10))
         #plt.title(sp)
         o3_max = 45
-        pm_max = 30
+        pm_max = 40
         o3_bins = np.arange(0, o3_max, 5)
-        pm_bins = np.arange(0, pm_max, 3)
+        pm_bins = np.arange(0, pm_max, 5)
         # compute auto color-scale using maximum concentrations
         down_scale = np.percentile(airpact[sp], 5)
         up_scale = np.percentile(airpact[sp], 95)
@@ -103,6 +109,9 @@ with PdfPages(base_dir+'maps/urbanova_avg_basemap_' + '_'+ start.strftime("%Y%m%
         cbticks = True
         cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
         cbar.set_label(cblabel)
+        
+        
+        plt.annotate("mean: " + str(round(airpact[sp].mean(),2)) + " "+ unit_list[i], xy=(0.04, 0.98), xycoords='axes fraction')
         
         #if cbticks:
         #    cbar.set_ticks(clevs)
@@ -170,9 +179,11 @@ for i, sp in enumerate(var_list):
         cbar.set_label(cblabel)
         if cbticks:
             cbar.set_ticks(clevs)
-        
+            
+        #datetime_object = datetime.strptime(str(airpact["DateTime"][t,0,0]), '%Y%m%d %I:%M')
+
         # print the surface-layer mean on the map plot
-        plt.annotate("mean: " + str(airpact[sp][t,:,:].mean()) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0.02, 0.98), xycoords='axes fraction')
+        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0.04, 0.98), xycoords='axes fraction')
         
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False) 
         plt.show()
@@ -250,7 +261,7 @@ for i, sp in enumerate(var_list):
             cbar.set_ticks(clevs)
         
         # print the surface-layer mean on the map plot
-        plt.annotate("mean: " + str(airpact[sp][t,:,:].mean()) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0.02, 0.98), xycoords='axes fraction')
+        plt.annotate("mean: " + str(round(airpact[sp][t,:,:].mean(),2)) + " "+ unit_list[i] + ' at ' + airpact["DateTime"][t,0,0], xy=(0.04, 0.98), xycoords='axes fraction')
         
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False) 
         plt.show()
