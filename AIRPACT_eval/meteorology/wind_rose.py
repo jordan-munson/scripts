@@ -15,8 +15,8 @@ import numpy as np
 import matplotlib.ticker as tkr
 
 # Set directories
-inputdir = r'E:/Research/AIRPACT_eval/meteorology/'
-outputdir = r'E:/Research/AIRPACT_eval/meteorology/AQS_plots/windrose/'
+inputdir = r'G:/Research/AIRPACT_eval/meteorology/'
+outputdir = r'G:/Research/AIRPACT_eval/meteorology/AQS_plots/windrose/'
 
 #Load data
 df_airpact = pd.read_csv(inputdir+'df_airpact.csv').drop(['Unnamed: 0','lat','lon'],axis=1)
