@@ -55,11 +55,18 @@ airpact = load_obj(name)
 # obtain model lat and lon - needed for AQS eval and basemap
 lat = airpact['lat'][0]
 lon = airpact['lon'][0]
+
+# mins and max's of the plot
+llcrnrlon=np.amin(airpact['lon'])
+llcrnrlat=np.amin(airpact['lat'])
+urcrnrlon=np.amax(airpact['lon'])
+urcrnrlat=np.amax(airpact['lat'])
+
 #%%
 #base map
 m = Basemap(projection='merc',
-              llcrnrlon = lon[0,0], urcrnrlon = lon[258-1,285 -1], 
-              llcrnrlat = lat[0,0], urcrnrlat = lat[258-1,285-1],
+              llcrnrlon = llcrnrlon, urcrnrlon = urcrnrlon, 
+              llcrnrlat = llcrnrlat, urcrnrlat = urcrnrlat,
               resolution='h',
               area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
 x,y = m(lon,lat)
@@ -80,6 +87,13 @@ with PdfPages(base_dir+'4km_avg_basemap_' + '_'+ start.strftime("%Y%m%d") + '-' 
         pm_max = 40
         o3_bins = np.arange(0, o3_max, 5)
         pm_bins = np.arange(0, pm_max, 5)
+        vmin = 0
+        if sp == "O3":
+            clevs = o3_bins
+            vmax = o3_max
+        else:
+            clevs = pm_bins
+            vmax = pm_max
         # compute auto color-scale using maximum concentrations
         down_scale = np.percentile(airpact[sp], 5)
         up_scale = np.percentile(airpact[sp], 95)
@@ -90,14 +104,16 @@ with PdfPages(base_dir+'4km_avg_basemap_' + '_'+ start.strftime("%Y%m%d") + '-' 
         #clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10),3)
         print("debug clevs", clevs, sp)
         
-
-        cs = m.contourf(x,y,airpact[sp].mean(axis=0),clevs,cmap=plt.get_cmap('jet'), extend='both')
-        cs.cmap.set_under('cyan')
-        cs.cmap.set_over('black')
+        cmap = plt.get_cmap('jet')
+        colormesh = m.pcolormesh(x, y, airpact[sp].mean(axis=0), vmin = vmin,vmax=vmax, cmap=cmap)
         
-        #m.drawcoastlines()
-        #m.drawstates()
-        #m.drawcountries()
+        #cs = m.contourf(x,y,airpact[sp].mean(axis=0),clevs,cmap=plt.get_cmap('jet'), extend='both')
+        #cs.cmap.set_under('cyan')
+        colormesh.cmap.set_over('black')
+        
+        m.drawcoastlines()
+        m.drawstates()
+        m.drawcountries()
         #m.drawcounties()
         #m.drawrivers()
 
