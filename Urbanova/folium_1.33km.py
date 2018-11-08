@@ -243,7 +243,7 @@ for i, sp in enumerate(var_list):
 
         #cs = m.contourf(x,y,airpact[sp][t,:,:],clevs,cmap=plt.get_cmap('jet'), extend='both')
         #cs.cmap.set_under('cyan')
-        #cs.cmap.set_over('black')
+
         
         #m.drawcoastlines()
         #m.drawstates()
@@ -252,7 +252,7 @@ for i, sp in enumerate(var_list):
         # These two lines below change the map to continuos. However this muddles the image
         cmap = plt.get_cmap('jet')
         colormesh = m.pcolormesh(x, y, airpact[sp][t,:,:], vmin = vmin,vmax=vmax, cmap=cmap)
-        
+        colormesh.cmap.set_over('black')
         cblabel = unit_list[i]
         cbticks = True
         cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
