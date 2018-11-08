@@ -8,7 +8,7 @@ Created on Mon Oct 22 16:58:32 2018
 
 #Import libraries
 import matplotlib
-matplotlib.use('Agg')  # Uncomment this when using in Kamiak/Aeolus
+#matplotlib.use('Agg')  # Uncomment this when using in Kamiak/Aeolus
 import numpy as np
 import datetime
 import pytz
