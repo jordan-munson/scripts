@@ -15,7 +15,7 @@
     <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
     <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
     
-    <style>#map_a94c8bd54dd544949774e8f7ed4713fa {
+    <style>#map_abb32fce33e84e288884179b97cc2ef9 {
         position: relative;
         width: 100.0%;
         height: 100.0%;
@@ -36,7 +36,7 @@
 </head>
 <body>    
     
-    <div class="folium-map" id="map_a94c8bd54dd544949774e8f7ed4713fa" ></div>
+    <div class="folium-map" id="map_abb32fce33e84e288884179b97cc2ef9" ></div>
 </body>
 <script>    
     
@@ -44,8 +44,8 @@
         var bounds = null;
     
 
-    var map_a94c8bd54dd544949774e8f7ed4713fa = L.map(
-        'map_a94c8bd54dd544949774e8f7ed4713fa', {
+    var map_abb32fce33e84e288884179b97cc2ef9 = L.map(
+        'map_abb32fce33e84e288884179b97cc2ef9', {
         center: [45.4072, -117.5004],
         zoom: 7,
         maxBounds: bounds,
@@ -57,7 +57,7 @@
 
     
     
-    var tile_layer_cb32f7e4808c4048a1518ae01ecba1f6 = L.tileLayer(
+    var tile_layer_08f3ff8610d74e3abf9a54f9a0753db4 = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
         "attribution": null,
@@ -67,20 +67,20 @@
         "minZoom": 0,
         "noWrap": false,
         "subdomains": "abc"
-}).addTo(map_a94c8bd54dd544949774e8f7ed4713fa);
+}).addTo(map_abb32fce33e84e288884179b97cc2ef9);
     
-                var lat_lng_popup_e92a28c2f7144a70b2730028de02ce83 = L.popup();
+                var lat_lng_popup_4aedecfa58934eb88164832de675ada3 = L.popup();
                 function latLngPop(e) {
-                    lat_lng_popup_e92a28c2f7144a70b2730028de02ce83
+                    lat_lng_popup_4aedecfa58934eb88164832de675ada3
                         .setLatLng(e.latlng)
                         .setContent("Latitude: " + e.latlng.lat.toFixed(4) +
                                     "<br>Longitude: " + e.latlng.lng.toFixed(4))
-                        .openOn(map_a94c8bd54dd544949774e8f7ed4713fa);
+                        .openOn(map_abb32fce33e84e288884179b97cc2ef9);
                     }
-                map_a94c8bd54dd544949774e8f7ed4713fa.on('click', latLngPop);
+                map_abb32fce33e84e288884179b97cc2ef9.on('click', latLngPop);
             
     
-                var image_overlay_33e43e8c1cde4723af350119e1b894de = L.imageOverlay(
+                var image_overlay_6abd61f132eb4a4fa6aa73bd13da9554 = L.imageOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/4km_basemap_1_O3.png',
                     [[39.81001663208008, -125.88920593261719], [49.81791305541992, -109.6165771484375]],
                     {
@@ -92,10 +92,10 @@
   "opacity": 0.5,
   "zIndex": 1
 }
-                    ).addTo(map_a94c8bd54dd544949774e8f7ed4713fa);
+                    ).addTo(map_abb32fce33e84e288884179b97cc2ef9);
             
     
-                var image_overlay_12ef3685dff44bf589b6f75e0166461d = L.imageOverlay(
+                var image_overlay_8aca03902c834f96b126ed193eb7d4c7 = L.imageOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/4km_basemap_1_PMIJ.png',
                     [[39.81001663208008, -125.88920593261719], [49.81791305541992, -109.6165771484375]],
                     {
@@ -107,53 +107,53 @@
   "opacity": 0.5,
   "zIndex": 1
 }
-                    ).addTo(map_a94c8bd54dd544949774e8f7ed4713fa);
+                    ).addTo(map_abb32fce33e84e288884179b97cc2ef9);
             
     
-                var video_overlay_8345df4adbea49038c5cbc70143eb204 = L.videoOverlay(
+                var video_overlay_7214531eac724633882610da20edc5a4 = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_4km_O3_output.webm',
                     [[39.81001663208008, -125.88920593261719], [49.81791305541992, -109.6165771484375]],
                     {"opacity": 0.5, "attribution": "O3_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_a94c8bd54dd544949774e8f7ed4713fa);
+                    ).addTo(map_abb32fce33e84e288884179b97cc2ef9);
             
     
-                var video_overlay_f2df86e630254093bc4462bc59702a86 = L.videoOverlay(
+                var video_overlay_e6b670c6d4944625bdf7adfc967aa88e = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_4km_PMIJ_output.webm',
                     [[39.81001663208008, -125.88920593261719], [49.81791305541992, -109.6165771484375]],
                     {"opacity": 0.5, "attribution": "pm_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_a94c8bd54dd544949774e8f7ed4713fa);
+                    ).addTo(map_abb32fce33e84e288884179b97cc2ef9);
             
     
-                var video_overlay_ce6ce2561f0d45bf9a4441378ce4b165 = L.videoOverlay(
+                var video_overlay_6c05faaaf58c46d2a0ae4c9afa6f192b = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_4km_O3_tiled_output.webm',
                     [[39.81001663208008, -125.88920593261719], [49.81791305541992, -109.6165771484375]],
                     {"opacity": 0.5, "attribution": "O3_tiled_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_a94c8bd54dd544949774e8f7ed4713fa);
+                    ).addTo(map_abb32fce33e84e288884179b97cc2ef9);
             
     
-                var video_overlay_6581784f7c7b4be8a71abb4ffab1d2ee = L.videoOverlay(
+                var video_overlay_242d012dbe184cd6ae013eb23b7a2244 = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_4km_PMIJ_tiled_output.webm',
                     [[39.81001663208008, -125.88920593261719], [49.81791305541992, -109.6165771484375]],
                     {"opacity": 0.5, "attribution": "pm_tiled_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_a94c8bd54dd544949774e8f7ed4713fa);
+                    ).addTo(map_abb32fce33e84e288884179b97cc2ef9);
             
     
-            var layer_control_39fe8dce644f47529fff677c0327ef4e = {
-                base_layers : { "openstreetmap" : tile_layer_cb32f7e4808c4048a1518ae01ecba1f6, },
-                overlays : { "Ozone" : image_overlay_33e43e8c1cde4723af350119e1b894de,"PM" : image_overlay_12ef3685dff44bf589b6f75e0166461d,"O3_video" : video_overlay_8345df4adbea49038c5cbc70143eb204,"PM_video" : video_overlay_f2df86e630254093bc4462bc59702a86,"O3_tiled_video" : video_overlay_ce6ce2561f0d45bf9a4441378ce4b165,"PM_tiled_video" : video_overlay_6581784f7c7b4be8a71abb4ffab1d2ee, }
+            var layer_control_e47871b800a1467ab8800f432077f039 = {
+                base_layers : { "openstreetmap" : tile_layer_08f3ff8610d74e3abf9a54f9a0753db4, },
+                overlays : { "Ozone" : image_overlay_6abd61f132eb4a4fa6aa73bd13da9554,"PM" : image_overlay_8aca03902c834f96b126ed193eb7d4c7,"O3_video" : video_overlay_7214531eac724633882610da20edc5a4,"PM_video" : video_overlay_e6b670c6d4944625bdf7adfc967aa88e,"O3_tiled_video" : video_overlay_6c05faaaf58c46d2a0ae4c9afa6f192b,"PM_tiled_video" : video_overlay_242d012dbe184cd6ae013eb23b7a2244, }
                 };
             L.control.layers(
-                layer_control_39fe8dce644f47529fff677c0327ef4e.base_layers,
-                layer_control_39fe8dce644f47529fff677c0327ef4e.overlays,
+                layer_control_e47871b800a1467ab8800f432077f039.base_layers,
+                layer_control_e47871b800a1467ab8800f432077f039.overlays,
                 {position: 'topright',
                  collapsed: true,
                  autoZIndex: true
-                }).addTo(map_a94c8bd54dd544949774e8f7ed4713fa);
+                }).addTo(map_abb32fce33e84e288884179b97cc2ef9);
             
-                image_overlay_33e43e8c1cde4723af350119e1b894de.remove();
-                image_overlay_12ef3685dff44bf589b6f75e0166461d.remove();
-                video_overlay_f2df86e630254093bc4462bc59702a86.remove();
-                video_overlay_ce6ce2561f0d45bf9a4441378ce4b165.remove();
-                video_overlay_6581784f7c7b4be8a71abb4ffab1d2ee.remove();
+                image_overlay_6abd61f132eb4a4fa6aa73bd13da9554.remove();
+                image_overlay_8aca03902c834f96b126ed193eb7d4c7.remove();
+                video_overlay_e6b670c6d4944625bdf7adfc967aa88e.remove();
+                video_overlay_6c05faaaf58c46d2a0ae4c9afa6f192b.remove();
+                video_overlay_242d012dbe184cd6ae013eb23b7a2244.remove();
         
 </script>
