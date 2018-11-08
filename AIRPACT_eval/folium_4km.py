@@ -293,8 +293,8 @@ lat_max=np.amax(airpact['lat'])
 extents = [[lat_min, lon_min], [lat_max, lon_max]]
 
 # Set paths to monthly average maps
-png1 = output_dir+'plots/maps/4km_basemap_1_O3.png'
-png2 = output_dir+'plots/maps/4km_basemap_1_PMIJ.png'
+png1 = git_dir+'4km_basemap_1_O3.png'
+png2 = git_dir+'4km_basemap_1_PMIJ.png'
 
 # Set paths to videos
 video1 = git_dir+'movie_4km_O3_output.webm'

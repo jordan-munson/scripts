@@ -220,7 +220,7 @@ for i, sp in enumerate(var_list):
            
         outpng = base_dir +'maps/daily_basemap/airpact_hourly_basemap_tiled_' + sp + '_%05d.png' % t
         print(outpng)
-        
+        pm_max = 35
         fig = plt.figure(figsize=(14,10))
         #plt.title('at ' + airpact["DateTime"][t,0,0])
         
