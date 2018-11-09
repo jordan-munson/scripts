@@ -58,7 +58,7 @@ for version in versions:
     plt.title(version + ' Predicted')
     plt.legend(title="m/s")#, loc=(1.2,0))
     
-    plt.savefig(outputdir + version+'_predicted_windrose.png' ,bbox_inches='tight')
+    plt.savefig(outputdir + version+'_predicted_windrose.png' ,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
     plt.show()
     plt.close()
     
@@ -74,12 +74,11 @@ for version in versions:
     print(df.dtypes)
     
     # Actualy plot the wind rose here
-    bins = np.arange(0.0, 11, 2)
     plot_windrose(df,kind='bar',bins=bins,normed=True)
     
     plt.title(version + ' Observed')
     plt.legend(title="m/s")#, loc=(1.2,0))
-    plt.savefig(outputdir + version+'_observed_windrose.png' ,bbox_inches='tight')
+    plt.savefig(outputdir + version+'_observed_windrose.png' ,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
 
     plt.show()
     plt.close()
