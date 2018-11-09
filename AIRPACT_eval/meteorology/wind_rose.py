@@ -18,15 +18,13 @@ import folium
 # Set directories
 inputdir = r'G:/Research/AIRPACT_eval/meteorology/'
 outputdir = r'G:/Research/AIRPACT_eval/meteorology/AQS_plots/windrose/'
-
 #Load data
 df_airpact = pd.read_csv(inputdir+'df_airpact.csv').drop(['Unnamed: 0','lat','lon'],axis=1)
-df_obs = pd.read_csv(inputdir+'df_obs.csv').drop(['Unnamed: 0','Local Site Name'],axis=1).rename(columns={'datetime':'DateTime'})
+df_obs = pd.read_csv(inputdir+'df_obs.csv').drop(['Unnamed: 0'],axis=1).rename(columns={'datetime':'DateTime'})
 
 
 #%%
-types = ['obs','mod']
-# Plot model wind roses
+types = ['predicted','observed']# Plot model wind roses
 versions = ['AP3','AP4','AP5']
 
 for version in versions:
@@ -42,52 +40,68 @@ for version in versions:
         start_date ='2015-12-01'
         end_date = '2018-07-01'
     for i in types:
+        print('Working on ' +i)
         # Locate correct site model data
         #Manipulate dataframe
-        
-        if i == 'obs':
-            df=df_airpact
+        if i == 'predicted':
+            df1=df_airpact
             title = (version + ' Predicted')
-            save = outputdir + version+'_predicted_windrose.png'
-            df = df.rename(columns={'WSPD10':'speed','WDIR10':'direction'})
+            name = 'site_name'
         else:
-            df=df_obs
+            df1=df_obs
             title = (version + ' Observed')
-            save = outputdir + version+'_observed_windrose.png'
-            df = df.rename(columns={'aqs_wspd':'speed','aqs_wdir':'direction'})
-
-        mask = (df['DateTime'] > start_date) & (df['DateTime'] <= end_date) # Create a mask to determine the date range used
-        df = df.loc[mask]  
-        df = df.groupby("DateTime").mean()
-        df = df[['speed','direction']]
+            name = 'Local Site Name'
+            
+        df2 = df1.copy()
+        for sid in list(set(df2['AQS_ID'])):
+            # Reset df, need to use df1 for this.
+            df = df2
+                
+            # Locate values correlating to site ID
+            df = df.loc[df['AQS_ID']==sid]
+            
+            # Reset the index so that the name can be found in the first row
+            df = df.reset_index(drop=True)
+            
+            # Find the site name, if not available use site id
+            site_nameinfo = str(df[name][0])
+            if site_nameinfo == 'nan':
+                site_nameinfo = str(sid)
+            # If blank space in name exists, replace with _
+            site_nameinfo = site_nameinfo.replace(" ", "_")
+            site_nameinfo = site_nameinfo.replace("/", "-")
+            
+            # Just grab time period desired (airpact version)
+            mask = (df['DateTime'] > start_date) & (df['DateTime'] <= end_date) # Create a mask to determine the date range used
+            df = df.loc[mask]  
+            df = df.groupby("DateTime").mean()   
+            
+            # Set save name and rename columns for plot
+            if i == 'predicted':
+                save = outputdir +site_nameinfo+'_'+ version+'_predicted_windrose.png'
+                df = df.rename(columns={'WSPD10':'speed','WDIR10':'direction'})
+            else:
+                save = outputdir +site_nameinfo+'_'+ version+'_observed_windrose.png'
+                df = df.rename(columns={'aqs_wspd':'speed','aqs_wdir':'direction'})
+            df = df[['speed','direction']]
+            df = df.dropna()
+            # Plot windrose
+            bins = np.arange(0.0, 11, 2)
+            plot_windrose(df,kind='bar',bins=bins,normed=True) # If want to change colors, cmap=cm.hot. normed sets the lines as percents
+            # Look at the link below for how to use and modify the wind rose.
+            # https://windrose.readthedocs.io/en/latest/usage.html#a-stacked-histogram-with-normed-displayed-in-percent-results
+            
+            plt.title(site_nameinfo+' '+version+ ' '+i)
+            plt.legend(title="m/s")#, loc=(1.2,0))
+            try:
+                plt.savefig( save,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
+            except ValueError:
+                continue
+            plt.show()
+            plt.close()
         
-        print(df.dtypes)
-        
-        bins = np.arange(0.0, 11, 2)
-        plot_windrose(df,kind='bar',bins=bins,normed=True) # If want to change colors, cmap=cm.hot. normed sets the lines as percents
-        # Look at the link below for how to use and modify the wind rose.
-        # https://windrose.readthedocs.io/en/latest/usage.html#a-stacked-histogram-with-normed-displayed-in-percent-results
-        plt.title(title)
-        plt.legend(title="m/s")#, loc=(1.2,0))
-        
-        plt.savefig( save,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
-        plt.show()
-        plt.close()
-        
-    
-#    bins = np.arange(0, 30 + 1, 1)
-#    bins = bins[1:]
-#    
-#    ax, params = plot_windrose(df, kind='pdf', bins=bins)
-#    print("Weibull params:")
-#    print(params)
-#    # plt.savefig("screenshots/pdf.png")
-#    plt.show()
-#    plt.close()
 #%%
-# =============================================================================
-# Plot in Folium
-# =============================================================================
+# Folium setup
 m= folium.Map(location=[47.6588, -117.4260],zoom_start=9) # Create the plot
 m.add_child(folium.LatLngPopup()) #Add click lat/lon functionality
 
@@ -98,31 +112,26 @@ lon_max=np.amax(-116.51278686523438)
 lat_max=np.amax(48.234893798828125)
 
 extents = [[lat_min, lon_min], [lat_max, lon_max]]
-types = ['observed','predicted']
-for sp in version:
+# Plot to Folium
+for version in versions:
     for i in types:
-        print('Plotting '+sp+' to Folium map')
-        # Name variables
-    #    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_output.webm'])
-    #    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_tiled_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_tiled_output.webm'])
-        png = outputdir + version+'_'+i+'_windrose.png'
-        #video1 = git_dir+'movie_'+sp+'_output.webm'
-        #video2 = git_dir+'movie_'+sp+'_tiled_output.webm'
+        for sid in list(set(df2['AQS_ID'])):
+            
+            # Plot windrose on folium
+            print('Plotting '+site_nameinfo+' '+version+ ' '+i+' to Folium map')
+            # Name variables
+            png = outputdir + site_nameinfo+'_'+ version+'_'+i+'_windrose.png'
+            
+            #Plot average map
+            folium.raster_layers.ImageOverlay(png,bounds = extents,name=version,opacity = 0.7, show = False).add_to(m)
+ 
         
-        #Plot average map
-        folium.raster_layers.ImageOverlay(png,bounds = extents,name=sp,opacity = 0.5, show = False).add_to(m)
-        
-        #Plot countourf video
-        #folium.raster_layers.VideoOverlay(video_url=video1,bounds = extents,name=sp+'_video',opacity = 0.5,attr = sp+'_video_map',show = False,autoplay=True).add_to(m)
-        #Plot colormap video
-        #folium.raster_layers.VideoOverlay(video_url=video2,bounds = extents,name=sp+'_tiled_video',opacity = 0.5,attr = sp+'_tiled_video_map',show = False,autoplay=True).add_to(m)
-
 # Add ability to move between layers
 folium.LayerControl().add_to(m)
 
 # Save and show the created map. Use Jupyter to see the map within your console
 m.save(inputdir+'folium_windrose_map.html')
-
+    
 #%%
 '''
 # Try to plot them all on one page
