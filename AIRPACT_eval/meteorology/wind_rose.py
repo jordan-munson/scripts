@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
 import matplotlib.ticker as tkr
+import folium
 
 # Set directories
 inputdir = r'G:/Research/AIRPACT_eval/meteorology/'
@@ -24,6 +25,7 @@ df_obs = pd.read_csv(inputdir+'df_obs.csv').drop(['Unnamed: 0','Local Site Name'
 
 
 #%%
+types = ['obs','mod']
 # Plot model wind roses
 versions = ['AP3','AP4','AP5']
 
@@ -39,49 +41,39 @@ for version in versions:
     elif version == 'AP5':
         start_date ='2015-12-01'
         end_date = '2018-07-01'
+    for i in types:
+        # Locate correct site model data
+        #Manipulate dataframe
         
-    # Locate correct site model data
-    #Manipulate dataframe
-    df=df_airpact
-    mask = (df['DateTime'] > start_date) & (df['DateTime'] <= end_date) # Create a mask to determine the date range used
-    df = df.loc[mask]  
-    df = df.groupby("DateTime").mean()
-    df = df.rename(columns={'WSPD10':'speed','WDIR10':'direction'})
-    df = df[['speed','direction']]
-    
-    print(df.dtypes)
-    
-    bins = np.arange(0.0, 11, 2)
-    plot_windrose(df,kind='bar',bins=bins,normed=True) # If want to change colors, cmap=cm.hot. normed sets the lines as percents
-    # Look at the link below for how to use and modify the wind rose.
-    # https://windrose.readthedocs.io/en/latest/usage.html#a-stacked-histogram-with-normed-displayed-in-percent-results
-    plt.title(version + ' Predicted')
-    plt.legend(title="m/s")#, loc=(1.2,0))
-    
-    plt.savefig(outputdir + version+'_predicted_windrose.png' ,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
-    plt.show()
-    plt.close()
-    
-    # Now the observed results
-    #Manipulate data frame
-    df = df_obs
-    mask = (df['DateTime'] > start_date) & (df['DateTime'] <= end_date) # Create a mask to determine the date range used
-    df = df.loc[mask]  
-    df = df.groupby("DateTime").mean()
-    df = df.rename(columns={'aqs_wspd':'speed','aqs_wdir':'direction'})
-    df = df[['speed','direction']]
-    
-    print(df.dtypes)
-    
-    # Actualy plot the wind rose here
-    plot_windrose(df,kind='bar',bins=bins,normed=True)
-    
-    plt.title(version + ' Observed')
-    plt.legend(title="m/s")#, loc=(1.2,0))
-    plt.savefig(outputdir + version+'_observed_windrose.png' ,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
+        if i == 'obs':
+            df=df_airpact
+            title = (version + ' Predicted')
+            save = outputdir + version+'_predicted_windrose.png'
+            df = df.rename(columns={'WSPD10':'speed','WDIR10':'direction'})
+        else:
+            df=df_obs
+            title = (version + ' Observed')
+            save = outputdir + version+'_observed_windrose.png'
+            df = df.rename(columns={'aqs_wspd':'speed','aqs_wdir':'direction'})
 
-    plt.show()
-    plt.close()
+        mask = (df['DateTime'] > start_date) & (df['DateTime'] <= end_date) # Create a mask to determine the date range used
+        df = df.loc[mask]  
+        df = df.groupby("DateTime").mean()
+        df = df[['speed','direction']]
+        
+        print(df.dtypes)
+        
+        bins = np.arange(0.0, 11, 2)
+        plot_windrose(df,kind='bar',bins=bins,normed=True) # If want to change colors, cmap=cm.hot. normed sets the lines as percents
+        # Look at the link below for how to use and modify the wind rose.
+        # https://windrose.readthedocs.io/en/latest/usage.html#a-stacked-histogram-with-normed-displayed-in-percent-results
+        plt.title(title)
+        plt.legend(title="m/s")#, loc=(1.2,0))
+        
+        plt.savefig( save,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
+        plt.show()
+        plt.close()
+        
     
 #    bins = np.arange(0, 30 + 1, 1)
 #    bins = bins[1:]
@@ -92,6 +84,44 @@ for version in versions:
 #    # plt.savefig("screenshots/pdf.png")
 #    plt.show()
 #    plt.close()
+#%%
+# =============================================================================
+# Plot in Folium
+# =============================================================================
+m= folium.Map(location=[47.6588, -117.4260],zoom_start=9) # Create the plot
+m.add_child(folium.LatLngPopup()) #Add click lat/lon functionality
+
+# mins and max's of the plot
+lon_min=np.amin(-118.22552490234375)
+lat_min=np.amin(47.08146286010742)
+lon_max=np.amax(-116.51278686523438)
+lat_max=np.amax(48.234893798828125)
+
+extents = [[lat_min, lon_min], [lat_max, lon_max]]
+types = ['observed','predicted']
+for sp in version:
+    for i in types:
+        print('Plotting '+sp+' to Folium map')
+        # Name variables
+    #    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_output.webm'])
+    #    check_call(['ffmpeg', '-y', '-framerate','10', '-i',base_dir+'maps/daily_basemap/airpact_emissions_hourly_basemap_tiled_'+sp+'_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_tiled_output.webm'])
+        png = outputdir + version+'_'+i+'_windrose.png'
+        #video1 = git_dir+'movie_'+sp+'_output.webm'
+        #video2 = git_dir+'movie_'+sp+'_tiled_output.webm'
+        
+        #Plot average map
+        folium.raster_layers.ImageOverlay(png,bounds = extents,name=sp,opacity = 0.5, show = False).add_to(m)
+        
+        #Plot countourf video
+        #folium.raster_layers.VideoOverlay(video_url=video1,bounds = extents,name=sp+'_video',opacity = 0.5,attr = sp+'_video_map',show = False,autoplay=True).add_to(m)
+        #Plot colormap video
+        #folium.raster_layers.VideoOverlay(video_url=video2,bounds = extents,name=sp+'_tiled_video',opacity = 0.5,attr = sp+'_tiled_video_map',show = False,autoplay=True).add_to(m)
+
+# Add ability to move between layers
+folium.LayerControl().add_to(m)
+
+# Save and show the created map. Use Jupyter to see the map within your console
+m.save(inputdir+'folium_windrose_map.html')
 
 #%%
 '''
