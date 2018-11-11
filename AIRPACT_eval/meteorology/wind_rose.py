@@ -14,91 +14,111 @@ import matplotlib.cm as cm
 import numpy as np
 import matplotlib.ticker as tkr
 import folium
-
+from folium import FeatureGroup
 # Set directories
 inputdir = r'G:/Research/AIRPACT_eval/meteorology/'
 outputdir = r'G:/Research/AIRPACT_eval/meteorology/AQS_plots/windrose/'
 #Load data
-df_airpact = pd.read_csv(inputdir+'df_airpact.csv').drop(['Unnamed: 0','lat','lon'],axis=1)
-df_obs = pd.read_csv(inputdir+'df_obs.csv').drop(['Unnamed: 0'],axis=1).rename(columns={'datetime':'DateTime'})
+df_airpact = pd.read_csv(inputdir+'df_airpact.csv').drop(['Unnamed: 0'],axis=1)
+df_obs = pd.read_csv(inputdir+'df_obs.csv').drop(['Unnamed: 0'],axis=1).rename(columns={'datetime':'DateTime','Latitude':'lat','Longitude':'lon'})
 
-
-#%%
 types = ['predicted','observed']# Plot model wind roses
 versions = ['AP3','AP4','AP5']
 
-for version in versions:
-    
-    # Set date range used based of versions
-    if version == 'AP3':
-        start_date ='2009-05-01'
-        end_date = '2014-07-01'
-    elif version == 'AP4':
-        start_date ='2014-07-01'
-        end_date = '2015-12-01'
-    elif version == 'AP5':
-        start_date ='2015-12-01'
-        end_date = '2018-07-01'
-    for i in types:
-        print('Working on ' +i)
-        # Locate correct site model data
-        #Manipulate dataframe
-        if i == 'predicted':
-            df1=df_airpact
-            title = (version + ' Predicted')
-            name = 'site_name'
-        else:
-            df1=df_obs
-            title = (version + ' Observed')
-            name = 'Local Site Name'
-            
-        df2 = df1.copy()
-        for sid in list(set(df2['AQS_ID'])):
-            # Reset df, need to use df1 for this.
-            df = df2
-                
-            # Locate values correlating to site ID
-            df = df.loc[df['AQS_ID']==sid]
-            
-            # Reset the index so that the name can be found in the first row
-            df = df.reset_index(drop=True)
-            
-            # Find the site name, if not available use site id
-            site_nameinfo = str(df[name][0])
-            if site_nameinfo == 'nan':
-                site_nameinfo = str(sid)
-            # If blank space in name exists, replace with _
-            site_nameinfo = site_nameinfo.replace(" ", "_")
-            site_nameinfo = site_nameinfo.replace("/", "-")
-            
-            # Just grab time period desired (airpact version)
-            mask = (df['DateTime'] > start_date) & (df['DateTime'] <= end_date) # Create a mask to determine the date range used
-            df = df.loc[mask]  
-            df = df.groupby("DateTime").mean()   
-            
-            # Set save name and rename columns for plot
-            if i == 'predicted':
-                save = outputdir +site_nameinfo+'_'+ version+'_predicted_windrose.png'
-                df = df.rename(columns={'WSPD10':'speed','WDIR10':'direction'})
-            else:
-                save = outputdir +site_nameinfo+'_'+ version+'_observed_windrose.png'
-                df = df.rename(columns={'aqs_wspd':'speed','aqs_wdir':'direction'})
-            df = df[['speed','direction']]
-            df = df.dropna()
-            # Plot windrose
-            bins = np.arange(0.0, 11, 2)
-            plot_windrose(df,kind='bar',bins=bins,normed=True) # If want to change colors, cmap=cm.hot. normed sets the lines as percents
-            # Look at the link below for how to use and modify the wind rose.
-            # https://windrose.readthedocs.io/en/latest/usage.html#a-stacked-histogram-with-normed-displayed-in-percent-results
-            
-            plt.title(site_nameinfo+' '+version+ ' '+i)
-            plt.legend(title="m/s")#, loc=(1.2,0))
-            try:
-                plt.savefig( save,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
-            except ValueError:
-                continue
-            plt.show()
-            plt.close()
+# =============================================================================
+# #Create AQSID Column form state code, county code, and site num
+# aqsid = pd.read_csv(r'G:\Research\AIRPACT_eval/aqs_sites.csv')
+# aqsid = aqsid.ix[:,['State Code','County Code','Site Number','Local Site Name','Location Setting']]
+# 
+# aqsid['County Code'] = ["%03d" % n for n in aqsid['County Code'] ]
+# aqsid['Site Number'] = ["%04d" % n for n in aqsid['Site Number'] ]
+# 
+# aqsid['AQS_ID'] = (aqsid['State Code']).astype(str) + (aqsid['County Code']).astype(str)+(aqsid['Site Number']).astype(str)
+# 
+# # Must force every cell in AQSID to be a string, otherwise lose most of data
+# aqsid['AQS_ID'] = aqsid['AQS_ID'].astype(str)
+# df_obs['AQS_ID'] = df_obs['AQS_ID'].astype(str)
+# 
+# df_obs = pd.merge(df_obs,aqsid) # Merge df_mod and aqsid so as to add names and such to the datafram
+# df_obs = df_obs.drop(['State Code','County Code','Site Number'], axis=1)
+# 
+# =============================================================================
+#%%
+
+# =============================================================================
+# for version in versions:
+#     
+#     # Set date range used based of versions
+#     if version == 'AP3':
+#         start_date ='2009-05-01'
+#         end_date = '2014-07-01'
+#     elif version == 'AP4':
+#         start_date ='2014-07-01'
+#         end_date = '2015-12-01'
+#     elif version == 'AP5':
+#         start_date ='2015-12-01'
+#         end_date = '2018-07-01'
+#     for i in types:
+#         print('Working on ' +i)
+#         # Locate correct site model data
+#         #Manipulate dataframe
+#         if i == 'predicted':
+#             df1=df_airpact
+#             title = (version + ' Predicted')
+#             name = 'site_name'
+#         else:
+#             df1=df_obs
+#             title = (version + ' Observed')
+#             name = 'Local Site Name'
+#             
+#         df2 = df1.copy()
+#         for sid in list(set(df2['AQS_ID'])):
+#             # Reset df, need to use df1 for this.
+#             df = df2
+#                 
+#             # Locate values correlating to site ID
+#             df = df.loc[df['AQS_ID']==sid]
+#             
+#             # Reset the index so that the name can be found in the first row
+#             df = df.reset_index(drop=True)
+#             
+#             # Find the site name, if not available use site id
+#             site_nameinfo = str(df[name][0])
+#             if site_nameinfo == 'nan':
+#                 site_nameinfo = str(sid)
+#             # If blank space in name exists, replace with _
+#             site_nameinfo = site_nameinfo.replace(" ", "_")
+#             site_nameinfo = site_nameinfo.replace("/", "-")
+#             
+#             # Just grab time period desired (airpact version)
+#             mask = (df['DateTime'] > start_date) & (df['DateTime'] <= end_date) # Create a mask to determine the date range used
+#             df = df.loc[mask]  
+#             df = df.groupby("DateTime").mean()   
+#             
+#             # Set save name and rename columns for plot
+#             if i == 'predicted':
+#                 save = outputdir +site_nameinfo+'_'+ version+'_predicted_windrose.png'
+#                 df = df.rename(columns={'WSPD10':'speed','WDIR10':'direction'})
+#             else:
+#                 save = outputdir +site_nameinfo+'_'+ version+'_observed_windrose.png'
+#                 df = df.rename(columns={'aqs_wspd':'speed','aqs_wdir':'direction'})
+#             df = df[['speed','direction']]
+#             df = df.dropna()
+#             # Plot windrose
+#             bins = np.arange(0.0, 11, 2)
+#             plot_windrose(df,kind='bar',bins=bins,normed=True) # If want to change colors, cmap=cm.hot. normed sets the lines as percents
+#             # Look at the link below for how to use and modify the wind rose.
+#             # https://windrose.readthedocs.io/en/latest/usage.html#a-stacked-histogram-with-normed-displayed-in-percent-results
+#             
+#             plt.title(site_nameinfo+' '+version+ ' '+i)
+#             plt.legend(title="m/s")#, loc=(1.2,0))
+#             try:
+#                 plt.savefig( save,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
+#             except ValueError:
+#                 continue
+#             plt.show()
+#             plt.close()
+# =============================================================================
         
 #%%
 # Folium setup
@@ -111,11 +131,52 @@ lat_min=np.amin(47.08146286010742)
 lon_max=np.amax(-116.51278686523438)
 lat_max=np.amax(48.234893798828125)
 
+plotted_sites = []
+missing_sites = []
 extents = [[lat_min, lon_min], [lat_max, lon_max]]
 # Plot to Folium
 for version in versions:
+    feature_group = FeatureGroup(name=version)
     for i in types:
+        if i == 'predicted':
+            df1=df_airpact
+            title = (version + ' Predicted')
+            name = 'site_name'
+        else:
+            df1=df_obs
+            title = (version + ' Observed')
+            name = 'Local Site Name'
+            
+        df2 = df1.copy()
+        
         for sid in list(set(df2['AQS_ID'])):
+            df = df2
+                
+            # Locate values correlating to site ID
+            df = df.loc[df['AQS_ID']==sid]            
+            # Reset the index so that the name can be found in the first row
+            df = df.reset_index(drop=True)
+            
+            # Find the site name, if not available use site id
+            site_nameinfo = str(df[name][0])
+            if site_nameinfo == 'nan':
+                site_nameinfo = str(sid)
+            # If blank space in name exists, replace with _
+            site_nameinfo = site_nameinfo.replace(" ", "_")
+            site_nameinfo = site_nameinfo.replace("/", "-")
+            
+            # Set the location of the wind roses on the map
+            site_lat = df['lat'][0]
+            site_lon = df['lon'][0]
+            
+            width = 0.15
+            height = 0.15
+            
+            lon_min=np.amin(site_lon - width)
+            lat_min=np.amin(site_lat - height)
+            lon_max=np.amax(site_lon + width)
+            lat_max=np.amax(site_lat + height)
+            extents = [[lat_min, lon_min], [lat_max, lon_max]]
             
             # Plot windrose on folium
             print('Plotting '+site_nameinfo+' '+version+ ' '+i+' to Folium map')
@@ -123,14 +184,24 @@ for version in versions:
             png = outputdir + site_nameinfo+'_'+ version+'_'+i+'_windrose.png'
             
             #Plot average map
-            folium.raster_layers.ImageOverlay(png,bounds = extents,name=version,opacity = 0.7, show = False).add_to(m)
- 
+            try:
+                folium.raster_layers.ImageOverlay(png,bounds = extents,name=site_nameinfo+' '+version+ ' '+i,opacity = 0.7, show = True).add_to(feature_group)
+                plotted_sites.append(site_nameinfo+'_'+version+ '_'+i)
+            except FileNotFoundError:
+                print('Missing ' + site_nameinfo+' '+version+ ' '+i)
+                missing_sites.append(site_nameinfo+'_'+version+ '_'+i)
+                continue
+    feature_group.add_to(m)
         
 # Add ability to move between layers
 folium.LayerControl().add_to(m)
 
 # Save and show the created map. Use Jupyter to see the map within your console
 m.save(inputdir+'folium_windrose_map.html')
+m
+# Print how many sites have been plotted
+print('Number of plotted sites is ' + str(len(plotted_sites)))
+print('Number of missing sites is ' + str(len(missing_sites)))
     
 #%%
 '''
