@@ -166,6 +166,7 @@ for version in versions:
             site_nameinfo = site_nameinfo.replace("/", "-")
             
             # Set the location of the wind roses on the map
+            df = df.dropna()
             site_lat = df['lat'][0]
             site_lon = df['lon'][0]
             
