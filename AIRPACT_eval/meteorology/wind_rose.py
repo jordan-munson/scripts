@@ -167,8 +167,13 @@ for version in versions:
             
             # Set the location of the wind roses on the map
             df = df.dropna()
-            site_lat = df['lat'][0]
-            site_lon = df['lon'][0]
+            try:
+                site_lat = df['lat'][0]
+                site_lon = df['lon'][0]
+            except IndexError:
+                print('Missing ' + site_nameinfo+' '+version+ ' '+i)
+                missing_sites.append(site_nameinfo+'_'+version+ '_'+i)
+                continue
             
             width = 0.15
             height = 0.15
