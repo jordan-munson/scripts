@@ -15,6 +15,7 @@ import numpy as np
 import matplotlib.ticker as tkr
 import folium
 from folium import FeatureGroup
+
 # Set directories
 inputdir = r'G:/Research/AIRPACT_eval/meteorology/'
 outputdir = r'G:/Research/AIRPACT_eval/meteorology/AQS_plots/windrose/'
@@ -136,7 +137,7 @@ missing_sites = []
 extents = [[lat_min, lon_min], [lat_max, lon_max]]
 # Plot to Folium
 for version in versions:
-    feature_group = FeatureGroup(name=version)
+    
     for i in types:
         if i == 'predicted':
             df1=df_airpact
@@ -146,14 +147,14 @@ for version in versions:
             df1=df_obs
             title = (version + ' Observed')
             name = 'Local Site Name'
-            
+        feature_group = FeatureGroup(name=version+' '+i)   
         df2 = df1.copy()
         
         for sid in list(set(df2['AQS_ID'])):
             df = df2
-                
             # Locate values correlating to site ID
-            df = df.loc[df['AQS_ID']==sid]            
+            df = df.loc[df['AQS_ID']==sid] 
+            
             # Reset the index so that the name can be found in the first row
             df = df.reset_index(drop=True)
             
@@ -166,38 +167,38 @@ for version in versions:
             site_nameinfo = site_nameinfo.replace("/", "-")
             
             # Set the location of the wind roses on the map
-            df = df.dropna()
-            try:
-                site_lat = df['lat'][0]
-                site_lon = df['lon'][0]
-            except IndexError:
-                print('Missing ' + site_nameinfo+' '+version+ ' '+i)
-                missing_sites.append(site_nameinfo+'_'+version+ '_'+i)
-                continue
+
+            site_lat = df['lat'][0]
+            site_lon = df['lon'][0]
             
-            width = 0.15
-            height = 0.15
+            width = 0.095
+            height = 0.08
             
             lon_min=np.amin(site_lon - width)
             lat_min=np.amin(site_lat - height)
             lon_max=np.amax(site_lon + width)
             lat_max=np.amax(site_lat + height)
             extents = [[lat_min, lon_min], [lat_max, lon_max]]
+            if np.isnan(lon_min):
+                print('Missing ' + site_nameinfo+' '+version+ ' '+i+' nan in extents')
+                missing_sites.append(site_nameinfo+'_'+version+ '_'+i)
+                continue 
             
             # Plot windrose on folium
             print('Plotting '+site_nameinfo+' '+version+ ' '+i+' to Folium map')
             # Name variables
             png = outputdir + site_nameinfo+'_'+ version+'_'+i+'_windrose.png'
             
+            
             #Plot average map
             try:
-                folium.raster_layers.ImageOverlay(png,bounds = extents,name=site_nameinfo+' '+version+ ' '+i,opacity = 0.7, show = True).add_to(feature_group)
+                folium.raster_layers.ImageOverlay(png,bounds = extents,name=site_nameinfo+' '+version+ ' '+i,opacity = 1, show = True).add_to(feature_group)
                 plotted_sites.append(site_nameinfo+'_'+version+ '_'+i)
             except FileNotFoundError:
                 print('Missing ' + site_nameinfo+' '+version+ ' '+i)
                 missing_sites.append(site_nameinfo+'_'+version+ '_'+i)
                 continue
-    feature_group.add_to(m)
+        feature_group.add_to(m)
         
 # Add ability to move between layers
 folium.LayerControl().add_to(m)
