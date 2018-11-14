@@ -56,12 +56,19 @@ airpact = load_obj(name)
 lat = airpact['lat'][0]
 lon = airpact['lon'][0]
 
-# mins and max's of the plot
-llcrnrlon=np.amin(airpact['lon'])
-llcrnrlat=np.amin(airpact['lat'])
-urcrnrlon=np.amax(airpact['lon'])
-urcrnrlat=np.amax(airpact['lat'])
+# =============================================================================
+# # mins and max's of the plot
+# llcrnrlon=np.amin(airpact['lon'])
+# llcrnrlat=np.amin(airpact['lat'])
+# urcrnrlon=np.amax(airpact['lon'])
+# urcrnrlat=np.amax(airpact['lat'])
+# =============================================================================
 
+# these change that domain to be the Urbaonva domain
+llcrnrlon = lon[186,136] 
+urcrnrlon = lon[215-1,165-1] 
+llcrnrlat = lat[186,136] 
+urcrnrlat = lat[215-1,165-1]
 #%%
 #base map
 m = Basemap(projection='merc',
@@ -223,7 +230,7 @@ x,y = m(lon,lat)
 var_list = ["O3", "PMIJ"]
 unit_list = ["ppb", "$ug/m^3$"]
 ############################################
-# hourly domain basemaps, this takes lots of time if doing hourly. Switch to daily could be prudent over a long timespan
+# hourly domain basemaps, for entire airpact domain
 ############################################
 #save maps into the pdf file (two maps in single page)
 
@@ -299,15 +306,22 @@ print('Videos made')
 ######################################
         # Plot folium
 ######################################
-m= folium.Map(location=[45.4072, -117.5004],zoom_start=6) # Create the plot
+#m= folium.Map(location=[45.4072, -117.5004],zoom_start=6) # This is centered and zoomed for the entire airpact domain
+m= folium.Map(location=[47.6588, -117.4260],zoom_start=9.25) # This is centered on the Urbanova domain
 m.add_child(folium.LatLngPopup()) #Add click lat/lon functionality
 
 # mins and max's of the plot
-lon_min=np.amin(airpact['lon'])
-lat_min=np.amin(airpact['lat'])
-lon_max=np.amax(airpact['lon'])
-lat_max=np.amax(airpact['lat'])
+# =============================================================================
+# lon_min=np.amin(airpact['lon'])
+# lat_min=np.amin(airpact['lat'])
+# lon_max=np.amax(airpact['lon'])
+# lat_max=np.amax(airpact['lat'])
+# =============================================================================
 
+lon_min = lon[186,136] 
+lon_max = lon[215-1,165-1] 
+lat_min = lat[186,136] 
+lat_max = lat[215-1,165-1]
 extents = [[lat_min, lon_min], [lat_max, lon_max]]
 
 # Set paths to monthly average maps
