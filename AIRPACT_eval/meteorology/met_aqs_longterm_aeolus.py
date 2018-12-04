@@ -32,18 +32,18 @@ begin_time = time.time()
 
 # Set a directory containing python scripts
 #base_dir = "/data/lar/users/jmunson/longterm_airpact/"
-base_dir = r'E:\Research\AIRPACT_eval\meteorology/'
+base_dir = r'G:\Research\AIRPACT_eval\meteorology/'
 
 # set a directory to save output files
 outputdir = base_dir + 'AQS_plots/'
 
 # set a directory containing wrfout files
 #datadir = base_dir + 'linked_days/'
-datadir = r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\AIRPACT\2018/'
+datadir = r'G:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\AIRPACT\2018/'
 
 # all the functions are saved in Met_functions_for_Ben.py
-exec(open(base_dir +"Met_functions_for_Ben.py").read())
-print(base_dir +"Met_functions_for_Ben.py")
+exec(open(r'G:\Research\scripts/AIRPACT_eval\meteorology/' +"Met_functions_for_Ben.py").read())
+#print(base_dir +"Met_functions_for_Ben.py")
 
 #df1 = pd.read_csv('airpact_met_200951_2012102.csv').drop(['Unnamed: 0'],axis=1)
 #df2 = pd.read_csv('airpact_met_2012102_2016113.csv').drop(['Unnamed: 0'],axis=1)

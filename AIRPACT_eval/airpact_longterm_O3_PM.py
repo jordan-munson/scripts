@@ -5,7 +5,7 @@ Created on Thu Jul  5 12:01:19 2018
 @author: Jordan Munson
 """
 import matplotlib as mpl
-mpl.use('Agg')
+#mpl.use('Agg')
 import pandas as pd
 import matplotlib.dates as mdates
 import datetime as dt
@@ -42,10 +42,12 @@ endmonth='05'
 endyear='2018'
 
 #Set directory
-inputDir = r'E:/Research/AIRPACT_eval/'
+inputDir = r'G:/Research/AIRPACT_eval/'
 # Open statistics script
-exec(open(r'E:/Research/Urbanova_Jordan/statistical_functions.py').read())
-aqsid = pd.read_csv(r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison/Aqsid.csv')
+stat_path = r'G:/Research/scripts/Urbanova/statistical_functions.py'
+ben_path = r'G:\Research\AIRPACT_eval\meteorology/Met_functions_for_Ben.py'
+exec(open(stat_path).read())
+aqsid = pd.read_csv(r'G:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison/Aqsid.csv')
 aqsid = aqsid.drop(['Unnamed: 4','Unnamed: 5','Unnamed: 6','Latitude','Longitude'], axis=1)
 aqsid = aqsid.drop([0,0], axis=0)
 '''
@@ -94,7 +96,7 @@ df_mod['datetime'] = pd.to_datetime(df_mod['datetime']) #Must convert to date ti
 df_mod = df_mod.drop('Unnamed: 0',axis=1)
 
 #Create AQSID Column form state code, county code, and site num
-aqsid = pd.read_csv(r'E:\Research\AIRPACT_eval/aqs_sites.csv')
+aqsid = pd.read_csv(r'F:\Research\AIRPACT_eval/aqs_sites.csv')
 aqsid = aqsid.ix[:,['State Code','County Code','Site Number','Local Site Name','Location Setting']]
 
 aqsid['County Code'] = ["%03d" % n for n in aqsid['County Code'] ]
@@ -591,7 +593,7 @@ for species in pollutant:
 
 #%%
             
-exec(open(r'E:/Research/Urbanova_Jordan/statistical_functions.py').read())
+exec(open(stat_path).read())
 #Plot data
 #Function to help move spines
 def make_patch_spines_invisible(ax):
@@ -829,7 +831,7 @@ setting =['total']
 versions = ['ap3','ap4','ap5'] #List versions
 stats_all = pd.DataFrame() # statistics for each station
 
-exec(open(r'E:\Research\AIRPACT_eval\meteorology/Met_functions_for_Ben.py').read())
+exec(open(ben_path).read())
 #import Met_functions_for_Ben as met
 for version in versions:
 
@@ -900,7 +902,7 @@ print(stats_all['FB'],stats_all['FE'])
 ##############################################################################
 #Run stats for duration of airpact
 ##############################################################################
-exec(open(r'E:/Research/Urbanova_Jordan/statistical_functions.py').read())
+exec(open(stat_path).read())
 #Plot data
 #Function to help move spines
 def make_patch_spines_invisible(ax):

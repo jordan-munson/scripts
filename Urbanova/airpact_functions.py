@@ -13,7 +13,7 @@ from datetime import timedelta
 import pytz
 import copy
 import time
-
+import os
 
 #Read AIRPACT gas species
 def readAIRPACTgas(infile,layer):
@@ -51,15 +51,16 @@ def DateTime_range(start, end, delta):
 # save airpact output into dataframe
 def get_airpact_DF(start, end, layer):
     # prepare time loop to read model output
-    #date_diff =end -start
-    #date_diff =  int(round( date_diff.total_seconds()/60/60/24)) # total hour duration
-    
+    date_diff =end -start
+    date_diff =  int(round( date_diff.total_seconds()/60/60/24)) # total hour duration
+    print('date diff is '+ str(date_diff))
     print("start date is "+ start.strftime("%Y%m%d") )
     now = start
     
     modelarray={}
     hr=(end-start).total_seconds()/3600+1
     hr=int(hr)
+    print('Hours in df are ' + str(hr))
     lonarray = np.zeros ( (hr,y_dim, x_dim) )
     latarray = np.zeros ( (hr,y_dim, x_dim) )
     for i in range(0,hr):
@@ -74,13 +75,14 @@ def get_airpact_DF(start, end, layer):
             print('reading ', modeloutputs[t])
         else:
             print("no file")
-            exit() 
-       
+            #exit() 
+            continue # Try this instead to avoid an exit
        #create time array for 24 hours
         dts = [dt.strftime('%Y%m%d %H:00 UTC') for dt in
                DateTime_range(now, now+timedelta(hours=hr),
                               timedelta(hours=1))]
-        if t==0:
+               
+        if t==0:   # if the run is on the first day
             # Read gas, aerosols, and met predictions
             modelarray0 = readAIRPACTgas(nc,layer)
             modelaer0 = readAIRPACTaerosol(nc,layer)
@@ -107,7 +109,7 @@ def get_airpact_DF(start, end, layer):
             modelarray['DateTime'] = copy.copy(timearray)  ## without copy.copy, this will become pointer
             modelarray['lat'] = latarray
             modelarray['lon']= lonarray
-        elif t==len(modeloutputs)-1:
+        elif t==len(modeloutputs)-1:   # If the run is on the last day
             if end.hour<8:
                 h=end.hour+16
             else:
@@ -116,8 +118,8 @@ def get_airpact_DF(start, end, layer):
             timearray = np.empty( ( h+1, y_dim, x_dim), '|U18')
             # add time variable to modelarray
             for i in range(0, h):
+                #timearray[i,:,:] = dts[int(hr-h-1+i)]
                 timearray[i,:,:] = dts[int(hr-h-1+i)]
-            
             modelarray['DateTime'] = np.concatenate ( (modelarray['DateTime'], timearray))
             #modelarray['lat'] = np.concatenate ( (modelarray['lat'], latarray))
             #modelarray['lon'] = np.concatenate ( (modelarray['lon'], lonarray))
@@ -141,7 +143,7 @@ def get_airpact_DF(start, end, layer):
             del gas
             del gas0
             del aer0
-        else:
+        else:   # every day other than the first or last
             # create a time array for modelarray
             timearray = np.empty( ( 24, y_dim, x_dim), '|U18')
             # add time variable to modelarray
