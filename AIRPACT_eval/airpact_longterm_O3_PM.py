@@ -532,17 +532,24 @@ for species in pollutant:
         
         if species == 'PM2.5':
             ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
+            ax.set_ylim(0,25)
+            height = 20 # Height of annotations in graphs
+            spc = 1.2 # Space the annotations are moved up and down
         else:
             ax.set_ylabel('Ozone (ppb)')
-            
+            ax.set_ylim(0,50)
+            height=10
+            spc = 2
+        
         ax.set_xlim('2009-1-1','2018-7-1')
         ax.set_xlabel(' ')        
         ax.set_title('Type: '+str(site_type))
-        plt.legend()
-
+        plt.legend(prop={'size': 10},loc=2)
+        sze = 10 #size of annotation text
+        
         plt.grid(True)    # Add grid lines to make graph interpretation easier
         
-        # Create Airpact version change annotation
+        # Create Airpact version change annotation       
         ax.annotate('AP3',xy=(0.07,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,0.061),color='red',size='x-small') # Left Arrow AP3
         ax.annotate('AP3',xy=(0.35,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,0.061),color='red',size='x-small') # Right Arrow AP3
         
@@ -553,8 +560,17 @@ for species in pollutant:
         ax.annotate('AP5',xy=(0.82,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.68,0.061),color='red',size='x-small') # Right Arrow AP5
         
         # Add significant event annotations to plots
-        ax.annotate('12km to 4km',xy=(0.345,0.75),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(0.345,.8),color='red',size='x-small') # Right Arrow AP3
-        
+        ax.annotate('Species Increased',xy=('2010-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2010-7-1',height-spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+        ax.annotate('12km to 4km',xy=('2012-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2012-7-1',height),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km       
+        ax.annotate('Switch to WRF 3.4.1',xy=('2012-10-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2012-10-1',height+spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+        ax.annotate('MOVES replaces MOBILE6',xy=('2013-10-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2013-10-1',height+spc*2),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+        ax.annotate('Canadian Fire Incorporated',xy=('2015-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2015-7-1',height-spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+        ax.annotate('Switch to WRF 3.7.1',xy=('2015-11-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2015-11-1',height),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+        ax.annotate('Increased Layers',xy=('2016-4-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2016-4-1',height+spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+        ax.annotate('Updated Road Dust Emissions',xy=('2016-12-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2016-12-1',height+spc*2),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+
+
+
         ax.text(1.01, 0.4,'# of Observation sites '+str(temp1),fontsize = 12, ha='left', va='center', transform=ax.transAxes)  
         #ax.text(1.01, 0.5,'# of Model sites '+str(temp2),fontsize = 12, ha='left', va='center', transform=ax.transAxes)  
 
