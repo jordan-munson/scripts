@@ -215,64 +215,70 @@ mpl.rcParams['xtick.direction']   = 'in'
 df_mod.loc[:,'O3_mod'] = pd.to_numeric(df_mod.loc[:,'O3_mod'], errors='coerce')
 df_mod.loc[:,'PM2.5_mod'] = pd.to_numeric(df_mod.loc[:,'PM2.5_mod'], errors='coerce')
 
+stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
+stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
+stats_com = stats_com.drop(0,1)
+
 #%%
 ##############################################################################
 # Plot the data
 ##############################################################################
-'''
 
-# Scatter plots of modeled ozone vs pm
-for AQSID in list(set(df_com['AQSID'])):
-    #This section selects only data relevant to the aqs site
-    d = df_com.loc[df_com['AQSID']==AQSID]
-    d=d.reset_index()
-    site_nameinfo = d.loc[0,'Local Site Name'] #Gets the longname of the site to title the plot
-    d=d.ix[:,['PM2.5_mod','O3_mod','datetime']]
-    d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
-    d = d.set_index('datetime') 
-    d = d.resample('D').mean()
-    fig,ax=plt.subplots(1,1, figsize=(8,8)) #Set figure dimensions
-    #Find max values to set axis
-    #axismax = max(max(d['PM2.5_mod'],numeric_only=True),max(d['O3_mod']))     #This works on some PC's but not others
-    try:    #The axis max makes sure the x and y axis are the same
-        axismax= max(d.max(numeric_only=True))
-        ax.set_ylim(0,axismax)
-        ax.set_xlim(0,axismax)
-        plt.plot([0,axismax], [0,axismax], color='black')
-    except ValueError:
-        pass
-    
-    #Plot first section of year
-    mask = (d.index > '2014-7-1') & (d.index <= '2015-6-30')
-    da=d.loc[mask]
-    ax.scatter(da['PM2.5_mod'], da['O3_mod'], c='b', label = '07/14-07/15',linewidths=None, alpha=0.8) #Plotting the data
-    
-    #Plot first section of year
-    mask = (d.index > '2015-7-1') & (d.index <= '2016-6-30')
-    db=d.loc[mask]
-    ax.scatter(db['PM2.5_mod'], db['O3_mod'], c='r', label = '07/15-07/16',linewidths=None, alpha=0.7) #Plotting the data
-    
-    #Plot first section of year
-    mask = (d.index > '2016-7-1') & (d.index <= '2017-6-30')
-    dc=d.loc[mask]
-    ax.scatter(dc['PM2.5_mod'], dc['O3_mod'], c='g', label = '07/16-07/17',linewidths=None, alpha=0.7) #Plotting the data
-    
-    ax.set_aspect('equal', 'box')
-    plt.axis('equal')
-    ax.set_ylabel('Ozone')
-    ax.set_xlabel('$PM_{2.5}$')        
-    ax.set_title(site_nameinfo) 
-    plt.legend()
 
-    plt.plot()
-    try:
-        if axismax>1:
-            plt.savefig(inputDir +'/plots/scatter/scatter_' + site_nameinfo+'.png', pad_inches=0.1, bbox_inches='tight')
-        else:
-            pass
-    except(FileNotFoundError):
-        pass
-'''
+# =============================================================================
+# # Scatter plots of modeled ozone vs pm
+# for AQSID in list(set(df_com['AQSID'])):
+#     #This section selects only data relevant to the aqs site
+#     d = df_com.loc[df_com['AQSID']==AQSID]
+#     d=d.reset_index()
+#     site_nameinfo = d.loc[0,'Local Site Name'] #Gets the longname of the site to title the plot
+#     d=d.ix[:,['PM2.5_mod','O3_mod','datetime']]
+#     d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
+#     d = d.set_index('datetime') 
+#     d = d.resample('D').mean()
+#     fig,ax=plt.subplots(1,1, figsize=(8,8)) #Set figure dimensions
+#     #Find max values to set axis
+#     #axismax = max(max(d['PM2.5_mod'],numeric_only=True),max(d['O3_mod']))     #This works on some PC's but not others
+#     try:    #The axis max makes sure the x and y axis are the same
+#         axismax= max(d.max(numeric_only=True))
+#         ax.set_ylim(0,axismax)
+#         ax.set_xlim(0,axismax)
+#         plt.plot([0,axismax], [0,axismax], color='black')
+#     except ValueError:
+#         pass
+#     
+#     #Plot first section of year
+#     mask = (d.index > '2014-7-1') & (d.index <= '2015-6-30')
+#     da=d.loc[mask]
+#     ax.scatter(da['PM2.5_mod'], da['O3_mod'], c='b', label = '07/14-07/15',linewidths=None, alpha=0.8) #Plotting the data
+#     
+#     #Plot first section of year
+#     mask = (d.index > '2015-7-1') & (d.index <= '2016-6-30')
+#     db=d.loc[mask]
+#     ax.scatter(db['PM2.5_mod'], db['O3_mod'], c='r', label = '07/15-07/16',linewidths=None, alpha=0.7) #Plotting the data
+#     
+#     #Plot first section of year
+#     mask = (d.index > '2016-7-1') & (d.index <= '2017-6-30')
+#     dc=d.loc[mask]
+#     ax.scatter(dc['PM2.5_mod'], dc['O3_mod'], c='g', label = '07/16-07/17',linewidths=None, alpha=0.7) #Plotting the data
+#     
+#     ax.set_aspect('equal', 'box')
+#     plt.axis('equal')
+#     ax.set_ylabel('Ozone')
+#     ax.set_xlabel('$PM_{2.5}$')        
+#     ax.set_title(site_nameinfo) 
+#     plt.legend()
+# 
+#     plt.plot()
+#     try:
+#         if axismax>1:
+#             plt.savefig(inputDir +'/plots/scatter/scatter_' + site_nameinfo+'.png', pad_inches=0.1, bbox_inches='tight')
+#         else:
+#             pass
+#     except(FileNotFoundError):
+#         pass
+# =============================================================================
+
 #%%        
 stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
@@ -492,7 +498,9 @@ stats_com.to_csv(inputDir + 'longterm_statistics.csv')
 # This si the section with site types and labeled ap3,ap4,ap5 arrows. 
 # I will modify this one to include some significant events, suhc as changes in domain
             
-# Monthly plots of averaged site types
+# =============================================================================
+#  Monthly plots of averaged site types
+# =============================================================================
 stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 stats_com = stats_com.drop(0,1)
