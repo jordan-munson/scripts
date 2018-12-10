@@ -270,12 +270,12 @@ for species in pollutant:
                     
                 if species == 'PM2.5':
                     ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
-                    ax.set_ylim(0,25)
+                    ax.set_ylim(0,30)
                     height = 20 # Height of annotations in graphs
                     spc = 1.2 # Space the annotations are moved up and down
                 else:
                     ax.set_ylabel('Ozone (ppb)')
-                    ax.set_ylim(0,50)
+                    ax.set_ylim(0,55)
                     height=10
                     spc = 2
                 
