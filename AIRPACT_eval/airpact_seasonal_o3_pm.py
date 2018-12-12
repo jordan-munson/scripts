@@ -5,7 +5,7 @@ Created on Fri Dec  7 08:33:10 2018
 @author: Jordan Munson
 """
 import matplotlib as mpl
-#mpl.use('Agg')
+mpl.use('Agg')
 import pandas as pd
 import matplotlib.dates as mdates
 import datetime as dt
@@ -18,25 +18,30 @@ from subprocess import check_call
 from datetime import timedelta
 from matplotlib.cm import get_cmap
 from mpl_toolkits.basemap import Basemap
-import os
 from netCDF4 import Dataset
 from matplotlib.backends.backend_pdf import PdfPages
 from calendar import monthrange
+from matplotlib.dates import DateFormatter
 
 starttime = time.time()
 begin_time = time.time()
 
-#Set directory
-inputDir = r'G:/Research/AIRPACT_eval/'
-# Open statistics script
-stat_path = r'G:/Research/scripts/Urbanova/statistical_functions.py'
-ben_path = r'G:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
-exec(open(stat_path).read())
-aqsid = pd.read_csv(r'G:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison/Aqsid.csv')
-aqsid = aqsid.drop(['Unnamed: 4','Unnamed: 5','Unnamed: 6','Latitude','Longitude'], axis=1)
-aqsid = aqsid.drop([0,0], axis=0)
+#Set directorys
+#inputDir = r'G:/Research/AIRPACT_eval/'
+#stat_path = r'G:/Research/scripts/Urbanova/statistical_functions.py'
+#aqsid = pd.read_csv(r'G:\Research\AIRPACT_eval/aqs_sites.csv')
 
-#%%
+# Aeolus directories
+inputDir = '/data/lar/users/jmunson/longterm_airpact/'
+stat_path = '/data/lar/users/jmunson/statistical_functions.py'
+aqsid = pd.read_csv(inputDir+'aqs_sites.csv')
+
+# Open statistics script
+exec(open(stat_path).read())
+#aqsid = aqsid.drop(['Unnamed: 4','Unnamed: 5','Unnamed: 6','Latitude','Longitude'], axis=1)
+#aqsid = aqsid.drop([0,0], axis=0)
+
+
 ##############################################################################
 # Read AQS data. csv's created from 'AQS_grabbing.py' script, and the model data from the previous lines of code
 ##############################################################################
@@ -46,7 +51,6 @@ df_mod['datetime'] = pd.to_datetime(df_mod['datetime']) #Must convert to date ti
 df_mod = df_mod.drop('Unnamed: 0',axis=1)
 
 #Create AQSID Column form state code, county code, and site num
-aqsid = pd.read_csv(r'G:\Research\AIRPACT_eval/aqs_sites.csv')
 aqsid = aqsid.ix[:,['State Code','County Code','Site Number','Local Site Name','Location Setting']]
 
 aqsid['County Code'] = ["%03d" % n for n in aqsid['County Code'] ]
@@ -169,20 +173,247 @@ stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 stats_com = stats_com.drop(0,1)
 #%%
 # =============================================================================
-#  Monthly plots of averaged site types
+# # =============================================================================
+# #  Monthly plots of averaged site types
+# # =============================================================================
+# stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
+# stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
+# stats_com = stats_com.drop(0,1)
+# settings = ['RURAL', 'SUBURBAN', 'URBAN AND CENTER CITY']
+# seasons = ['Summer','Fall','Winter','Spring'] 
+# pollutant = ['O3','PM2.5']
+# versions = ['AP3','AP4','AP5']
+# 
+# for species in pollutant:
+#     da = df_com.dropna(subset=['Location Setting'])
+# 
+#     for version in versions:
+#         print(version)
+#     # Set date range used based of versions
+#         if version == 'AP3':
+#             start_date ='2009-05-01'
+#             end_date = '2014-07-01'
+#             years = [2009,2010,2011,2012,2013,2014]
+#         elif version == 'AP4':
+#             start_date ='2014-07-01'
+#             end_date = '2015-12-01'
+#             years = [2014,2015]
+#         elif version == 'AP5':
+#             start_date ='2015-12-01'
+#             end_date = '2018-07-01'
+#             years = [2016,2017]
+#         
+#         # Locate correct site model data
+#         mask = (df_com['datetime'] > start_date) & (df_com['datetime'] <= end_date) # Create a mask to determine the date range used
+#         dc = da.loc[mask]
+#         
+#         for setting in settings:    #list(set(da['Location Setting'])):
+#             # Create the overal plot and its settings
+#             fig = plt.figure(figsize=(10,6))
+#             if species == 'PM2.5':
+#                 #fig.set_ylabel('$PM_{2.5} (ug/m^3)$')
+#                 fig.text(0, 0.5, '$PM_{2.5} (ug/m^3)$', va='center', rotation='vertical')
+#                
+#             else:
+#                 #fig.set_ylabel('Ozone (ppb)') 
+#                 fig.text(0, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
+#             fig.suptitle(str(version)+' '+str(setting),y=1) # title
+#             fig.tight_layout() # spaces the plots out a bit
+#             
+#             for season in seasons:
+#                 db=pd.DataFrame()       #reset empty
+#                 #This section selects only data relevant to the aqs site
+#                 print('Setting is ' + setting,season)
+#                 d = dc.loc[df_com['Location Setting']==setting]
+#                 d=d.reset_index()
+#                 site_type = d.loc[0,'Location Setting']
+#                 
+#                 # Determine how many sites are being used
+#                 temp1 = d.loc[(d['Location Setting'] == setting)].dropna(subset=[species+'_obs'])
+#                 temp1 = temp1.groupby(['Local Site Name']).count()
+#                 temp1 = len(temp1.index.get_level_values(0))
+#                 temp2 = d.loc[(d['Location Setting'] == setting)].dropna(subset=[species+'_mod'])
+#                 temp2 = temp2.groupby(['Local Site Name']).count()
+#                 temp2 = len(temp2.index.get_level_values(0))        
+#                 d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
+#                 d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
+#                 
+#                 d = d.set_index('datetime') # Set datetime column as index
+#                 d1=pd.DataFrame()
+#                 d2=pd.DataFrame()
+#                 d3=pd.DataFrame()
+#                 for year in years:
+#                 # Select seasons
+#                     if season == 'Summer':
+#                         year = str(year)
+#                         mask = (d.index > year+'-6-1') & (d.index <= year+'-6-30')
+#                         d11=d.loc[mask]
+#                         d1 = d1.append(d11)
+#                         mask = (d.index > year+'-7-1') & (d.index <= year+'-7-31')
+#                         d22=d.loc[mask]
+#                         d2 = d2.append(d22)
+#                         mask = (d.index > year+'-8-1') & (d.index <= year+'-8-31')
+#                         d33=d.loc[mask]
+#                         d3 = d3.append(d33)
+#                         dates = pd.date_range(start='6/1/2009',end='8/31/2009')
+#                         ax = fig.add_subplot(223)
+#                         
+#                     if season == 'Fall':
+#                         year = str(year)
+#                         mask = (d.index > year+'-9-1') & (d.index <= year+'-9-30')
+#                         d11=d.loc[mask]
+#                         d1 = d1.append(d11)
+#                         mask = (d.index > year+'-10-1') & (d.index <= year+'-10-31')
+#                         d22=d.loc[mask]
+#                         d2 = d2.append(d22)
+#                         mask = (d.index > year+'-11-1') & (d.index <= year+'-11-30')
+#                         d33=d.loc[mask]
+#                         d3 = d3.append(d33)
+#                         dates = pd.date_range(start='9/1/2009',end='11/30/2009')
+#                         ax = fig.add_subplot(224)
+#                         
+#                     if season == 'Winter':
+#                         if year == 2009:   # Don't have 2008 data, so have to skip first iteration
+#                             continue
+#                         mask = (d.index > str(year-1)+'-12-1') & (d.index <= str(year-1)+'-12-31')
+#                         d11=d.loc[mask]
+#                         d1 = d1.append(d11)
+#                         year = str(year)
+#                         mask = (d.index > year+'-1-1') & (d.index <= year+'-1-31')
+#                         d22=d.loc[mask]
+#                         d2 = d2.append(d22)
+#                         mask = (d.index > year+'-2-1') & (d.index <= year+'-2-28')
+#                         d33=d.loc[mask]
+#                         d3 = d3.append(d33)
+#                         dates = pd.date_range(start='12/1/2009',end='2/28/2010')
+#                         ax = fig.add_subplot(221)
+# 
+#                         
+#                     if season == 'Spring':
+#                         if year == 2009:   # Don't have 2008 data, so have to skip first iteration
+#                             continue
+#                         year = str(year)
+#                         mask = (d.index > year+'-3-1') & (d.index <= year+'-3-31')
+#                         d11=d.loc[mask]
+#                         d1 = d1.append(d11)
+#                         mask = (d.index > year+'-4-1') & (d.index <= year+'-4-30')
+#                         d22=d.loc[mask]
+#                         d2 = d2.append(d22)
+#                         mask = (d.index > year+'-5-1') & (d.index <= year+'-5-31')
+#                         d33=d.loc[mask]
+#                         d3 = d3.append(d33)
+#                         dates = pd.date_range(start='3/1/2009',end='5/31/2009')
+#                         ax = fig.add_subplot(222)
+# 
+#                         
+#                 plt.rcParams["figure.figsize"] = (8,4)
+#                 plt.tight_layout() # spaces the plots out a bit
+# 
+#                 # Change data to monthly averages
+#                 d1 = d1.groupby(d1.index.day).mean()
+#                 d2 = d2.groupby(d2.index.day).mean()
+#                 d3 = d3.groupby(d3.index.day).mean()
+#                 cat = [d1,d2,d3]
+#                 db = pd.concat(cat).reset_index(drop=True)
+#                 db['datetime'] = dates
+#                 db = db.set_index('datetime')
+#                 #db = db.resample('D', convention='start').mean()
+#                 
+#                 # Plotting section
+#                 #ax = fig.add_subplot(1,i,1)
+#                 #Plot
+#                 db.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
+#                     
+#                 if species == 'PM2.5':
+#                     #ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
+#                     ax.set_ylim(0,30)
+#                     height = 20 # Height of annotations in graphs
+#                     spc = 1.2 # Space the annotations are moved up and down
+#                 else:
+#                     #ax.set_ylabel('Ozone (ppb)')
+#                     ax.set_ylim(0,55)
+#                     height=10
+#                     spc = 2
+#                 
+#                 #ax.set_xlim('2009-1-1','2018-7-1')
+#                 myFmt = DateFormatter("%m")
+#                 ax.xaxis.set_major_formatter(myFmt)
+#                 ax.set_xlabel('')        # Gets rid of the 'DateTime' x label and replaces with a space
+#                 ax.set_title(str(season),fontsize=12) # sets the titles of individ plots as the season, and makes the font smaller
+#                 plt.legend(prop={'size': 10},loc=3) # Places the legend in the lower left corner at a size of 10
+#                 sze = 10 #size of annotation text
+#                 
+#                 plt.grid(True)    # Add grid lines to make graph interpretation easier
+#                 
+#                 #Calculate Statistics
+#                 try:
+#                     #Run stats functions
+#                     aq_stats = stats(d, species+'_mod', species+'_obs')
+#                 
+#                 # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
+#            
+#                     # Merge stats into single dataframe
+#                     aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + site_type)    
+#                     stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
+#                     
+#                     #Drop some stats to put on plots
+#                     aq_stats = aq_stats.drop('MB',0)        
+#                     aq_stats = aq_stats.drop('ME',0)
+#                     aq_stats = aq_stats.drop('RMSE',0)
+#                     aq_stats = aq_stats.drop('NMB',0)
+#                     aq_stats = aq_stats.drop('NME',0)
+#                 except (ZeroDivisionError):
+#                     pass
+#                     
+#                     #ax.text(0.15,-0.15, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
+#             try:
+#                 if species == 'O3':
+#                     print('O3')
+#                     plt.savefig(inputDir+'/plots/seasons/'+'O3_seasons_sitetype_'+site_type+'_'+version+'.png',  pad_inches=0.1, bbox_inches='tight')
+#                 else:
+#                     print('PM')
+#                     plt.savefig(inputDir+'/plots/seasons/'+'PM_seasons_sitetype_'+site_type+'_'+version+'.png',  pad_inches=0.1, bbox_inches='tight')
+#                 #plt.show()
+#                 #plt.close()
+#             except(FileNotFoundError):
+#                 pass
+#         
+# 
+# =============================================================================
+#%%
+# =============================================================================
+#  The section below makes seasonal plots irregardless of site type
 # =============================================================================
 stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 stats_com = stats_com.drop(0,1)
 settings = ['RURAL', 'SUBURBAN', 'URBAN AND CENTER CITY']
-seasons = ['Summer','Fall'] 
-pollutant = ['O3','PM2.5']
+seasons = ['Summer','Fall','Winter','Spring'] 
+pollutant = ['PM2.5','O3']
 versions = ['AP3','AP4','AP5']
 
 for species in pollutant:
+    print(species)
     da = df_com.dropna(subset=['Location Setting'])
-    
-    for version in versions:
+    # Create the overal plot and its settings
+    fig = plt.figure(figsize=(10,18))
+    if species == 'PM2.5':
+        #fig.set_ylabel('$PM_{2.5} (ug/m^3)$')
+        fig.text(-0.02, 0.5, '$PM_{2.5} (ug/m^3)$', va='center', rotation='vertical')
+       
+    else:
+        #fig.set_ylabel('Ozone (ppb)') 
+        fig.text(-0.02, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
+    fig.suptitle('Seasonal Variations by AIRPACT Version',y=1.02) # title
+    fig.tight_layout() # spaces the plots out a bit
+
+    #Annotate versions in
+    fig.text(0, 0.99, 'AIRPACT 3', va='center')
+    fig.text(0, 0.66, 'AIRPACT 4', va='center')
+    fig.text(0, 0.33, 'AIRPACT 5', va='center')
+
+    for version,i in zip(versions,[0,4,8]):
+        print(version)
     # Set date range used based of versions
         if version == 'AP3':
             start_date ='2009-05-01'
@@ -201,150 +432,159 @@ for species in pollutant:
         mask = (df_com['datetime'] > start_date) & (df_com['datetime'] <= end_date) # Create a mask to determine the date range used
         dc = da.loc[mask]
         
-        for setting in settings:    #list(set(da['Location Setting'])):
-            for season in seasons:
-                db=pd.DataFrame()       #reset empty
-                #This section selects only data relevant to the aqs site
-                print('Setting is ' + setting,season)
-                d = dc.loc[df_com['Location Setting']==setting]
-                d=d.reset_index()
-                site_type = d.loc[0,'Location Setting']
-                
-                # Determine how many sites are being used
-                temp1 = d.loc[(d['Location Setting'] == setting)].dropna(subset=[species+'_obs'])
-                temp1 = temp1.groupby(['Local Site Name']).count()
-                temp1 = len(temp1.index.get_level_values(0))
-                temp2 = d.loc[(d['Location Setting'] == setting)].dropna(subset=[species+'_mod'])
-                temp2 = temp2.groupby(['Local Site Name']).count()
-                temp2 = len(temp2.index.get_level_values(0))        
-                d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
-                d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
-                
-                d = d.set_index('datetime') # Set datetime column as index
-                d1=pd.DataFrame()
-                d2=pd.DataFrame()
-                d3=pd.DataFrame()
-                for year in years:
-                # Select seasons
-                    if season == 'Summer':
-                        year = str(year)
-                        mask = (d.index > year+'-6-1') & (d.index <= year+'-6-30')
-                        d11=d.loc[mask]
-                        d1 = d1.append(d11)
-                        mask = (d.index > year+'-7-1') & (d.index <= year+'-7-31')
-                        d22=d.loc[mask]
-                        d2 = d2.append(d22)
-                        mask = (d.index > year+'-8-1') & (d.index <= year+'-8-31')
-                        d33=d.loc[mask]
-                        d3 = d3.append(d33)
-                        dates = pd.date_range(start='6/1/2009',end='8/31/2009')
-                        
-                    if season == 'Fall':
-                        year = str(year)
-                        mask = (d.index > year+'-9-1') & (d.index <= year+'-9-30')
-                        d11=d.loc[mask]
-                        d1 = d1.append(d11)
-                        mask = (d.index > year+'-10-1') & (d.index <= year+'-10-31')
-                        d22=d.loc[mask]
-                        d2 = d2.append(d22)
-                        mask = (d.index > year+'-11-1') & (d.index <= year+'-11-30')
-                        d33=d.loc[mask]
-                        d3 = d3.append(d33)
-                        dates = pd.date_range(start='9/1/2009',end='11/30/2009')
-    
-                # Change data to monthly averages
-                  
-                d1 = d1.groupby(d1.index.day).mean()
-                d2 = d2.groupby(d2.index.day).mean()
-                d3 = d3.groupby(d3.index.day).mean()
-                cat = [d1,d2,d3]
-                db = pd.concat(cat).reset_index(drop=True)
-                db['datetime'] = dates
-                db = db.set_index('datetime')
-                #db = db.resample('D', convention='start').mean()
-                
-                # Plotting section
-                fig,ax=plt.subplots(1,1, figsize=(12,4)) #Set figure dimensions
-                #Plot
-                db.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
-                    
-                if species == 'PM2.5':
-                    ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
-                    ax.set_ylim(0,30)
-                    height = 20 # Height of annotations in graphs
-                    spc = 1.2 # Space the annotations are moved up and down
-                else:
-                    ax.set_ylabel('Ozone (ppb)')
-                    ax.set_ylim(0,55)
-                    height=10
-                    spc = 2
-                
-                #ax.set_xlim('2009-1-1','2018-7-1')
-                ax.set_xlabel(' ')        
-                ax.set_title(str(version)+' '+str(site_type)+' '+str(season))
-                plt.legend(prop={'size': 10},loc=2)
-                sze = 10 #size of annotation text
-                
-                plt.grid(True)    # Add grid lines to make graph interpretation easier
-                
-    # =============================================================================
-    #             # Create Airpact version change annotation       
-    #             ax.annotate('AP3',xy=(0.07,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,0.061),color='red',size='x-small') # Left Arrow AP3
-    #             ax.annotate('AP3',xy=(0.35,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,0.061),color='red',size='x-small') # Right Arrow AP3
-    #             
-    #             ax.annotate('AP4',xy=(0.35,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.45,0.061),color='red',size='x-small') # Left Arrow AP4
-    #             ax.annotate('AP4',xy=(0.55,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.45,0.061),color='red',size='x-small') # Right Arrow AP4
-    #     
-    #             ax.annotate('AP5',xy=(0.55,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.68,0.061),color='red',size='x-small') # Left Arrow AP5
-    #             ax.annotate('AP5',xy=(0.82,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.68,0.061),color='red',size='x-small') # Right Arrow AP5
-    #             
-    #             # Add significant event annotations to plots
-    #             ax.annotate('Species Increased',xy=('2010-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2010-7-1',height-spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-    #             ax.annotate('12km to 4km',xy=('2012-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2012-7-1',height),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km       
-    #             ax.annotate('Switch to WRF 3.4.1',xy=('2012-10-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2012-10-1',height+spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-    #             ax.annotate('MOVES replaces MOBILE6',xy=('2013-10-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2013-10-1',height+spc*2),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-    #             ax.annotate('Canadian Fire Incorporated',xy=('2015-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2015-7-1',height-spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-    #             ax.annotate('Switch to WRF 3.7.1',xy=('2015-11-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2015-11-1',height),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-    #             ax.annotate('Increased Layers',xy=('2016-4-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2016-4-1',height+spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-    #             ax.annotate('Updated Road Dust Emissions',xy=('2016-12-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2016-12-1',height+spc*2),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-    #     
-    # =============================================================================
+
         
-        
-                ax.text(1.01, 0.4,'# of Observation sites '+str(temp1),fontsize = 12, ha='left', va='center', transform=ax.transAxes)  
-                #ax.text(1.01, 0.5,'# of Model sites '+str(temp2),fontsize = 12, ha='left', va='center', transform=ax.transAxes)  
-        
-                #Calculate Statistics
-                try:
-                    #Run stats functions
-                    aq_stats = stats(d, species+'_mod', species+'_obs')
-                
-                # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
-           
-                    # Merge stats into single dataframe
-                    aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + site_type)    
-                    stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
-                    
-                    #Drop some stats to put on plots
-                    aq_stats = aq_stats.drop('MB',0)        
-                    aq_stats = aq_stats.drop('ME',0)
-                    aq_stats = aq_stats.drop('RMSE',0)
-                    aq_stats = aq_stats.drop('NMB',0)
-                    aq_stats = aq_stats.drop('NME',0)
-                    
-                    #ax.text(0.15,-0.15, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
-                    try:
-                        if species == 'O3':
-                            print('O3')
-                            #plt.savefig(inputDir+'/plots/monthly/ozone/'+'O3_monthly_sitetype_'+site_type+'.png',  pad_inches=0.1, bbox_inches='tight')
-                        else:
-                            print('PM')
-                            #plt.savefig(inputDir+'/plots/monthly/pm/'+'PM_monthly_sitetype_'+site_type+'.png',  pad_inches=0.1, bbox_inches='tight')
-                        plt.show()
-                        plt.close()
-                    except(FileNotFoundError):
-                        pass
-        
-                except (ZeroDivisionError):
-                    pass
+        for season in seasons:
+            print(season)
+            db=pd.DataFrame()       #reset empty
+            #This section selects only data relevant to the aqs site
+ 
+            # set dataframe maybe
+            d=df_com.copy()
+            d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
+            #print('starting datetime conversion')
+            d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
+            #print('datetime conversion finished')
             
+            d = d.set_index('datetime') # Set datetime column as index
+            d1=pd.DataFrame()
+            d2=pd.DataFrame()
+            d3=pd.DataFrame()
+            for year in years:
+            # Select seasons
+                if season == 'Summer':
+                    year = str(year)
+                    mask = (d.index > year+'-6-1') & (d.index <= year+'-6-30')
+                    d11=d.loc[mask]
+                    d1 = d1.append(d11)
+                    mask = (d.index > year+'-7-1') & (d.index <= year+'-7-31')
+                    d22=d.loc[mask]
+                    d2 = d2.append(d22)
+                    mask = (d.index > year+'-8-1') & (d.index <= year+'-8-31')
+                    d33=d.loc[mask]
+                    d3 = d3.append(d33)
+                    dates = pd.date_range(start='6/1/2009',end='8/31/2009')
+                    ax = fig.add_subplot(6,2,3+i)
+                    
+                if season == 'Fall':
+                    year = str(year)
+                    mask = (d.index > year+'-9-1') & (d.index <= year+'-9-30')
+                    d11=d.loc[mask]
+                    d1 = d1.append(d11)
+                    mask = (d.index > year+'-10-1') & (d.index <= year+'-10-31')
+                    d22=d.loc[mask]
+                    d2 = d2.append(d22)
+                    mask = (d.index > year+'-11-1') & (d.index <= year+'-11-30')
+                    d33=d.loc[mask]
+                    d3 = d3.append(d33)
+                    dates = pd.date_range(start='9/1/2009',end='11/30/2009')
+                    ax = fig.add_subplot(6,2,4+i)
+                    
+                if season == 'Winter':
+                    if year == 2009:   # Don't have 2008 data, so have to skip first iteration
+                        continue
+                    mask = (d.index > str(year-1)+'-12-1') & (d.index <= str(year-1)+'-12-31')
+                    d11=d.loc[mask]
+                    d1 = d1.append(d11)
+                    year = str(year)
+                    mask = (d.index > year+'-1-1') & (d.index <= year+'-1-31')
+                    d22=d.loc[mask]
+                    d2 = d2.append(d22)
+                    mask = (d.index > year+'-2-1') & (d.index <= year+'-2-28')
+                    d33=d.loc[mask]
+                    d3 = d3.append(d33)
+                    dates = pd.date_range(start='12/1/2009',end='2/28/2010')
+                    ax = fig.add_subplot(6,2,1+i)
+
+                    
+                if season == 'Spring':
+                    if year == 2009:   # Don't have 2008 data, so have to skip first iteration
+                        continue
+                    year = str(year)
+                    mask = (d.index > year+'-3-1') & (d.index <= year+'-3-31')
+                    d11=d.loc[mask]
+                    d1 = d1.append(d11)
+                    mask = (d.index > year+'-4-1') & (d.index <= year+'-4-30')
+                    d22=d.loc[mask]
+                    d2 = d2.append(d22)
+                    mask = (d.index > year+'-5-1') & (d.index <= year+'-5-31')
+                    d33=d.loc[mask]
+                    d3 = d3.append(d33)
+                    dates = pd.date_range(start='3/1/2009',end='5/31/2009')
+                    ax = fig.add_subplot(6,2,2+i)
+
+                    
+            plt.rcParams["figure.figsize"] = (8,4)
+            plt.tight_layout() # spaces the plots out a bit
+
+            # Change data to monthly averages
+            d1 = d1.groupby(d1.index.day).mean()
+            d2 = d2.groupby(d2.index.day).mean()
+            d3 = d3.groupby(d3.index.day).mean()
+            cat = [d1,d2,d3]
+            db = pd.concat(cat).reset_index(drop=True)
+            db['datetime'] = dates
+            db = db.set_index('datetime')
+            #db = db.resample('D', convention='start').mean()
+            
+            # Plotting section
+            #ax = fig.add_subplot(1,i,1)
+            #Plot
+            db.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
+                
+            if species == 'PM2.5':
+                #ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
+                ax.set_ylim(0,30)
+                height = 20 # Height of annotations in graphs
+                spc = 1.2 # Space the annotations are moved up and down
+            else:
+                #ax.set_ylabel('Ozone (ppb)')
+                ax.set_ylim(0,55)
+                height=10
+                spc = 2
+            
+            #ax.set_xlim('2009-1-1','2018-7-1')
+            myFmt = DateFormatter("%b")
+            ax.xaxis.set_major_formatter(myFmt)
+            ax.set_xlabel('')        # Gets rid of the 'DateTime' x label and replaces with a space
+            ax.set_title(str(season),fontsize=12) # sets the titles of individ plots as the season, and makes the font smaller
+            plt.legend(prop={'size': 10})#,loc=3) # Places the legend in the lower left corner at a size of 10
+            sze = 10 #size of annotation text
+            
+            plt.grid(True)    # Add grid lines to make graph interpretation easier
+            
+            #Calculate Statistics
+            try:
+                #Run stats functions
+                aq_stats = stats(d, species+'_mod', species+'_obs')
+            
+            # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
+       
+                # Merge stats into single dataframe
+                aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species)    
+                stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
+                
+                #Drop some stats to put on plots
+                aq_stats = aq_stats.drop('MB',0)        
+                aq_stats = aq_stats.drop('ME',0)
+                aq_stats = aq_stats.drop('RMSE',0)
+                aq_stats = aq_stats.drop('NMB',0)
+                aq_stats = aq_stats.drop('NME',0)
+            except (ZeroDivisionError):
+                pass
+                
+                #ax.text(0.15,-0.15, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
+    try:
+        if species == 'O3':
+            print('O3')
+            plt.savefig(inputDir+'/plots/seasons/'+'O3_seasons.png',  pad_inches=0.1, bbox_inches='tight')
+        else:
+            print('PM')
+            plt.savefig(inputDir+'/plots/seasons/'+'PM_seasons.png',  pad_inches=0.1, bbox_inches='tight')
+        #plt.show()
+        #plt.close()
+    except(FileNotFoundError):
+        pass
+end_time = time.time()
+print("Run time was %s minutes"%(round((end_time-begin_time)/60)))
+print('done')

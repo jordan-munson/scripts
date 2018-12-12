@@ -87,7 +87,7 @@ df_mod = df_mod.drop(['DateTime'], axis=1)
 df_mod.to_csv(inputDir + '/model_aqs.csv')
 print('Model data combined')
 '''
-#%%
+
 ##############################################################################
 # Read AQS data. csv's created from 'AQS_grabbing.py' script, and the model data from the previous lines of code
 ##############################################################################
@@ -509,7 +509,11 @@ settings = ['RURAL', 'SUBURBAN', 'URBAN AND CENTER CITY']
 pollutant = ['O3','PM2.5']
 for species in pollutant:
     da = df_com.dropna(subset=['Location Setting'])
-    for setting in settings:    #list(set(da['Location Setting'])):
+    fig = plt.figure(figsize=(14,16))
+    fig.suptitle('Monthly Averaged '+str(species),y=0.94,fontsize=28,ha='center') # title
+    fig.tight_layout() # spaces the plots out a bit
+    
+    for setting,i in zip(settings,[1,2,3]):    #list(set(da['Location Setting'])):
         #This section selects only data relevant to the aqs site
         print('Setting is ' + setting)
         d = da.loc[df_com['Location Setting']==setting]
@@ -536,9 +540,10 @@ for species in pollutant:
         #d=d.loc[mask]
         #dc = fb(d.resample('M',convention='start'),d[species+'_mod'],d[species+'_obs'])
         d = d.resample('M', convention='start').mean()
-        fig,ax=plt.subplots(1,1, figsize=(12,4)) #Set figure dimensions
-
+        #fig,ax=plt.subplots(1,1, figsize=(12,4)) #Set figure dimensions
+        
         #Plot
+        ax = fig.add_subplot(3,1,i) # set subplots
         d.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
         
         if species == 'PM2.5':
@@ -554,21 +559,39 @@ for species in pollutant:
         
         ax.set_xlim('2009-1-1','2018-7-1')
         ax.set_xlabel(' ')        
-        ax.set_title('Type: '+str(site_type))
+        ax.set_title(str(site_type))
         plt.legend(prop={'size': 10},loc=2)
         sze = 10 #size of annotation text
         
         plt.grid(True)    # Add grid lines to make graph interpretation easier
         
-        # Create Airpact version change annotation       
-        ax.annotate('AP3',xy=(0.07,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,0.061),color='red',size='x-small') # Left Arrow AP3
-        ax.annotate('AP3',xy=(0.35,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,0.061),color='red',size='x-small') # Right Arrow AP3
+        #text_height = 0.061
+        text_height = 0.05
+        x1 = 0.395
+        x2 = 0.622
+        x3 = 0.95
         
-        ax.annotate('AP4',xy=(0.35,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.45,0.061),color='red',size='x-small') # Left Arrow AP4
-        ax.annotate('AP4',xy=(0.55,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.45,0.061),color='red',size='x-small') # Right Arrow AP4
-
-        ax.annotate('AP5',xy=(0.55,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.68,0.061),color='red',size='x-small') # Left Arrow AP5
-        ax.annotate('AP5',xy=(0.82,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.68,0.061),color='red',size='x-small') # Right Arrow AP5
+        t1 = (x1-0.07)/2+0.07
+        t2 = (x2-x1)/2+x1
+        t3 = (x3-x2)/2+x2
+        
+        if i == 3:
+            # Create Airpact version change annotation. First commented out section is for having site number on side       
+            #ax.annotate('AP3',xy=(0.07,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,text_height),va='center',color='red',size='x-small') # Left Arrow AP3 # previous height of 0.061 for the xytext
+            #ax.annotate('AP3',xy=(0.35,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,text_height),va='center',color='red',size='x-small') # Right Arrow AP3            
+            #ax.annotate('AP4',xy=(0.35,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.45,text_height),va='center',color='red',size='x-small') # Left Arrow AP4
+            #ax.annotate('AP4',xy=(0.55,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.45,text_height),va='center',color='red',size='x-small') # Right Arrow AP4    
+            #ax.annotate('AP5',xy=(0.55,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.68,text_height),va='center',color='red',size='x-small') # Left Arrow AP5
+            #ax.annotate('AP5',xy=(0.82,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.68,text_height),va='center',color='red',size='x-small') # Right Arrow AP5
+        
+            ax.annotate('AP3',xy=(0.07,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Left Arrow AP3 # previous height of 0.061 for the xytext
+            ax.annotate('AP3',xy=(x1,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Right Arrow AP3
+            
+            ax.annotate('AP4',xy=(x1,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Left Arrow AP4
+            ax.annotate('AP4',xy=(x2,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Right Arrow AP4
+    
+            ax.annotate('AP5',xy=(x2,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Left Arrow AP5
+            ax.annotate('AP5',xy=(x3,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Right Arrow AP5
         
         # Add significant event annotations to plots
         ax.annotate('Species Increased',xy=('2010-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2010-7-1',height-spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
@@ -581,9 +604,8 @@ for species in pollutant:
         ax.annotate('Updated Road Dust Emissions',xy=('2016-12-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2016-12-1',height+spc*2),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
 
 
-
-        ax.text(1.01, 0.4,'# of Observation sites '+str(temp1),fontsize = 12, ha='left', va='center', transform=ax.transAxes)  
-        #ax.text(1.01, 0.5,'# of Model sites '+str(temp2),fontsize = 12, ha='left', va='center', transform=ax.transAxes)  
+        #ax.text(1.01, 0.4,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes)  
+        ax.text(0.98, 0.92,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes)  
 
         #Calculate Statistics
         try:
@@ -602,20 +624,21 @@ for species in pollutant:
             aq_stats = aq_stats.drop('RMSE',0)
             aq_stats = aq_stats.drop('NMB',0)
             aq_stats = aq_stats.drop('NME',0)
-            
-            #ax.text(0.15,-0.15, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
-            try:
-                if species == 'O3':
-                    plt.savefig(inputDir+'/plots/monthly/ozone/'+'O3_monthly_sitetype_'+site_type+'.png',  pad_inches=0.1, bbox_inches='tight')
-                else:
-                    plt.savefig(inputDir+'/plots/monthly/pm/'+'PM_monthly_sitetype_'+site_type+'.png',  pad_inches=0.1, bbox_inches='tight')
-                plt.show()
-                plt.close()
-            except(FileNotFoundError):
-                pass
-
         except (ZeroDivisionError):
             pass
+            
+            #ax.text(0.15,-0.15, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
+    try:
+        if species == 'O3':
+            plt.savefig(inputDir+'/plots/monthly/ozone/'+'O3_monthly_sitetype.png',  pad_inches=0.1, bbox_inches='tight')
+        else:
+            plt.savefig(inputDir+'/plots/monthly/pm/'+'PM_monthly_sitetype.png',  pad_inches=0.1, bbox_inches='tight')
+        plt.show()
+        plt.close()
+    except(FileNotFoundError):
+        pass
+
+
         
 
 #%%
