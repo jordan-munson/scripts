@@ -408,24 +408,27 @@ for species in pollutant:
     fig.tight_layout() # spaces the plots out a bit
 
     #Annotate versions in
-    fig.text(0, 0.99, 'AIRPACT 3', va='center')
-    fig.text(0, 0.66, 'AIRPACT 4', va='center')
-    fig.text(0, 0.33, 'AIRPACT 5', va='center')
+    fig.text(0.5, 0.99, 'AIRPACT 3', va='center',ha='center')
+    fig.text(0.5, 0.66, 'AIRPACT 4', va='center',ha='center')
+    fig.text(0.5, 0.33, 'AIRPACT 5', va='center',ha='center')
 
     for version,i in zip(versions,[0,4,8]):
         print(version)
     # Set date range used based of versions
         if version == 'AP3':
             start_date ='2009-05-01'
-            end_date = '2014-07-01'
+            #end_date = '2014-07-01'
+            end_date = '2014-06-30'
             years = [2009,2010,2011,2012,2013,2014]
         elif version == 'AP4':
             start_date ='2014-07-01'
-            end_date = '2015-12-01'
+            #end_date = '2015-12-01'
+            end_date = '2015-11-30'
             years = [2014,2015]
         elif version == 'AP5':
             start_date ='2015-12-01'
-            end_date = '2018-07-01'
+            #end_date = '2018-07-01'
+            end_date = '2018-06-30'
             years = [2016,2017]
         
         # Locate correct site model data
