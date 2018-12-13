@@ -55,10 +55,8 @@ def fb(df,name_var1,name_var2):  #var1 is model var2 is observed
     df_new[name_var2]=df[name_var2]
     df_new['dif_var']=df_new[name_var1]-df_new[name_var2]
     df_new['sum_var']=df_new[name_var1]+df_new[name_var2]
-# =============================================================================
-#     df_new = df_new.drop(df_new[df_new.sum_var<=0].index) # Drop cells that are zero. These values cause infinity results
-#     df_new = df_new.drop(df_new[df_new.dif_var==0].index) # Drop cells that are zero. These values cause infinity results 
-# =============================================================================
+    df_new = df_new.drop(df_new[df_new.sum_var<=0].index) # Drop cells that are zero. These values cause infinity results
+    df_new = df_new.drop(df_new[df_new.dif_var==0].index) # Drop cells that are zero. These values cause infinity results 
     df_new = df_new.dropna()
     FB= round((df_new['dif_var']/df_new['sum_var']).sum()*(2/len(df_new.index))*100,2)
     return FB
@@ -70,10 +68,8 @@ def fe(df,name_var1,name_var2):  #var1 is model var2 is observed
     df_new[name_var2]=df[name_var2]
     df_new['dif_var']=abs(df_new[name_var1]-df_new[name_var2])
     df_new['sum_var']=df_new[name_var1]+df_new[name_var2]
-# =============================================================================
-#     df_new = df_new.drop(df_new[df_new.sum_var<=0].index) # Drop cells that are zero. These values cause infinity results
-#     df_new = df_new.drop(df_new[df_new.dif_var==0].index) # Drop cells that are zero. These values cause infinity results
-# =============================================================================
+    df_new = df_new.drop(df_new[df_new.sum_var<=0].index) # Drop cells that are zero. These values cause infinity results
+    df_new = df_new.drop(df_new[df_new.dif_var==0].index) # Drop cells that are zero. These values cause infinity results
     df_new = df_new.dropna()
     FE= round((df_new['dif_var']/df_new['sum_var']).sum()*(2/len(df_new.index))*100,2)
     return FE

@@ -534,7 +534,8 @@ for species in pollutant:
             #ax = fig.add_subplot(1,i,1)
             #Plot
             db.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
-                
+            ax.set_xlim(start_date,end_date) # set limits in the hopes of removing doubled last label
+            plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right') # angle x axis labels
             if species == 'PM2.5':
                 #ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
                 ax.set_ylim(0,30)

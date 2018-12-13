@@ -31,7 +31,6 @@ fig.tight_layout() # spaces the plots out a bit
 fig.text(0.5, .99, 'AIRPACT 3', va='center',ha='center')
 fig.text(0.5, 0.66, 'AIRPACT 4', va='center',ha='center')
 fig.text(0.5, 0.33, 'AIRPACT 5', va='center',ha='center')
-
 for i in [1,2,3,4,5,6,7,8,9,10,11,12]:
     ax = fig.add_subplot(6,2,i)
     plt.rcParams["figure.figsize"] = (8,4)
@@ -41,6 +40,10 @@ for i in [1,2,3,4,5,6,7,8,9,10,11,12]:
     ax.set_title(str('Winter'),fontsize=12) # sets the titles of individ plots as the season, and makes the font smaller
     plt.legend(prop={'size': 10})#,loc=3) # Places the legend in the lower left corner at a size of 10
     sze = 10 #size of annotation text
+    
+    plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right')
+    #ax.xaxis.labelpad = 100
+    
     
     plt.grid(True)    # Add grid lines to make graph interpretation easier
     

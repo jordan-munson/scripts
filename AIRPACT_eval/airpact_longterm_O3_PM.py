@@ -724,6 +724,7 @@ for species in pollutant:
             
 
              #Calculate Statistics. Organized the way they are so as to make plotting easier
+            df_stats = df_stats.reset_index(drop=True)
             df_stats = df_stats.ix[:,[species+'_mod',species+'_obs','AQSID']]
             df_stats = df_stats.dropna()
             df_stats['diff'] = df_stats[species+'_obs'].abs()-df_stats[species+'_mod'].abs()
