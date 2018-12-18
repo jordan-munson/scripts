@@ -466,7 +466,9 @@ for species in pollutant:
                     mask = (d.index > year+'-8-1') & (d.index <= year+'-8-31')
                     d33=d.loc[mask]
                     d3 = d3.append(d33)
-                    dates = pd.date_range(start='6/1/2009',end='8/31/2009')
+                    s = '6/1/2009'
+                    e = '8/31/2009'
+                    dates = pd.date_range(start=s,end=e)
                     ax = fig.add_subplot(6,2,3+i)
                     
                 if season == 'Fall':
@@ -480,7 +482,9 @@ for species in pollutant:
                     mask = (d.index > year+'-11-1') & (d.index <= year+'-11-30')
                     d33=d.loc[mask]
                     d3 = d3.append(d33)
-                    dates = pd.date_range(start='9/1/2009',end='11/30/2009')
+                    s = '9/1/2009'
+                    e = '11/20/2009'
+                    dates = pd.date_range(start=s,end=e)
                     ax = fig.add_subplot(6,2,4+i)
                     
                 if season == 'Winter':
@@ -496,7 +500,9 @@ for species in pollutant:
                     mask = (d.index > year+'-2-1') & (d.index <= year+'-2-28')
                     d33=d.loc[mask]
                     d3 = d3.append(d33)
-                    dates = pd.date_range(start='12/1/2009',end='2/28/2010')
+                    s = '12/1/2009'
+                    e = '2/28/2010'
+                    dates = pd.date_range(start=s,end=e)
                     ax = fig.add_subplot(6,2,1+i)
 
                     
@@ -534,7 +540,7 @@ for species in pollutant:
             #ax = fig.add_subplot(1,i,1)
             #Plot
             db.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
-            ax.set_xlim(start_date,end_date) # set limits in the hopes of removing doubled last label
+            ax.set_xlim(s,e) # set limits in the hopes of removing doubled last label
             plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right') # angle x axis labels
             if species == 'PM2.5':
                 #ax.set_ylabel('$PM_{2.5} (ug/m^3)$')

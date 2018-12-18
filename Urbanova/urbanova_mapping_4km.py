@@ -28,10 +28,10 @@ grid_dir=r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\AIRPACT\2018
 #ata_dir = '/data/lar/projects/Urbanova/'
 #grid_dir = '/data/lar/projects/Urbanova/2018/2018011100/MCIP37/'
 
-exec(open(base_dir + "/airpact_functions.py").read())
+exec(open(r"E:\Research\scripts\Urbanova/airpact_functions.py").read())
 # set start and end date
 start = datetime.datetime(year=2018, month=2, day=13, hour=0)
-end = datetime.datetime(year=2018, month=2, day=14, hour=23)
+end = datetime.datetime(year=2018, month=2, day=13, hour=23)
 timezone = pytz.timezone("utc")
 start = timezone.localize(start)
 end = timezone.localize(end)

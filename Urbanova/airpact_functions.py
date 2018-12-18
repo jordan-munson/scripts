@@ -18,7 +18,11 @@ import os
 #Read AIRPACT gas species
 def readAIRPACTgas(infile,layer):
     #gaslist = ['NO','NO2','SO2','O3','ISOP','CO','NH3','FORM']  # Feb 16 2017 - add more VOC species to evaluate MOSAIC
-    gaslist = ['O3']
+
+    if filetype == 'aconc':
+        gaslist = ["O3",'BENZENE','CO','NH3','NO','NO2','SO2']
+    else:
+        gaslist = ['O3']
     airpactgas = {}
     for k in gaslist:
         airpactgas[k] = infile.variables[k][:,layer,:,:]
@@ -302,3 +306,152 @@ def stats(df,name_var1,name_var2):
     g.index = ["FB","FE","NMB", "NME", "RMSE", "r_squared"]
     g.columns = [name_var1]
     return g
+#%%
+
+
+# save aconc output into dataframe
+def get_aconc_DF(start, end, layer):
+    # prepare time loop to read model output
+    filetype='aconc'
+    date_diff =end -start
+    date_diff =  int(round( date_diff.total_seconds()/60/60/24)) # total hour duration
+    print('date diff is '+ str(date_diff))
+    print("start date is "+ start.strftime("%Y%m%d") )
+    now = start
+    
+    modelarray={}
+    hr=(end-start).total_seconds()/3600+1
+    hr=int(hr)
+    print('Hours in df are ' + str(hr))
+    lonarray = np.zeros ( (hr,y_dim, x_dim) )
+    latarray = np.zeros ( (hr,y_dim, x_dim) )
+    for i in range(0,hr):
+        latarray[i,:,:] = lat
+        lonarray[i,:,:] = lon
+    
+    for t in range(0, len(modeloutputs)):
+        #modeloutput= datadir +"input/wrfout_d01_" +  now.strftime("%Y-%m-%d_00:00:00_subset")
+        # open and read wrfout using netCDF function (Dataset)
+        if os.path.isfile(modeloutputs[t]):
+            nc  = Dataset(modeloutputs[t], 'r')
+            print('reading ', modeloutputs[t])
+        else:
+            print("no file")
+            #exit() 
+            continue # Try this instead to avoid an exit
+       #create time array for 24 hours
+        dts = [dt.strftime('%Y%m%d %H:00 UTC') for dt in
+               DateTime_range(now, now+timedelta(hours=hr),
+                              timedelta(hours=1))]
+               
+        if t==0:   # if the run is on the first day
+            # Read gas, aerosols, and met predictions
+            modelarray0 = readAIRPACTgas(nc,layer)
+            #modelaer0 = readAIRPACTaerosol(nc,layer)
+            #modelarray0.update(modelaer0) # combine gas and aerosols, so all tracers are in airpact
+            modelarray={}
+            if start.hour<8:
+                h=start.hour+16
+            else:
+                h=start.hour-8
+            for i in list(modelarray0.keys()):
+                modelarray[i]=modelarray0[i][0:,:,:]
+            #modelmet = readairpactmet(nc)
+            #modelarray.update(modelmet)
+            
+            # create a time array for modelarray
+            timearray = np.empty( ( int(24), y_dim, x_dim), '|U18')
+            
+            # add time variable to modelarray
+            j=0
+            for i in range(0, 24):
+                timearray[j,:,:] = dts[i]
+                j=j+1
+            
+            modelarray['DateTime'] = copy.copy(timearray)  ## without copy.copy, this will become pointer
+            modelarray['lat'] = latarray
+            modelarray['lon']= lonarray
+        elif t==len(modeloutputs)-1:   # If the run is on the last day
+            if end.hour<8:
+                h=end.hour+16
+            else:
+                h=end.hour-8
+            # create a time array for modelarray
+            #timearray = np.empty( ( h+1, y_dim, x_dim), '|U18')
+            timearray = np.empty( ( 24, y_dim, x_dim), '|U18') # for use with single days data
+
+            # add time variable to modelarray
+            for i in range(0, 24):
+                #timearray[i,:,:] = dts[int(hr-h-1+i)]
+                timearray[i,:,:] = dts[int(24)]
+            modelarray['DateTime'] = np.concatenate ( (modelarray['DateTime'], timearray))
+            #modelarray['lat'] = np.concatenate ( (modelarray['lat'], latarray))
+            #modelarray['lon'] = np.concatenate ( (modelarray['lon'], lonarray))
+            
+            gas0 = readAIRPACTgas(nc,layer)
+            aer0 = readAIRPACTaerosol(nc,layer)
+            #met = readairpactmet(nc)
+            gas0.update(aer0)
+            gas={}
+            for i in list(gas0.keys()):
+                gas[i]=gas0[i][:(h+1),:,:]
+            #gas.update(met)
+            
+            # loop over all keys excluding time
+            keys = set(modelarray.keys())
+            excludes = set(['DateTime','lat','lon'])
+            
+            for k in keys.difference(excludes): #modelarray.keys():
+                modelarray[k] = np.concatenate((modelarray[k], gas[k]))
+            
+            del gas
+            del gas0
+            del aer0
+        else:   # every day other than the first or last
+            # create a time array for modelarray
+            timearray = np.empty( ( 24, y_dim, x_dim), '|U18')
+            # add time variable to modelarray
+            h_first_day=24-start.hour
+            for i in range(0, 24):
+                timearray[i,:,:] = dts[h_first_day+(t-2)*24+i]
+                          
+            modelarray['DateTime'] = np.concatenate ( (modelarray['DateTime'], timearray))
+            #modelarray['lat'] = np.concatenate ( (modelarray['lat'], latarray))
+            #modelarray['lon'] = np.concatenate ( (modelarray['lon'], lonarray))
+            
+            gas0 = readAIRPACTgas(nc,layer)
+            aer0 = readAIRPACTaerosol(nc,layer)
+            #met = readairpactmet(nc)
+            gas0.update(aer0)
+            gas={}
+            for i in list(gas0.keys()):
+                gas[i]=gas0[i][:,:,:]
+            #gas.update(met)
+            
+            # loop over all keys excluding time
+            keys = set(modelarray.keys())
+            excludes = set(['DateTime','lat','lon'])
+            
+            for k in keys.difference(excludes): #modelarray.keys():
+                modelarray[k] = np.concatenate((modelarray[k], gas[k]))
+            
+            del gas
+            del gas0
+            del aer0
+            #del met
+        
+        # How to accumulate modelarray over time
+        now += timedelta(hours=24)
+        print("now time is", now)
+        
+        nc.close()
+    
+    #del modelaer0
+    #del modelmet
+    del timearray
+    del latarray
+    del lonarray
+    return modelarray
+
+
+#urbanova_old = get_aconc_DF(start, end, layer)
