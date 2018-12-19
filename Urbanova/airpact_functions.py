@@ -20,7 +20,10 @@ def readAIRPACTgas(infile,layer):
     #gaslist = ['NO','NO2','SO2','O3','ISOP','CO','NH3','FORM']  # Feb 16 2017 - add more VOC species to evaluate MOSAIC
 
     if filetype == 'aconc':
-        gaslist = ["O3",'BENZENE','CO','NH3','NO','NO2','SO2']
+        gaslist = ["O3",'BENZENE','CO','NH3','NO','NO2','SO2',
+                   'AXYL1J','AXYL2J','AXYL3J','ATOL1J','ATOL2J','ATOL3J','ABNZ1J','ABNZ2J','ABNZ3J','AISO1J','AISO2J','AISO3J','ATRP1J','ATRP2J','ASQTJ','AALKJ','AORGCJ','AOLGBJ','AOLGAJ','APOCI','APOCJ','APNCOMI','APNCOMJ',
+                   'ASO4I','ANO3I','ANH4I','ANAI','ACLI','AECI','APOCI','APNCOMI','AOTHRI',
+                   'ASO4J','ANO3J','ANH4J','ANAJ','ACLJ','AECJ','AOTHRJ','AFEJ','ASIJ','ATIJ','ACAJ','AMGJ','AMNJ','AALJ','AKJ']
     else:
         gaslist = ['O3']
     airpactgas = {}
@@ -312,7 +315,7 @@ def stats(df,name_var1,name_var2):
 # save aconc output into dataframe
 def get_aconc_DF(start, end, layer):
     # prepare time loop to read model output
-    filetype='aconc'
+    #filetype='aconc'
     date_diff =end -start
     date_diff =  int(round( date_diff.total_seconds()/60/60/24)) # total hour duration
     print('date diff is '+ str(date_diff))

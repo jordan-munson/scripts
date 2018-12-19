@@ -101,13 +101,48 @@ m = Basemap(projection='merc',
               llcrnrlat = lat[0,0], urcrnrlat = lat[90-1,90-1],
               resolution='h', area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
 x,y = m(lon,lat)
-var_list = ["O3",'CO','NH3','NO','NO2','SO2','BENZENE']#, "PMIJ"]
-unit_list = ["ppb",'ppmv','ppmv','ppmv','ppmv','ppmv','ppmv']#, "$ug/m^3$"]
+var_list = ["O3",'CO','NH3','NO','NO2','SO2','BENZENE','PMIJ']
+unit_list = ["ppb",'ppmv','ppmv','ppmv','ppmv','ppmv','ppmv','ug/m3']
+rnd = 7 # value to use when rounding
+
 #urbanova = pd.DataFrame()
 urbanova = urbanova_old.copy()
+# calculate PM2.5
+#Create lists to sum
+aomij_list = ['AXYL1J','AXYL2J','AXYL3J','ATOL1J','ATOL2J','ATOL3J','ABNZ1J','ABNZ2J','ABNZ3J','AISO1J','AISO2J','AISO3J','ATRP1J','ATRP2J','ASQTJ','AALKJ','AORGCJ','AOLGBJ','AOLGAJ','APOCI','APOCJ','APNCOMI','APNCOMJ']
+atoti_list = ['ASO4I','ANO3I','ANH4I','ANAI','ACLI','AECI','APOCI','APNCOMI','AOTHRI']
+atotj_list = ['ASO4J','ANO3J','ANH4J','ANAJ','ACLJ','AECJ','AOTHRJ','AFEJ','ASIJ','ATIJ','ACAJ','AMGJ','AMNJ','AALJ','AKJ']
+#empty arrays to fill
+urbanova_old['AOMIJ'] = np.empty( ( 24, y_dim, x_dim), dtype = float)
+urbanova_old['ATOTI'] = np.empty( ( 24, y_dim, x_dim), dtype = float)
+urbanova_old['ATOTJ'] = np.empty( ( 24, y_dim, x_dim), dtype = float)
+
+for i in aomij_list:
+    urbanova_old['AOMIJ'] = urbanova_old['AOMIJ'] + urbanova_old[i]
+for i in atoti_list:
+    urbanova_old['ATOTI'] = urbanova_old['ATOTI'] + urbanova_old[i]
+for i in atotj_list:
+    urbanova_old['ATOTJ'] = urbanova_old['ATOTJ'] + urbanova_old[i]    
+urbanova_old['ATOTJ'] = urbanova_old['ATOTJ']-(urbanova_old['APOCI']+urbanova_old['APNCOMI'])
+
+urbanova_old['PMIJ'] = urbanova_old['ATOTI'] + urbanova_old['ATOTJ']
+
+# now do same for new cctm
+urbanova_new['AOMIJ'] = np.empty( ( 24, y_dim, x_dim), dtype = float)
+urbanova_new['ATOTI'] = np.empty( ( 24, y_dim, x_dim), dtype = float)
+urbanova_new['ATOTJ'] = np.empty( ( 24, y_dim, x_dim), dtype = float)
+
+for i in aomij_list:
+    urbanova_new['AOMIJ'] = urbanova_new['AOMIJ'] + urbanova_new[i]
+for i in atoti_list:
+    urbanova_new['ATOTI'] = urbanova_new['ATOTI'] + urbanova_new[i]
+for i in atotj_list:
+    urbanova_new['ATOTJ'] = urbanova_new['ATOTJ'] + urbanova_new[i]    
+urbanova_new['ATOTJ'] = urbanova_new['ATOTJ']-(urbanova_new['APOCI']+urbanova_new['APNCOMI'])
+
+urbanova_new['PMIJ'] = urbanova_new['ATOTI'] + urbanova_new['ATOTJ']
 for sp in var_list:
     urbanova[sp] =  -urbanova_old[sp]+urbanova_new[sp]
-
 
 #%%
 ############################################
@@ -123,7 +158,7 @@ for i, sp in enumerate(var_list):
         outpng = base_dir +'maps/cctm_comp/urbanova_comp_hourly_basemap_' + sp + '_%05d.png' % t
         print(outpng)
         
-        fig = plt.figure(figsize=(14,10))
+        fig, ax = plt.subplots(figsize=(14,10))
        # plt.title(sp +'_at_' + urbanova["DateTime"][t,0,0])
         
         # compute auto color-scale using maximum concentrations
@@ -140,13 +175,27 @@ for i, sp in enumerate(var_list):
         cs.cmap.set_over('black')
         #m.drawcounties()
         
+                # annotate with text box
+        textstr = "mean: " + str(round(urbanova[sp][t,:,:].mean(),rnd)) + " "+ unit_list[i] + ' ' + sp +'_at_' + urbanova["DateTime"][t,0,0]
+        props = dict(boxstyle='round', facecolor='black', alpha=0.5) # settings for text box
+        
+        # place a text box in upper left in axes coords
+        ax.text(0.05, 0.97, textstr, transform=ax.transAxes, fontsize=14,
+                verticalalignment='top', bbox=props)
+        
+        # attempt to place box around 
+        props = dict(boxstyle='round', facecolor='black', alpha=0.6) # settings for text box
+        textstr = '                                                                                         '
+        ax.text(0.0145, 0.059, textstr, transform=ax.transAxes, fontsize=22,
+                verticalalignment='top', bbox=props)
+    
         cblabel = unit_list[i]
         cbticks = True
         cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
         cbar.set_label(cblabel)
         
         # print the surface-layer mean on the map plot
-        plt.annotate("mean: " + str(urbanova[sp][t,:,:].mean()) + " "+ unit_list[i] + ' ' + sp +'_at_' + urbanova["DateTime"][t,0,0], xy=(0.04, 0.98), xycoords='axes fraction')
+        #plt.annotate("mean: " + str(urbanova[sp][t,:,:].mean()) + " "+ unit_list[i] + ' ' + sp +'_at_' + urbanova["DateTime"][t,0,0], xy=(0.04, 0.98), xycoords='axes fraction')
         
         plt.savefig(outpng,transparent=True, bbox_inches='tight', pad_inches=0, frameon = False)
         plt.show()
@@ -164,7 +213,7 @@ for i, sp in enumerate(var_list):
 for i, sp in enumerate(var_list):
     
     plt.style.use('dark_background')
-    fig = plt.figure(figsize=(14,10))
+    fig, ax = plt.subplots(figsize=(14,10))
     #plt.title(sp)
     
     # compute auto color-scale using maximum concentrations
@@ -180,16 +229,35 @@ for i, sp in enumerate(var_list):
     cs.cmap.set_under('cyan')
     cs.cmap.set_over('black')
     
+    # Find min and max values
+    map_min = np.amin(urbanova[sp])
+    map_max = np.amax(urbanova[sp])
+    
+    
     #m.drawcoastlines()
     #m.drawstates()
    # m.drawcountries()
 #        m.drawcounties()
 
+    # annotate with text box
+    textstr ='\n'.join(( "mean: " + str(round(urbanova[sp].mean(),rnd)) + " "+ unit_list[i] + ' ' + sp,
+                        'max: ' + str(round(map_max,rnd)),
+                        'min: ' + str(round(map_min,rnd))))
+    props = dict(boxstyle='round', facecolor='black', alpha=0.5) # settings for text box
+    
+    # place a text box in upper left in axes coords
+    ax.text(0.05, 0.97, textstr, transform=ax.transAxes, fontsize=14,
+            verticalalignment='top', bbox=props)
+    
+    # attempt to place box around 
+    props = dict(boxstyle='round', facecolor='black', alpha=0.6) # settings for text box
+    textstr = '                                                                                         '
+    ax.text(0.0145, 0.059, textstr, transform=ax.transAxes, fontsize=22,
+            verticalalignment='top', bbox=props)
     cblabel = unit_list[i]
     cbticks = True
     cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
     cbar.set_label(cblabel)
-    plt.annotate("mean: " + str(round(urbanova[sp].mean(),5)) + " "+ unit_list[i], xy=(0.04, 0.98), xycoords='axes fraction')
     # print the surface-layer mean on the map plot
     
     #else:
@@ -252,7 +320,7 @@ for i, sp in enumerate(var_list):
 ######################################
         # Plot folium
 ######################################
-m= folium.Map(location=[47.6588, -117.4260],zoom_start=9.25) # Create the plot
+m= folium.Map(location=[47.6588, -117.4260],zoom_start=9) # Create the plot
 m.add_child(folium.LatLngPopup()) #Add click lat/lon functionality
 
 # mins and max's of the plot
