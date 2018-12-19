@@ -143,7 +143,7 @@ urbanova_new['ATOTJ'] = urbanova_new['ATOTJ']-(urbanova_new['APOCI']+urbanova_ne
 urbanova_new['PMIJ'] = urbanova_new['ATOTI'] + urbanova_new['ATOTJ']
 for sp in var_list:
     urbanova[sp] =  -urbanova_old[sp]+urbanova_new[sp]
-
+urbanova['O3']=urbanova['O3'] *1000 # convert from ppm to ppb
 #%%
 ############################################
 # hourly domain basemaps
