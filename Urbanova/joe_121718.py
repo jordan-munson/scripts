@@ -27,6 +27,7 @@ base_dir=r'E:/Research/Urbanova_Jordan/'
 grid_dir_urb=r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\Urbanova/2018\2018011100\MCIP37/'
 data_dir=r'D:/big_research_files/'
 output_dir = r'E:/Research/scripts/folium_files/'
+git_dir = 'https://github.com/jordan-munson/scripts/raw/master/folium_files/'
 
 #base_dir = '/data/lar/users/jmunson/'
 #data_dir = '/data/lar/projects/Urbanova/'
@@ -164,7 +165,7 @@ for i, sp in enumerate(var_list):
     
     plt.style.use('dark_background')
     fig = plt.figure(figsize=(14,10))
-    plt.title(sp)
+    #plt.title(sp)
     
     # compute auto color-scale using maximum concentrations
     down_scale = np.percentile(urbanova[sp], 5)
@@ -190,8 +191,8 @@ for i, sp in enumerate(var_list):
     cbar.set_label(cblabel)
     plt.annotate("mean: " + str(round(urbanova[sp].mean(),5)) + " "+ unit_list[i], xy=(0.04, 0.98), xycoords='axes fraction')
     # print the surface-layer mean on the map plot
-    #if sp == 'O3':
-        #plt.annotate("mean: " + str(airpact[sp].mean(axis=0).mean()) +" ppb", xy=(0, 1.02), xycoords='axes fraction')
+    
+    plt.annotate("mean: " + str(airpact[sp].mean(axis=0).mean()), xy=(0, 1.02), xycoords='axes fraction')
     #else:
         #plt.annotate("mean: " + str(airpact[sp].mean(axis=0).mean()) +" $ug/m^3$", xy=(0, 1.02), xycoords='axes fraction')
     outpng = base_dir +'maps/cctm_comp/delta_basemap_' +str(end_month)+'_'+ sp + '.png'
@@ -266,7 +267,7 @@ extents = [[lat_min, lon_min], [lat_max, lon_max]]
 # Add monthly average maps to Folium
 for sp in var_list:
     folium.raster_layers.ImageOverlay(base_dir +'maps/cctm_comp/delta_basemap_' +str(end_month)+'_'+ sp + '.png',bounds = extents,name=sp,opacity = 0.5, show = False).add_to(m)
-    folium.raster_layers.VideoOverlay(video_url=output_dir+'movie_'+sp+'_output.webm',bounds = extents,name=sp+'video',opacity = 0.5,attr = sp+'video',show = False,autoplay=True).add_to(m)
+    folium.raster_layers.VideoOverlay(video_url=git_dir+'movie_'+sp+'_output.webm',bounds = extents,name=sp+'video',opacity = 0.5,attr = sp+'video',show = False,autoplay=True).add_to(m)
 
 
 # Add videos to Folium
