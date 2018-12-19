@@ -23,10 +23,10 @@ from mpl_toolkits.basemap import Basemap
 import matplotlib.patches as patches
 
 # Set file paths
-base_dir=r'E:/Research/Urbanova_Jordan/'
-grid_dir_urb=r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\Urbanova/2018\2018011100\MCIP37/'
-data_dir=r'D:/big_research_files/'
-output_dir = r'E:/Research/scripts/folium_files/'
+base_dir=r'G:/Research/Urbanova_Jordan/'
+grid_dir_urb=r'G:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\Urbanova/2018\2018011100\MCIP37/'
+data_dir=r'E:/big_research_files/'
+output_dir = r'G:/Research/scripts/folium_files/'
 git_dir = 'https://github.com/jordan-munson/scripts/raw/master/folium_files/'
 
 #base_dir = '/data/lar/users/jmunson/'
@@ -46,7 +46,7 @@ end_month = 12
 #end_day = monthrange(end_year, end_month)[1]
 end_day = 15
 
-exec(open(r"E:/Research/scripts/Urbanova/airpact_functions.py").read())
+exec(open(r"G:/Research/scripts/Urbanova/airpact_functions.py").read())
 # set start and end date
 start = datetime.datetime(start_year, start_month, start_day, hour=0)
 end = datetime.datetime(end_year, end_month, end_day, hour=23)
@@ -62,7 +62,7 @@ date_diff =  int(round( date_diff.total_seconds()/60/60/24)) # total hour durati
 print("start date is "+ start.strftime("%Y%m%d") + ' combining 4km files' )
 now = start
 
-modeloutputs= [data_dir +'old_ACONC_'+now.strftime('%Y%m%d')+'.ncf']
+modeloutputs= [data_dir +'/old_CCTM/ACONC_'+now.strftime('%Y%m%d')+'.ncf']
 
 print(modeloutputs)
 
@@ -92,7 +92,7 @@ fin0.close()
 filetype = 'aconc'
 urbanova_old = get_aconc_DF(start, end, layer)
 print('Urb old done')
-modeloutputs= [data_dir +'ACONC_'+now.strftime('%Y%m%d')+'.ncf']
+modeloutputs= [data_dir +'new_CCTM/ACONC_'+now.strftime('%Y%m%d')+'.ncf']
 urbanova_new = get_aconc_DF(start, end, layer)
 print('Urb new done')
 #base map
@@ -129,7 +129,7 @@ for i, sp in enumerate(var_list):
         # compute auto color-scale using maximum concentrations
         down_scale = np.percentile(urbanova[sp], 5)
         up_scale = np.percentile(urbanova[sp], 95)
-        clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10),5)
+        clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10),6)
         print("debug clevs", clevs, sp)
         
         cblabel = unit_list[i]
@@ -138,7 +138,7 @@ for i, sp in enumerate(var_list):
         cs = m.contourf(x,y,urbanova[sp][t,:,:],clevs,cmap=plt.get_cmap('jet'), extend='both')
         cs.cmap.set_under('cyan')
         cs.cmap.set_over('black')
-
+        #m.drawcounties()
         
         cblabel = unit_list[i]
         cbticks = True
@@ -152,7 +152,7 @@ for i, sp in enumerate(var_list):
         plt.show()
         plt.close()
     # This requires ffmpeg program, which is not easy to install in aeolus/kamiak
-    os.chdir('E:/Research/Urbanova_Jordan')
+    os.chdir(base_dir)
     check_call(['ffmpeg', '-y', '-framerate','2', '-i',base_dir+'maps/cctm_comp/urbanova_comp_hourly_basemap_' + sp + '_%05d.png','-b:v','5000k', output_dir+'movie_'+sp+'_output.webm'])
 
 #%%
@@ -171,7 +171,7 @@ for i, sp in enumerate(var_list):
     down_scale = np.percentile(urbanova[sp], 5)
     up_scale = np.percentile(urbanova[sp], 95)
 
-    clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10), 5) # If ValueError: Contour levels must be increasing, simply increase round number
+    clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10), 6) # If ValueError: Contour levels must be increasing, simply increase round number
     print("debug clevs", clevs, sp)
     
     cblabel = unit_list[i]
@@ -192,7 +192,6 @@ for i, sp in enumerate(var_list):
     plt.annotate("mean: " + str(round(urbanova[sp].mean(),5)) + " "+ unit_list[i], xy=(0.04, 0.98), xycoords='axes fraction')
     # print the surface-layer mean on the map plot
     
-    plt.annotate("mean: " + str(airpact[sp].mean(axis=0).mean()), xy=(0, 1.02), xycoords='axes fraction')
     #else:
         #plt.annotate("mean: " + str(airpact[sp].mean(axis=0).mean()) +" $ug/m^3$", xy=(0, 1.02), xycoords='axes fraction')
     outpng = base_dir +'maps/cctm_comp/delta_basemap_' +str(end_month)+'_'+ sp + '.png'
