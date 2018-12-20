@@ -347,4 +347,75 @@ folium.LayerControl().add_to(m)
 # Save and show the created map. Use Jupyter to see the map within your console
 m.save(output_dir+'folium_cctm_change.html')
 m
+#%%
+# =============================================================================
+# # =============================================================================
+# # Time series
+# # =============================================================================
+# pollutants = ['PM2.5','O3']
+# 
+# start_date = str(start_year)+'-'+str(start_month)+'-'+str(start_day)
+# end_date = str(end_year)+'-'+str(end_month)+'-'+str(end_day)
+# 
+# airnow_data= data_dir +"AIRNowSites_" +  now.strftime("%Y%m%d") + "_v6.dat"
+# col_names_modeled = ['date', 'time', 'site_id', 'pollutant', 'concentration']
+# col_names_observed= ['datetime', 'site_id', 'O3_AP5_1p33km', 'PM2.5_AP5_1p33km', 'O3_obs', 'PM2.5_obs']
+# df_obs   = pd.read_csv('http://lar.wsu.edu/R_apps/2018ap5/data/hrly2018.csv', sep=',', names=col_names_observed, skiprows=[0],dtype='unicode')
+# df_sites = pd.read_csv(data_dir + 'aqsid.csv', skiprows=[1],dtype='unicode') # skip 2nd row which is blank
+# df_sites.rename(columns={'AQSID':'site_id'}, inplace=True)
+# 
+# mask = (df_obs['datetime'] > start_date) & (df_obs['datetime'] <= end_date) # Create a mask to determine the date range used
+# df_obs = df_obs.loc[mask]
+# 
+# for abrv in pollutants:
+#     # extract only abrv data
+#     df_base = df_base.loc[df_base['pollutant']==pollutant, df_base.columns]
+#     # Renames the abrv to concentration
+#     df_base.columns = df_base.columns.str.replace('concentration',abrv+ '_AP5_1.33km')
+# 
+#     # convert datatime colume to time data (This conversion is so slow)
+#     print('Executing datetime conversion, this takes a while')
+#     df_base['datetime'] = pd.to_datetime(df_base['date'] + ' ' + df_base['time'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
+#     df_obs['datetime'] = pd.to_datetime(df_obs['datetime'], infer_datetime_format=True)
+#     print('datetime conversion complete')
+# 
+#     #Convert model data to PST from UTC (PST = UTC-8)
+#     df_base["datetime"] = df_base["datetime"].apply(lambda x: x - dt.timedelta(hours=8))
+#     df_obs["datetime"] = df_obs["datetime"].apply(lambda x: x - dt.timedelta(hours=8))
+#     df_base = df_base.drop('date',axis=1)
+#     df_base = df_base.drop('time',axis=1)
+#     # sites which are common between base and Observations
+#     sites_common = set(df_obs['site_id']).intersection(set(df_base['site_id']))
+# 
+# 
+#     ## take only the data which is for common sites
+#     df_obs_new = pd.DataFrame(columns=df_obs.columns)
+#     df_base_new = pd.DataFrame(columns=df_base.columns)
+#     for sites in sites_common:
+#         #    print sites
+#         df1 = df_obs.loc[df_obs['site_id']==sites, df_obs.columns]
+#         df3 = df_base.loc[df_base['site_id']==sites, df_base.columns]
+#         df_obs_new = pd.concat([df_obs_new, df1], join='outer', ignore_index=True)
+#         df_base_new = pd.concat([df_base_new, df3], join='outer', ignore_index=True)
+# 
+#     # merge now
+#     df_obs_mod = pd.merge(df_obs_new, df_base_new, on=['datetime', 'site_id'], how='outer')
+# 
+#     # get rid of rows if abrv base is not available
+#     df_obs_mod = df_obs_mod[pd.notnull(df_obs_mod[abrv+'_AP5_1.33km'])]
+# 
+# 
+# 
+#     df_tseries = df_obs_mod.copy() 
+#     df_siteinfo = df_sites.set_index('site_id')
+# 
+# # convert object to numeric (This is required to plot these columns)
+#     df_tseries.loc[:,abrv+'_AP5_4km'] = pd.to_numeric(df_tseries.loc[:,abrv+'_AP5_4km'])
+#     df_tseries.loc[:,abrv+'_AP5_1.33km'] = pd.to_numeric(df_tseries.loc[:,abrv+'_AP5_1.33km'])
+#     df_tseries.loc[:,abrv+'_obs'] = pd.to_numeric(df_tseries.loc[:,abrv+'_obs'])
+# 
+#     df_tseries['datetime'] = df_tseries['datetime'].dt.tz_localize('UTC').dt.tz_convert('US/Pacific')
+#     print(set(df_tseries['site_id']))
+# =============================================================================
+    
 print('done')
