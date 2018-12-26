@@ -32,10 +32,10 @@ endmonth='05'
 endyear='2018'
 
 #Set directory
-inputDir = r'G:/Research/AIRPACT_eval/'
+inputDir = r'E:/Research/AIRPACT_eval/'
 # Open statistics script
-stat_path = r'G:/Research/scripts/Urbanova/statistical_functions.py'
-ben_path = r'G:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
+stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
+ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
 exec(open(stat_path).read())
 #aqsidd = pd.read_csv(r'G:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison/Aqsid.csv')
 #aqsidd = aqsidd.drop(['Unnamed: 4','Unnamed: 5','Unnamed: 6','Latitude','Longitude'], axis=1)
@@ -50,7 +50,7 @@ df_mod['datetime'] = pd.to_datetime(df_mod['datetime']) #Must convert to date ti
 df_mod = df_mod.drop('Unnamed: 0',axis=1)
 
 #Create AQSID Column form state code, county code, and site num
-aqsid = pd.read_csv(r'G:\Research\AIRPACT_eval/aqs_sites.csv')
+aqsid = pd.read_csv(inputDir+'aqs_sites.csv')
 aqsid = aqsid.ix[:,['State Code','County Code','Site Number','Local Site Name','Location Setting','Latitude','Longitude']]
 
 aqsid['County Code'] = ["%03d" % n for n in aqsid['County Code'] ]
@@ -160,17 +160,34 @@ df_com = df_com.dropna()
 stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 stats_com = stats_com.drop(0,1)
+lats = []
+lons = []
+
+m = Basemap(projection='merc',
+              #lat_0=lat, lon_0=lon,
+              llcrnrlat=40.5, urcrnrlat=49.5,
+              llcrnrlon=-125, urcrnrlon=-109,
+              area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
 
 # Calculate stats for each site and add to list
 pollutant = ['O3','PM2.5']
 for species in pollutant:
+    m.drawcounties()
+    m.drawcoastlines()
+    m.drawstates()
+    m.drawcountries()
     for AQSID in list(set(df_com['AQSID'])):
+
         #This section selects only data relevant to the aqs site
         d = df_com.loc[df_com['AQSID']==AQSID]
         d=d.reset_index()
         site_nameinfo = d.loc[0,'Local Site Name'] #Gets the longname of the site to title the plot
+        
         lat = d.loc[0,'Latitude']
         lon = d.loc[0,'Longitude']
+        lats.append(lat)
+        lons.append(lon)
+        
         site_type = d.loc[0,'Location Setting']
         d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
         d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
@@ -178,60 +195,31 @@ for species in pollutant:
         #print(dc)
         
         #d = d.set_index('datetime') 
-    
-        print(species+ ' ' + str(site_nameinfo))
+        
+        #print(species+ ' ' + str(site_nameinfo))
         #Calculate Statistics
         try:
             #Run stats functions
             aq_stats = stats(d, species+'_mod', species+'_obs')
-            aq_stats = aq_stats.append(lat)
-            aq_stats = aq_stats.append(lon)
+            
+                    #Mapping
+            x, y = m(lon, lat)
+            marker_shape = 'o'
+            marker_color = 'r'
+            size = 10*aq_stats[species+'_mod'][3] # Fractional Bias
+            m.scatter(x, y, marker=marker_shape,color=marker_color, s = size)
+
         # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
    
             # Merge stats into single dataframe
             aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + site_nameinfo)    
             stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
-            print('Stats check okay')
+            #print('Stats check okay')
         except (ZeroDivisionError):
             pass
+    plt.show()
 
-stats_com.to_csv(inputDir + 'stats/bias_map_stats.csv')
-#%%
-
-# obtain model lat and lon - needed for AQS eval and basemap
-lat = aq['lat'][']
-lon = airpact['lon'][0]
-
-llcrnrlon=np.amin(airpact['lon'])
-llcrnrlat=np.amin(airpact['lat'])
-urcrnrlon=np.amax(airpact['lon'])
-urcrnrlat=np.amax(airpact['lat'])
-
-m = Basemap(projection='merc',
-              lat_0=47.6588, lon_0=-117.4260,
-              area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
-x,y = m(lon,lat)
-
-
-m.drawmapboundary(fill_color='aqua')
-m.fillcontinents(color='coral',lake_color='aqua')
-m.drawcoastlines()
-
-lons = [0, 10, -20, -20]
-lats = [0, -10, 40, -20]
-
-x, y = m(lons, lats)
-
-m.scatter(x, y, marker='D',color='m')
-
-plt.show()
-
-
-
-
-
-
-
+#stats_com.to_csv(inputDir + 'stats/bias_map_stats.csv')
 
 
 

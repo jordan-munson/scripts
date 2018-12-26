@@ -396,7 +396,7 @@ for species in pollutant:
     print(species)
     da = df_com.dropna(subset=['Location Setting'])
     # Create the overal plot and its settings
-    fig = plt.figure(figsize=(10,18))
+    fig = plt.figure(figsize=(26,10))#10,18))
     if species == 'PM2.5':
         #fig.set_ylabel('$PM_{2.5} (ug/m^3)$')
         fig.text(-0.02, 0.5, '$PM_{2.5} (ug/m^3)$', va='center', rotation='vertical')
@@ -408,11 +408,15 @@ for species in pollutant:
     fig.tight_layout() # spaces the plots out a bit
 
     #Annotate versions in
-    fig.text(0.5, 0.99, 'AIRPACT 3', va='center',ha='center')
-    fig.text(0.5, 0.66, 'AIRPACT 4', va='center',ha='center')
-    fig.text(0.5, 0.33, 'AIRPACT 5', va='center',ha='center')
-
-    for version,i in zip(versions,[0,4,8]):
+# =============================================================================
+#     fig.text(0.5, 0.99, 'AIRPACT 3', va='center',ha='center')
+#     fig.text(0.5, 0.66, 'AIRPACT 4', va='center',ha='center')
+#     fig.text(0.5, 0.33, 'AIRPACT 5', va='center',ha='center')
+# =============================================================================
+    fig.text(0.184, 0.98, 'AIRPACT 3', va='center',ha='center')
+    fig.text(0.51, 0.98, 'AIRPACT 4', va='center',ha='center')
+    fig.text(0.835, 0.98, 'AIRPACT 5', va='center',ha='center')
+    for version,i in zip(versions,[0,1,2]):#[0,4,8]):
         print(version)
     # Set date range used based of versions
         if version == 'AP3':
@@ -469,23 +473,25 @@ for species in pollutant:
                     s = '6/1/2009'
                     e = '8/31/2009'
                     dates = pd.date_range(start=s,end=e)
-                    ax = fig.add_subplot(6,2,3+i)
+                    ax = fig.add_subplot(2,3,4+i)#(6,2,3+i)
                     
-                if season == 'Fall':
-                    year = str(year)
-                    mask = (d.index > year+'-9-1') & (d.index <= year+'-9-30')
-                    d11=d.loc[mask]
-                    d1 = d1.append(d11)
-                    mask = (d.index > year+'-10-1') & (d.index <= year+'-10-31')
-                    d22=d.loc[mask]
-                    d2 = d2.append(d22)
-                    mask = (d.index > year+'-11-1') & (d.index <= year+'-11-30')
-                    d33=d.loc[mask]
-                    d3 = d3.append(d33)
-                    s = '9/1/2009'
-                    e = '11/20/2009'
-                    dates = pd.date_range(start=s,end=e)
-                    ax = fig.add_subplot(6,2,4+i)
+# =============================================================================
+#                 if season == 'Fall':
+#                     year = str(year)
+#                     mask = (d.index > year+'-9-1') & (d.index <= year+'-9-30')
+#                     d11=d.loc[mask]
+#                     d1 = d1.append(d11)
+#                     mask = (d.index > year+'-10-1') & (d.index <= year+'-10-31')
+#                     d22=d.loc[mask]
+#                     d2 = d2.append(d22)
+#                     mask = (d.index > year+'-11-1') & (d.index <= year+'-11-30')
+#                     d33=d.loc[mask]
+#                     d3 = d3.append(d33)
+#                     s = '9/1/2009'
+#                     e = '11/20/2009'
+#                     dates = pd.date_range(start=s,end=e)
+#                     ax = fig.add_subplot(6,2,4+i)
+# =============================================================================
                     
                 if season == 'Winter':
                     if year == 2009:   # Don't have 2008 data, so have to skip first iteration
@@ -503,24 +509,26 @@ for species in pollutant:
                     s = '12/1/2009'
                     e = '2/28/2010'
                     dates = pd.date_range(start=s,end=e)
-                    ax = fig.add_subplot(6,2,1+i)
+                    ax = fig.add_subplot(2,3,1+i)#(6,2,1+i)
 
                     
-                if season == 'Spring':
-                    if year == 2009:   # Don't have 2008 data, so have to skip first iteration
-                        continue
-                    year = str(year)
-                    mask = (d.index > year+'-3-1') & (d.index <= year+'-3-31')
-                    d11=d.loc[mask]
-                    d1 = d1.append(d11)
-                    mask = (d.index > year+'-4-1') & (d.index <= year+'-4-30')
-                    d22=d.loc[mask]
-                    d2 = d2.append(d22)
-                    mask = (d.index > year+'-5-1') & (d.index <= year+'-5-31')
-                    d33=d.loc[mask]
-                    d3 = d3.append(d33)
-                    dates = pd.date_range(start='3/1/2009',end='5/31/2009')
-                    ax = fig.add_subplot(6,2,2+i)
+# =============================================================================
+#                 if season == 'Spring':
+#                     if year == 2009:   # Don't have 2008 data, so have to skip first iteration
+#                         continue
+#                     year = str(year)
+#                     mask = (d.index > year+'-3-1') & (d.index <= year+'-3-31')
+#                     d11=d.loc[mask]
+#                     d1 = d1.append(d11)
+#                     mask = (d.index > year+'-4-1') & (d.index <= year+'-4-30')
+#                     d22=d.loc[mask]
+#                     d2 = d2.append(d22)
+#                     mask = (d.index > year+'-5-1') & (d.index <= year+'-5-31')
+#                     d33=d.loc[mask]
+#                     d3 = d3.append(d33)
+#                     dates = pd.date_range(start='3/1/2009',end='5/31/2009')
+#                     ax = fig.add_subplot(6,2,2+i)
+# =============================================================================
 
                     
             plt.rcParams["figure.figsize"] = (8,4)

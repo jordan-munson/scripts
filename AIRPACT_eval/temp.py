@@ -22,17 +22,17 @@ mpl.rcParams['ytick.direction']   = 'in'
 mpl.rcParams['xtick.direction']   = 'in'
 
 
-fig = plt.figure(figsize=(10,18))
+fig = plt.figure(figsize=(26,10))
 fig.text(-0.02, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
-fig.suptitle('Seasonal Variations by AIRPACT Version',y=1.02) # title
+fig.suptitle('Seasonal Variations by AIRPACT Version',y=1.025) # title
 fig.tight_layout() # spaces the plots out a bit
 
 #Annotate versions in
-fig.text(0.5, .99, 'AIRPACT 3', va='center',ha='center')
-fig.text(0.5, 0.66, 'AIRPACT 4', va='center',ha='center')
-fig.text(0.5, 0.33, 'AIRPACT 5', va='center',ha='center')
-for i in [1,2,3,4,5,6,7,8,9,10,11,12]:
-    ax = fig.add_subplot(6,2,i)
+fig.text(0.184, .98, 'AIRPACT 3', va='center',ha='center')
+fig.text(0.51, 0.98, 'AIRPACT 4', va='center',ha='center')
+fig.text(0.835, 0.98, 'AIRPACT 5', va='center',ha='center')
+for i in [1,2,3,4,5,6]:
+    ax = fig.add_subplot(2,3,i)
     plt.rcParams["figure.figsize"] = (8,4)
     plt.tight_layout() # spaces the plots out a bit
     
