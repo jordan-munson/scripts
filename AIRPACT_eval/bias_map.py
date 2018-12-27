@@ -172,6 +172,10 @@ m = Basemap(projection='merc',
 # Calculate stats for each site and add to list
 pollutant = ['O3','PM2.5']
 for species in pollutant:
+    if species == 'O3':
+        unit_list = 'ppb'
+    else:
+        unit_list = '$ug/m^3$'
     m.drawcounties()
     m.drawcoastlines()
     m.drawstates()
@@ -205,18 +209,31 @@ for species in pollutant:
                     #Mapping
             x, y = m(lon, lat)
             marker_shape = 'o'
-            marker_color = 'r'
-            size = 10*aq_stats[species+'_mod'][3] # Fractional Bias
-            m.scatter(x, y, marker=marker_shape,color=marker_color, s = size)
-
+            #marker_color = 'r'
+            sp = 3 # Fractional Bias
+            size = 10*aq_stats[species+'_mod'][sp]
+            m.scatter(x, y, marker=marker_shape,c = aq_stats[species+'_mod'][sp], s = size)
+            #print(aq_stats[species+'_mod'][sp])
         # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
    
             # Merge stats into single dataframe
             aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + site_nameinfo)    
             stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
             #print('Stats check okay')
+            
+
+            
         except (ZeroDivisionError):
             pass
+                # colorbar
+    # compute auto color-scale using maximum concentrations
+    down_scale = 0 #np.percentile(stats_com[sp], 5)
+    up_scale = 100 #np.percentile(stats_com[sp], 95)
+    clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10),2)
+    clevs = [-100,-75,-50,-25,0,25,50,75,100]
+    cbticks = True
+    cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
+    cbar.set_label(unit_list)
     plt.show()
 
 #stats_com.to_csv(inputDir + 'stats/bias_map_stats.csv')
