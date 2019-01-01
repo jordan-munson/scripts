@@ -32,17 +32,17 @@ begin_time = time.time()
 
 # Set a directory containing python scripts
 #base_dir = "/data/lar/users/jmunson/longterm_airpact/"
-base_dir = r'G:\Research\AIRPACT_eval\meteorology/'
+base_dir = r'E:\Research\AIRPACT_eval\meteorology/'
 
 # set a directory to save output files
 outputdir = base_dir + 'AQS_plots/'
 
 # set a directory containing wrfout files
 #datadir = base_dir + 'linked_days/'
-datadir = r'G:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\AIRPACT\2018/'
+datadir = r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\AIRPACT\2018/'
 
 # all the functions are saved in Met_functions_for_Ben.py
-exec(open(r'G:\Research\scripts/AIRPACT_eval\meteorology/' +"Met_functions_for_Ben.py").read())
+exec(open(r'E:\Research\scripts/AIRPACT_eval\meteorology/' +"Met_functions_for_Ben.py").read())
 #print(base_dir +"Met_functions_for_Ben.py")
 
 #df1 = pd.read_csv('airpact_met_200951_2012102.csv').drop(['Unnamed: 0'],axis=1)
@@ -106,7 +106,7 @@ tot_hours = time_diff.days*24 #+ time_diff.seconds/3600
 date_diff_final = date_diff
 print(date_diff)
 del([df1,df2,df3,df4,df5,df6,df7,df8,df9])
-#%%
+
 ##############################################################################
 # Read AQS data. csv's created from 'AQS_grabbing.py' script, and the model data from the previous lines of code
 ##############################################################################
@@ -182,7 +182,7 @@ stations = site_list
 #aqsid.to_csv(base_dir+'/aqsid_waorid.csv')
 print('Data combined')
 
-#%%
+
 ####################################
 #########     AIRPACT     ##########
 ####################################
@@ -526,367 +526,369 @@ df_airpact = df_airpact.drop(['lat','lon'],axis=1)
 df_airpact = pd.merge(df_airpact,aqsid).drop(['State Code','County Code','Site Number','Local Site Name'],axis=1)
 del(aqsid)
 #%%
-stats_all = pd.DataFrame() # statistics for each station
-# Make Location Setting plots
-setting = ['URBAN AND CENTER CITY','SUBURBAN','RURAL']
-for i in setting:
-    print('Attempting setting '+str(i))
-    
-    # Locate correct site model data
-    df_mod1 = df_airpact.loc[(df_airpact['Location Setting'] == str(i))]
-    df_mod1 = df_mod1.reset_index(drop=True)
-    
-    # If there is no site data, this skips the site and moves to the next
-    try:
-        st_name = df_mod1.at[0,'Location Setting']
-    except KeyError:
-        continue
-    
-    df_h = df_obs.loc[(df_obs['Location Setting'] == str(i))].rename(columns={'datetime':'date_time'})
-    
-
-    #df_com = pd.merge(df_mod1,df_h, how='outer')
-    #########################################################
-    ##########     CONVERT/CALCULATE VARIABLES     ##########
-    #########################################################
-    
-    # Convert temperature from K to C°
-    temp1 = df_mod1['TEMP2'] - 273.15 
-    
-    # Convert pressure from Pa to hPa (mb)
-    p1 = df_mod1['PRSFC'] / 100
-    
-    # Calculate wind speed from u and v components
-    
-    #u1 = df_mod1['U10']
-    #v1 = df_mod1['V10']
-    #ws1 = np.sqrt((u1**2)+(v1**2))
-    
-    ws1 = df_mod1['WSPD10']    # MCIP files record wind speed, no need to calculate
-    
-    # Calculate wind direction from u and v components 
-    
-    #wind_dir1 = np.arctan2(u1/ws1, v1/ws1) # Where wind is blowing TO
-    #wind_dir_degrees1 = wind_dir1 * 180/np.pi   
-    #wd1 = wind_dir_degrees1 + 180
-    
-    wd1 = df_mod1['WDIR10']    # MCIP files record wind speed, no need to calculate
-    
-    # Calculate 2-m (approximately) relative humidity using Q2, TEMP2, PRSFC, & constants
-    # Formula taken from:
-    # http://mailman.ucar.edu/pipermail/wrf-users/2012/002546.html
-    pq0 = 379.90516
-    a2 = 17.2693882
-    a3 = 273.16
-    a4 = 35.86
-    
-    rh1 = df_mod1['Q2'] / ( (pq0 / df_mod1['PRSFC']) * np.exp(a2 * 
-                   (df_mod1['TEMP2'] - a3) / (df_mod1['TEMP2'] - a4)) )
-    
-    rh_new1 = rh1 * 100 # convert from fraction to %    
-    #rh_new1  = df_mod1['Q2']/1000    #Do this to get the mixing ration instead of RH
-    # Convert aqs data from F to C
-    if 'aqs_temp' in df_h:
-        df_h['aqs_temp'] = (df_h['aqs_temp']-32)*(5/9)
-        
-    #Try different way to create the dataframes, so as to retain all model data
-    df_models=df_mod1
-    df_models['TEMP2'] = df_models['TEMP2'] - 273.15
-    df_models['PRSFC'] = df_models['PRSFC']/100
-    df_models['rh1'] = rh_new1
-    df_models = df_models.rename(columns = {'DateTime':'date_time','TEMP2':'TEMP2_1','PRSFC':'PRSFC_1','WSPD10':'WS_1','WDIR10':'WD_1','rh1':'RH_1'})
-    
-    # Create new data frame with all variables from WRF models
-    #df_models = pd.DataFrame({'TEMP2_1': temp1, 'PRSFC_1': p1, 'WS_1': ws1, 'WD_1': wd1, 
-     #                         'RH_1': rh_new1})#, 'PRECIP_1': df_mod1['RAINNC']})
-    df_models = df_models.reset_index().drop(['index'],axis=1)
-    
-    df_models = df_models.set_index('date_time').drop(['site_name'],axis=1)
-    df_h = df_h.set_index('date_time') #.drop(['Local Site Name'],axis=1)
-    
-    # Checks the size of the dataframes
-    #mem_df_h=df_h.memory_usage(index=True).sum()
-    #mem_df_models = df_models.memory_usage(index=True).sum()
-    #print("df_h uses ",round(mem_df_h/ 1024**2)," MB")
-    #print("df_models uses ",round(mem_df_models/ 1024**2)," MB")
-    
-    
-    # Try and reset index so that concat can occur
-    #df_models = df_models.reset_index()
-    #df_h = df_h.reset_index()
-    # Concatenating observation and model data frames
-    #try:    # For some reason Portland, Portland International Airport throws this error "ValueError: Shape of passed values is (16, 103464), indices imply (16, 81096)", so this is my workaround
-    #    df_all = pd.concat([df_models,df_h], axis=1)
-    #    #df_all = df_h.join(df_models,how='outer')
-    #except ValueError:
-    #    continue
-    
-    df_sitenum = df_h # Set this to later on determine number of sites
-    #Average the data monthly
-    df_models = df_models.resample('M', convention='start').mean()
-    df_h = df_h.resample('M', convention='start').mean()
-    
-    del(df_mod1)
-    df_all = pd.merge(df_models,df_h, how ='outer',left_index=True,right_index=True)
-    del(df_models)
-    
-    # Select variables, specify labels, units and y-limits, and plot model 
-    # variables based on MesoWest variable names
-    new_list = ['aqs_temp','aqs_pressure','aqs_rh','aqs_wspd','aqs_wdir'] # Remember to add in winds here
-    for w in new_list:
-        var_name = str(w)
-        
-        temp1 = df_sitenum.loc[(df_sitenum['Location Setting'] == i)]
-        temp1 = temp1.groupby(['Local Site Name']).count()
-        temp1 = len(temp1.index.get_level_values(0))
-        # Skip variable if all values are zeros or NaNs
-        if df_h[var_name].isnull().all()==True or all(df_h[var_name]==0):
-            continue
-        
-        #var_units = mw_data['UNITS'][var_name]
-        if var_name=='aqs_temp':
-            var_name_mod1 = 'TEMP2_1'
-            mod_var1 = temp1
- 
-            var_label = 'Temperature (C°)'
-            var_units = 'C°'
-            ymin = 0
-            ymax = 40
-            
-        if var_name=='aqs_pressure':
-            var_name_mod1 = 'PRSFC_1'
-            mod_var1 = p1
-            
-            var_label = 'Pressure (mb)'
-            var_units = 'mb'
-            ymin = 850
-            ymax = 1050
-            
-        if var_name=='aqs_wspd':
-            var_name_mod1 = 'WS_1'
-            mod_var1 = ws1
-            
-            var_label = 'Wind Speed (m/s)'
-            var_units = 'm/s'
-            ymin = 0
-            ymax = 6
-            
-        if var_name=='aqs_wdir':  
-            var_name_mod1 = 'WD_1'
-            mod_var1 = wd1   
-            
-            var_label = 'Wind Direction (°)'
-            var_units = '°'
-            ymin = -1
-            ymax = 1
-            
-        if var_name=='aqs_rh':
-            var_name_mod1 = 'RH_1'
-            mod_var1 = rh_new1   
-        
-            var_label = 'Relative Humidity (%)'
-            var_units = '%'
-            ymin = 0
-            ymax = 110
-            
-       # if var_name=='precip_accum':
-        #    var_name_mod1 = 'PRECIP_1'
-         #   mod_var1 = df_mod1['RAINNC']
-            
-          #  var_label = 'Precipitation Accumulated (mm)'
-           # var_units = 'mm'
-            #ymin = 0 
-            #ymax = 10 
-        
-        
-        ################################################
-        ##########     COMPUTE STATISTICS     ##########
-        ################################################
-        
-        var_units = 'var units'
-        
-        stats1 = met.stats(df_all, var_name_mod1, var_name, var_units)
-        stats1.loc['model'] = ['AIRPACT']
-        stats_combined = pd.concat([stats1],axis=1,join_axes=[stats1.index])
-        
-        stats_T = stats_combined.T # transpose index and columns
-        #stats_T['lat'] = lat_mw
-        #stats_T['lon'] = lon_mw
-        stats_T['station ID'] = i
-        
-        stats_all = stats_all.append(stats_T)
-        
-        # Fill data frame for computing overall statistics
-        if var_name not in df_overall.columns:
-            df_overall[[var_name_mod1,var_name]] \
-            = df_all[[var_name_mod1,var_name]]
-        else:
-            df_overall = df_overall.append(df_all[[var_name_mod1,
-                                                   var_name]],ignore_index=True)
-        
-        if var_name not in vname_obs:
-            vname_obs.append(var_name)
-            vname_1.append(var_name_mod1)
-            vlabel.append(var_label)
-        
-        ###################################
-        ##########     PLOTS     ##########
-        ###################################
-        # this is needed for x-axis label
-        dfmt = dates.DateFormatter('%Y')
-        #dfmt = dates.DateFormatter('%m-%d')
-        
-        # Create a time series plot of a meteorological parameter
-        fig1, ax = plt.subplots(figsize=(8, 4))
-
-        '''
-        # MesoWest observations
-        if var_name == 'wind_direction':
-            ax.plot(df_h['date_time'],np.cos(df_h[var_name]*np.pi/180),c='k',label='Observations')
-            # UW WRF model output        
-            ax.plot(df_h['date_time'],np.cos(mod_var1*np.pi/180),c='b',label='Model')
-            # WRF-Chem model output
-            
-            ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
-        else:
-            ax.plot(df_h['date_time'],df_h[var_name],c='k',label='Observations')
-            # UW WRF model output        
-            ax.plot(df_h['date_time'],mod_var1,c='b',label='Model')
-            # WRF-Chem model output
-            
-            ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
-        '''
-        #df_all = df_all.resample('D').mean()
-
-     
-        # MesoWest observations
-        if var_name == 'aqs_wdir':
-            ax.plot(df_all.index,np.cos(df_all[var_name]*np.pi/180),c='k',label='Observations')
-            # UW WRF model output        
-            ax.plot(df_all.index,np.cos(df_all[var_name_mod1]*np.pi/180),c='b',label='Model')
-            # WRF-Chem model output
-            
-            ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
-        else:
-            ax.plot(df_all.index,df_all[var_name],c='k',label='Observations')
-            # UW WRF model output        
-            ax.plot(df_all.index,df_all[var_name_mod1],c='b',label='Model')
-            # WRF-Chem model output
-            
-            ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
-            
-        ax.set_xlim(str(start),str(end))
-                    
-        ax.xaxis.set_major_formatter(dfmt)
-        fig1.autofmt_xdate(rotation=60)
-        #df_all.plot(xticks=df_all.index)
-        # Display r^2 on plot
-        ax.text(1.15, 0.4,'$r^2$ = %s' %stats_T['R^2 [-]'][0], 
-                fontsize = 11, ha='center', va='center', transform=ax.transAxes)
-        ax.text(1.15, 0.3,'RMSE= %s' %stats_T['RMSE [var units]'][0], 
-                fontsize = 11, ha='center', va='center', transform=ax.transAxes)
-        ax.text(1.15, 0.2,'# of sites '+str(temp1), 
-                fontsize = 11, ha='center', va='center', transform=ax.transAxes)        # Plot number of sites
-        ax.legend(loc='upper right', bbox_to_anchor=(1.27, 0.9))
-        ax.fmt_xdata = mdates.DateFormatter('%Y-%m')
-        
-        yax = 0.02
-        yax2 = yax +0.011
-        size = 'medium'
-        # Create Airpact version change annotation
-        ax.annotate('AP3',xy=(0.09,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,yax2),color='red',size=size) # Left Arrow AP3
-        ax.annotate('AP3',xy=(0.33,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,yax2),color='red',size=size) # Right Arrow AP3
- 
-        ax.annotate('AP4',xy=(0.33,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.421,yax2),color='red',size=size) # Left Arrow AP4       
-        ax.annotate('AP4',xy=(0.512,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.421,yax2),color='red',size=size) # Right Arrow AP4
-        
-        ax.annotate('AP5',xy=(0.512,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.646,yax2),color='red',size=size) # Left Arrow AP5
-        ax.annotate('AP5',xy=(0.8,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.646,yax2),color='red',size=size) # Right Arrow AP5
-        '''
-        ax.annotate('AP3',xy=(0.09,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.235,yax2),color='red',size=size) # Left Arrow AP3
-        ax.annotate('AP3',xy=(0.405,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.235,yax2),color='red',size=size) # Right Arrow AP3
-        
-        ax.annotate('AP4',xy=(0.632,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.512,yax2),color='red',size=size) # Right Arrow AP4
-        ax.annotate('AP4',xy=(0.405,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.512,yax2),color='red',size=size) # Left Arrow AP4
-        
-        ax.annotate('AP5',xy=(0.632,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.78,yax2),color='red',size=size) # Left Arrow AP5
-        ax.annotate('AP5',xy=(0.94,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.78,yax2),color='red',size=size) # Right Arrow AP5
-        '''
-        # Add significant event annotations to plots
-        #ax.annotate('12km to 4km',xy=(0.405,0.75),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(0.405,.8),color='red',size='x-small') # Right Arrow AP3
-        
-        plt.show()
-        fig1.savefig(outputdir + '/time_series/type/aqs_%s_%s_timeseries_site.png' %(st_name, var_name),bbox_inches='tight')
-        plt.close()
-        
-
-        
-        '''
-        # Create a scatter plot with linear regression lines and 
-        # correlation coefficients "r" (models vs. obs)
-        fig2, ax = plt.subplots(figsize=(6, 4.5))
-        
-        ax.scatter(df_h[var_name], mod_var1, s=50, c='b', label='UW WRF')
-        ax.scatter(df_h[var_name], mod_var2, s=50, c='r', label='WSU WRF')
-        ax.scatter(df_h[var_name], mod_var3, s=50, c='g', label='HRRR') 
-        
-        # Perform linear regression
-        m1, b1 = np.polyfit(df_h[var_name], mod_var1, deg=1)
-        m2, b2 = np.polyfit(df_h[var_name], mod_var2, deg=1)
-        m3, b3 = np.polyfit(df_h[var_name], mod_var3, deg=1)
-        
-        #ax.plot(df_h[var_name], m1*df_h[var_name] + b1, '--b', label='UW_WRF')
-        #ax.plot(df_h[var_name], m2*df_h[var_name] + b2, ':r', label='WRF-Chem')
-        #ax.plot(df_h[var_name], m3*df_h[var_name] + b3, '-.g', label='HRRR')
-        
-        
-        # Get correlation coefficients
-        cc1 = round(np.corrcoef(df_h[var_name], mod_var1)[0, 1],3)
-        cc2 = round(np.corrcoef(df_h[var_name], mod_var2)[0, 1],3)
-        cc3 = round(np.corrcoef(df_h[var_name], mod_var3)[0, 1],3)
-        
-        ax.text(1.15, 0.9,'UW WRF: r = %s' %cc1, fontsize = 11, ha='center', 
-                va='center', transform=ax.transAxes)
-        ax.text(1.15, 0.8,'WSU WRF: r = %s' %cc2, fontsize = 11, ha='center', 
-                va='center', transform=ax.transAxes)
-        ax.text(1.15, 0.7,'HRRR: r = %s' %cc3, fontsize = 11, ha='center', 
-                va='center', transform=ax.transAxes)
-        
-        
-        # Define x and y-limits
-        xy_min = min(np.nanmin(df_h[var_name]),np.nanmin(mod_var1),np.nanmin(mod_var2),np.nanmin(mod_var3))
-        xy_max = max(np.nanmax(df_h[var_name]),np.nanmax(mod_var1),np.nanmax(mod_var2),np.nanmax(mod_var3))
-
-        # Add 1:1 line
-        ax.plot([xy_min,xy_max], [xy_min,xy_max], '-k', label = '1:1 line')
-        
-        ax.set(title=st_name,xlabel='Observed %s' %var_label,
-               ylabel='Predicted %s' %var_label,xlim=(xy_min,xy_max),ylim=(xy_min,xy_max))
-        ax.legend(loc='center right', bbox_to_anchor=(1.3, 0.5))
-        
-        plt.show()
-        fig2.savefig(outputdir + '%s_%s_regression.png' %(st_id, var_name),bbox_inches='tight')
-        '''
-    print(str(i) + ' plotted')
-    
-    #Create large dataframe with all the model data
-    #df_mod1 = df_mod1.reset_index(drop=True)
-    #site_name = pd.DataFrame([st_name],columns=['site_name'])
-    #df_mod2 = pd.concat([df_h,site_name], axis=1)
-    #df_mod2 = df_mod2.rename(columns={'date_time':'DateTime'})
-    #df_mod2.site_name = df_mod2.site_name.fillna(st_name)
-    #df_temp = pd.merge(df_mod1,df_mod2, on='DateTime', how='outer')
-    #df_met_all = pd.concat([df_met_all,df_temp])
-    
-    #ix1 = pd.concat([pd.DataFrame([ix1]),site_name], axis=1)
-    #iy1 = pd.concat([pd.DataFrame([iy1]),site_name], axis=1)
-    
-    #iy = iy.append(iy1)
-    #ix = ix.append(ix1)
-    #df_met_all = pd.concat([df_met_all,df_mod1])
-print('plots complete')    
-stats_all = stats_all.reset_index()
-stats_all.to_csv(base_dir+'/AQS_stats/aqs_stats.csv')
+# =============================================================================
+# stats_all = pd.DataFrame() # statistics for each station
+# # Make Location Setting plots
+# setting = ['URBAN AND CENTER CITY','SUBURBAN','RURAL']
+# for i in setting:
+#     print('Attempting setting '+str(i))
+#     
+#     # Locate correct site model data
+#     df_mod1 = df_airpact.loc[(df_airpact['Location Setting'] == str(i))]
+#     df_mod1 = df_mod1.reset_index(drop=True)
+#     
+#     # If there is no site data, this skips the site and moves to the next
+#     try:
+#         st_name = df_mod1.at[0,'Location Setting']
+#     except KeyError:
+#         continue
+#     
+#     df_h = df_obs.loc[(df_obs['Location Setting'] == str(i))].rename(columns={'datetime':'date_time'})
+#     
+# 
+#     #df_com = pd.merge(df_mod1,df_h, how='outer')
+#     #########################################################
+#     ##########     CONVERT/CALCULATE VARIABLES     ##########
+#     #########################################################
+#     
+#     # Convert temperature from K to C°
+#     temp1 = df_mod1['TEMP2'] - 273.15 
+#     
+#     # Convert pressure from Pa to hPa (mb)
+#     p1 = df_mod1['PRSFC'] / 100
+#     
+#     # Calculate wind speed from u and v components
+#     
+#     #u1 = df_mod1['U10']
+#     #v1 = df_mod1['V10']
+#     #ws1 = np.sqrt((u1**2)+(v1**2))
+#     
+#     ws1 = df_mod1['WSPD10']    # MCIP files record wind speed, no need to calculate
+#     
+#     # Calculate wind direction from u and v components 
+#     
+#     #wind_dir1 = np.arctan2(u1/ws1, v1/ws1) # Where wind is blowing TO
+#     #wind_dir_degrees1 = wind_dir1 * 180/np.pi   
+#     #wd1 = wind_dir_degrees1 + 180
+#     
+#     wd1 = df_mod1['WDIR10']    # MCIP files record wind speed, no need to calculate
+#     
+#     # Calculate 2-m (approximately) relative humidity using Q2, TEMP2, PRSFC, & constants
+#     # Formula taken from:
+#     # http://mailman.ucar.edu/pipermail/wrf-users/2012/002546.html
+#     pq0 = 379.90516
+#     a2 = 17.2693882
+#     a3 = 273.16
+#     a4 = 35.86
+#     
+#     rh1 = df_mod1['Q2'] / ( (pq0 / df_mod1['PRSFC']) * np.exp(a2 * 
+#                    (df_mod1['TEMP2'] - a3) / (df_mod1['TEMP2'] - a4)) )
+#     
+#     rh_new1 = rh1 * 100 # convert from fraction to %    
+#     #rh_new1  = df_mod1['Q2']/1000    #Do this to get the mixing ration instead of RH
+#     # Convert aqs data from F to C
+#     if 'aqs_temp' in df_h:
+#         df_h['aqs_temp'] = (df_h['aqs_temp']-32)*(5/9)
+#         
+#     #Try different way to create the dataframes, so as to retain all model data
+#     df_models=df_mod1
+#     df_models['TEMP2'] = df_models['TEMP2'] - 273.15
+#     df_models['PRSFC'] = df_models['PRSFC']/100
+#     df_models['rh1'] = rh_new1
+#     df_models = df_models.rename(columns = {'DateTime':'date_time','TEMP2':'TEMP2_1','PRSFC':'PRSFC_1','WSPD10':'WS_1','WDIR10':'WD_1','rh1':'RH_1'})
+#     
+#     # Create new data frame with all variables from WRF models
+#     #df_models = pd.DataFrame({'TEMP2_1': temp1, 'PRSFC_1': p1, 'WS_1': ws1, 'WD_1': wd1, 
+#      #                         'RH_1': rh_new1})#, 'PRECIP_1': df_mod1['RAINNC']})
+#     df_models = df_models.reset_index().drop(['index'],axis=1)
+#     
+#     df_models = df_models.set_index('date_time').drop(['site_name'],axis=1)
+#     df_h = df_h.set_index('date_time') #.drop(['Local Site Name'],axis=1)
+#     
+#     # Checks the size of the dataframes
+#     #mem_df_h=df_h.memory_usage(index=True).sum()
+#     #mem_df_models = df_models.memory_usage(index=True).sum()
+#     #print("df_h uses ",round(mem_df_h/ 1024**2)," MB")
+#     #print("df_models uses ",round(mem_df_models/ 1024**2)," MB")
+#     
+#     
+#     # Try and reset index so that concat can occur
+#     #df_models = df_models.reset_index()
+#     #df_h = df_h.reset_index()
+#     # Concatenating observation and model data frames
+#     #try:    # For some reason Portland, Portland International Airport throws this error "ValueError: Shape of passed values is (16, 103464), indices imply (16, 81096)", so this is my workaround
+#     #    df_all = pd.concat([df_models,df_h], axis=1)
+#     #    #df_all = df_h.join(df_models,how='outer')
+#     #except ValueError:
+#     #    continue
+#     
+#     df_sitenum = df_h # Set this to later on determine number of sites
+#     #Average the data monthly
+#     df_models = df_models.resample('M', convention='start').mean()
+#     df_h = df_h.resample('M', convention='start').mean()
+#     
+#     del(df_mod1)
+#     df_all = pd.merge(df_models,df_h, how ='outer',left_index=True,right_index=True)
+#     del(df_models)
+#     
+#     # Select variables, specify labels, units and y-limits, and plot model 
+#     # variables based on MesoWest variable names
+#     new_list = ['aqs_temp','aqs_pressure','aqs_rh','aqs_wspd','aqs_wdir'] # Remember to add in winds here
+#     for w in new_list:
+#         var_name = str(w)
+#         
+#         temp1 = df_sitenum.loc[(df_sitenum['Location Setting'] == i)]
+#         temp1 = temp1.groupby(['Local Site Name']).count()
+#         temp1 = len(temp1.index.get_level_values(0))
+#         # Skip variable if all values are zeros or NaNs
+#         if df_h[var_name].isnull().all()==True or all(df_h[var_name]==0):
+#             continue
+#         
+#         #var_units = mw_data['UNITS'][var_name]
+#         if var_name=='aqs_temp':
+#             var_name_mod1 = 'TEMP2_1'
+#             mod_var1 = temp1
+#  
+#             var_label = 'Temperature (C°)'
+#             var_units = 'C°'
+#             ymin = 0
+#             ymax = 40
+#             
+#         if var_name=='aqs_pressure':
+#             var_name_mod1 = 'PRSFC_1'
+#             mod_var1 = p1
+#             
+#             var_label = 'Pressure (mb)'
+#             var_units = 'mb'
+#             ymin = 850
+#             ymax = 1050
+#             
+#         if var_name=='aqs_wspd':
+#             var_name_mod1 = 'WS_1'
+#             mod_var1 = ws1
+#             
+#             var_label = 'Wind Speed (m/s)'
+#             var_units = 'm/s'
+#             ymin = 0
+#             ymax = 6
+#             
+#         if var_name=='aqs_wdir':  
+#             var_name_mod1 = 'WD_1'
+#             mod_var1 = wd1   
+#             
+#             var_label = 'Wind Direction (°)'
+#             var_units = '°'
+#             ymin = -1
+#             ymax = 1
+#             
+#         if var_name=='aqs_rh':
+#             var_name_mod1 = 'RH_1'
+#             mod_var1 = rh_new1   
+#         
+#             var_label = 'Relative Humidity (%)'
+#             var_units = '%'
+#             ymin = 0
+#             ymax = 110
+#             
+#        # if var_name=='precip_accum':
+#         #    var_name_mod1 = 'PRECIP_1'
+#          #   mod_var1 = df_mod1['RAINNC']
+#             
+#           #  var_label = 'Precipitation Accumulated (mm)'
+#            # var_units = 'mm'
+#             #ymin = 0 
+#             #ymax = 10 
+#         
+#         
+#         ################################################
+#         ##########     COMPUTE STATISTICS     ##########
+#         ################################################
+#         
+#         var_units = 'var units'
+#         
+#         stats1 = met.stats(df_all, var_name_mod1, var_name, var_units)
+#         stats1.loc['model'] = ['AIRPACT']
+#         stats_combined = pd.concat([stats1],axis=1,join_axes=[stats1.index])
+#         
+#         stats_T = stats_combined.T # transpose index and columns
+#         #stats_T['lat'] = lat_mw
+#         #stats_T['lon'] = lon_mw
+#         stats_T['station ID'] = i
+#         
+#         stats_all = stats_all.append(stats_T)
+#         
+#         # Fill data frame for computing overall statistics
+#         if var_name not in df_overall.columns:
+#             df_overall[[var_name_mod1,var_name]] \
+#             = df_all[[var_name_mod1,var_name]]
+#         else:
+#             df_overall = df_overall.append(df_all[[var_name_mod1,
+#                                                    var_name]],ignore_index=True)
+#         
+#         if var_name not in vname_obs:
+#             vname_obs.append(var_name)
+#             vname_1.append(var_name_mod1)
+#             vlabel.append(var_label)
+#         
+#         ###################################
+#         ##########     PLOTS     ##########
+#         ###################################
+#         # this is needed for x-axis label
+#         dfmt = dates.DateFormatter('%Y')
+#         #dfmt = dates.DateFormatter('%m-%d')
+#         
+#         # Create a time series plot of a meteorological parameter
+#         fig1, ax = plt.subplots(figsize=(8, 4))
+# 
+#         '''
+#         # MesoWest observations
+#         if var_name == 'wind_direction':
+#             ax.plot(df_h['date_time'],np.cos(df_h[var_name]*np.pi/180),c='k',label='Observations')
+#             # UW WRF model output        
+#             ax.plot(df_h['date_time'],np.cos(mod_var1*np.pi/180),c='b',label='Model')
+#             # WRF-Chem model output
+#             
+#             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
+#         else:
+#             ax.plot(df_h['date_time'],df_h[var_name],c='k',label='Observations')
+#             # UW WRF model output        
+#             ax.plot(df_h['date_time'],mod_var1,c='b',label='Model')
+#             # WRF-Chem model output
+#             
+#             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
+#         '''
+#         #df_all = df_all.resample('D').mean()
+# 
+#      
+#         # MesoWest observations
+#         if var_name == 'aqs_wdir':
+#             ax.plot(df_all.index,np.cos(df_all[var_name]*np.pi/180),c='k',label='Observations')
+#             # UW WRF model output        
+#             ax.plot(df_all.index,np.cos(df_all[var_name_mod1]*np.pi/180),c='b',label='Model')
+#             # WRF-Chem model output
+#             
+#             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
+#         else:
+#             ax.plot(df_all.index,df_all[var_name],c='k',label='Observations')
+#             # UW WRF model output        
+#             ax.plot(df_all.index,df_all[var_name_mod1],c='b',label='Model')
+#             # WRF-Chem model output
+#             
+#             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
+#             
+#         ax.set_xlim(str(start),str(end))
+#                     
+#         ax.xaxis.set_major_formatter(dfmt)
+#         fig1.autofmt_xdate(rotation=60)
+#         #df_all.plot(xticks=df_all.index)
+#         # Display r^2 on plot
+#         ax.text(1.15, 0.4,'$r^2$ = %s' %stats_T['R^2 [-]'][0], 
+#                 fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+#         ax.text(1.15, 0.3,'RMSE= %s' %stats_T['RMSE [var units]'][0], 
+#                 fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+#         ax.text(1.15, 0.2,'# of sites '+str(temp1), 
+#                 fontsize = 11, ha='center', va='center', transform=ax.transAxes)        # Plot number of sites
+#         ax.legend(loc='upper right', bbox_to_anchor=(1.27, 0.9))
+#         ax.fmt_xdata = mdates.DateFormatter('%Y-%m')
+#         
+#         yax = 0.02
+#         yax2 = yax +0.011
+#         size = 'medium'
+#         # Create Airpact version change annotation
+#         ax.annotate('AP3',xy=(0.09,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,yax2),color='red',size=size) # Left Arrow AP3
+#         ax.annotate('AP3',xy=(0.33,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,yax2),color='red',size=size) # Right Arrow AP3
+#  
+#         ax.annotate('AP4',xy=(0.33,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.421,yax2),color='red',size=size) # Left Arrow AP4       
+#         ax.annotate('AP4',xy=(0.512,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.421,yax2),color='red',size=size) # Right Arrow AP4
+#         
+#         ax.annotate('AP5',xy=(0.512,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.646,yax2),color='red',size=size) # Left Arrow AP5
+#         ax.annotate('AP5',xy=(0.8,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.646,yax2),color='red',size=size) # Right Arrow AP5
+#         '''
+#         ax.annotate('AP3',xy=(0.09,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.235,yax2),color='red',size=size) # Left Arrow AP3
+#         ax.annotate('AP3',xy=(0.405,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.235,yax2),color='red',size=size) # Right Arrow AP3
+#         
+#         ax.annotate('AP4',xy=(0.632,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.512,yax2),color='red',size=size) # Right Arrow AP4
+#         ax.annotate('AP4',xy=(0.405,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.512,yax2),color='red',size=size) # Left Arrow AP4
+#         
+#         ax.annotate('AP5',xy=(0.632,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.78,yax2),color='red',size=size) # Left Arrow AP5
+#         ax.annotate('AP5',xy=(0.94,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.78,yax2),color='red',size=size) # Right Arrow AP5
+#         '''
+#         # Add significant event annotations to plots
+#         #ax.annotate('12km to 4km',xy=(0.405,0.75),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(0.405,.8),color='red',size='x-small') # Right Arrow AP3
+#         
+#         plt.show()
+#         fig1.savefig(outputdir + '/time_series/type/aqs_%s_%s_timeseries_site.png' %(st_name, var_name),bbox_inches='tight')
+#         plt.close()
+#         
+# 
+#         
+#         '''
+#         # Create a scatter plot with linear regression lines and 
+#         # correlation coefficients "r" (models vs. obs)
+#         fig2, ax = plt.subplots(figsize=(6, 4.5))
+#         
+#         ax.scatter(df_h[var_name], mod_var1, s=50, c='b', label='UW WRF')
+#         ax.scatter(df_h[var_name], mod_var2, s=50, c='r', label='WSU WRF')
+#         ax.scatter(df_h[var_name], mod_var3, s=50, c='g', label='HRRR') 
+#         
+#         # Perform linear regression
+#         m1, b1 = np.polyfit(df_h[var_name], mod_var1, deg=1)
+#         m2, b2 = np.polyfit(df_h[var_name], mod_var2, deg=1)
+#         m3, b3 = np.polyfit(df_h[var_name], mod_var3, deg=1)
+#         
+#         #ax.plot(df_h[var_name], m1*df_h[var_name] + b1, '--b', label='UW_WRF')
+#         #ax.plot(df_h[var_name], m2*df_h[var_name] + b2, ':r', label='WRF-Chem')
+#         #ax.plot(df_h[var_name], m3*df_h[var_name] + b3, '-.g', label='HRRR')
+#         
+#         
+#         # Get correlation coefficients
+#         cc1 = round(np.corrcoef(df_h[var_name], mod_var1)[0, 1],3)
+#         cc2 = round(np.corrcoef(df_h[var_name], mod_var2)[0, 1],3)
+#         cc3 = round(np.corrcoef(df_h[var_name], mod_var3)[0, 1],3)
+#         
+#         ax.text(1.15, 0.9,'UW WRF: r = %s' %cc1, fontsize = 11, ha='center', 
+#                 va='center', transform=ax.transAxes)
+#         ax.text(1.15, 0.8,'WSU WRF: r = %s' %cc2, fontsize = 11, ha='center', 
+#                 va='center', transform=ax.transAxes)
+#         ax.text(1.15, 0.7,'HRRR: r = %s' %cc3, fontsize = 11, ha='center', 
+#                 va='center', transform=ax.transAxes)
+#         
+#         
+#         # Define x and y-limits
+#         xy_min = min(np.nanmin(df_h[var_name]),np.nanmin(mod_var1),np.nanmin(mod_var2),np.nanmin(mod_var3))
+#         xy_max = max(np.nanmax(df_h[var_name]),np.nanmax(mod_var1),np.nanmax(mod_var2),np.nanmax(mod_var3))
+# 
+#         # Add 1:1 line
+#         ax.plot([xy_min,xy_max], [xy_min,xy_max], '-k', label = '1:1 line')
+#         
+#         ax.set(title=st_name,xlabel='Observed %s' %var_label,
+#                ylabel='Predicted %s' %var_label,xlim=(xy_min,xy_max),ylim=(xy_min,xy_max))
+#         ax.legend(loc='center right', bbox_to_anchor=(1.3, 0.5))
+#         
+#         plt.show()
+#         fig2.savefig(outputdir + '%s_%s_regression.png' %(st_id, var_name),bbox_inches='tight')
+#         '''
+#     print(str(i) + ' plotted')
+#     
+#     #Create large dataframe with all the model data
+#     #df_mod1 = df_mod1.reset_index(drop=True)
+#     #site_name = pd.DataFrame([st_name],columns=['site_name'])
+#     #df_mod2 = pd.concat([df_h,site_name], axis=1)
+#     #df_mod2 = df_mod2.rename(columns={'date_time':'DateTime'})
+#     #df_mod2.site_name = df_mod2.site_name.fillna(st_name)
+#     #df_temp = pd.merge(df_mod1,df_mod2, on='DateTime', how='outer')
+#     #df_met_all = pd.concat([df_met_all,df_temp])
+#     
+#     #ix1 = pd.concat([pd.DataFrame([ix1]),site_name], axis=1)
+#     #iy1 = pd.concat([pd.DataFrame([iy1]),site_name], axis=1)
+#     
+#     #iy = iy.append(iy1)
+#     #ix = ix.append(ix1)
+#     #df_met_all = pd.concat([df_met_all,df_mod1])
+# print('plots complete')    
+# stats_all = stats_all.reset_index()
+# stats_all.to_csv(base_dir+'/AQS_stats/aqs_stats.csv')
+# =============================================================================
 #%%
 # Make plots and do stats for the different versions of AIRPACT (3,4,5)
 versions = ['ap3','ap4','ap5'] #List versions
@@ -1519,6 +1521,7 @@ for version in versions:
         #plt.show()
         
         fig1.savefig(outputdir + '/time_series/type/aqs_%s_%s_total_timeseries.png' %(st_name, var_name),bbox_inches='tight')
+        plt.show()
         plt.close()
 
         '''
@@ -1778,6 +1781,367 @@ plt.savefig('stats.png',bbox_inches='tight')
 '''
 
 #df_combined_all = pd.DataFrame.from_dict(df_airpact, orient='index')
+#%%
+stats_all = pd.DataFrame() # statistics for each station
+# Make Location Setting plots
+setting = ['URBAN AND CENTER CITY','SUBURBAN','RURAL']
+
+print('Attempting setting '+str(i))
+
+# Locate correct site model data
+#df_mod1 = df_airpact.loc[(df_airpact['Location Setting'] == str(i))]
+df_mod1 = df_airpact
+df_mod1 = df_mod1.reset_index(drop=True)
+
+df_h = df_obs.rename(columns={'datetime':'date_time'})
+
+#df_com = pd.merge(df_mod1,df_h, how='outer')
+#########################################################
+##########     CONVERT/CALCULATE VARIABLES     ##########
+#########################################################
+
+# Convert temperature from K to C°
+temp1 = df_mod1['TEMP2'] - 273.15 
+
+# Convert pressure from Pa to hPa (mb)
+p1 = df_mod1['PRSFC'] / 100
+
+# Calculate wind speed from u and v components
+
+#u1 = df_mod1['U10']
+#v1 = df_mod1['V10']
+#ws1 = np.sqrt((u1**2)+(v1**2))
+
+ws1 = df_mod1['WSPD10']    # MCIP files record wind speed, no need to calculate
+
+# Calculate wind direction from u and v components 
+
+#wind_dir1 = np.arctan2(u1/ws1, v1/ws1) # Where wind is blowing TO
+#wind_dir_degrees1 = wind_dir1 * 180/np.pi   
+#wd1 = wind_dir_degrees1 + 180
+
+wd1 = df_mod1['WDIR10']    # MCIP files record wind speed, no need to calculate
+
+# Calculate 2-m (approximately) relative humidity using Q2, TEMP2, PRSFC, & constants
+# Formula taken from:
+# http://mailman.ucar.edu/pipermail/wrf-users/2012/002546.html
+pq0 = 379.90516
+a2 = 17.2693882
+a3 = 273.16
+a4 = 35.86
+
+rh1 = df_mod1['Q2'] / ( (pq0 / df_mod1['PRSFC']) * np.exp(a2 * 
+               (df_mod1['TEMP2'] - a3) / (df_mod1['TEMP2'] - a4)) )
+
+rh_new1 = rh1 * 100 # convert from fraction to %    
+#rh_new1  = df_mod1['Q2']/1000    #Do this to get the mixing ration instead of RH
+# Convert aqs data from F to C
+if 'aqs_temp' in df_h:
+    df_h['aqs_temp'] = (df_h['aqs_temp']-32)*(5/9)
+    
+#Try different way to create the dataframes, so as to retain all model data
+df_models=df_mod1
+df_models['TEMP2'] = df_models['TEMP2'] - 273.15
+df_models['PRSFC'] = df_models['PRSFC']/100
+df_models['rh1'] = rh_new1
+df_models = df_models.rename(columns = {'DateTime':'date_time','TEMP2':'TEMP2_1','PRSFC':'PRSFC_1','WSPD10':'WS_1','WDIR10':'WD_1','rh1':'RH_1'})
+
+# Create new data frame with all variables from WRF models
+#df_models = pd.DataFrame({'TEMP2_1': temp1, 'PRSFC_1': p1, 'WS_1': ws1, 'WD_1': wd1, 
+ #                         'RH_1': rh_new1})#, 'PRECIP_1': df_mod1['RAINNC']})
+df_models = df_models.reset_index().drop(['index'],axis=1)
+
+df_models = df_models.set_index('date_time').drop(['site_name'],axis=1)
+df_h = df_h.set_index('date_time') #.drop(['Local Site Name'],axis=1)
+
+# Checks the size of the dataframes
+#mem_df_h=df_h.memory_usage(index=True).sum()
+#mem_df_models = df_models.memory_usage(index=True).sum()
+#print("df_h uses ",round(mem_df_h/ 1024**2)," MB")
+#print("df_models uses ",round(mem_df_models/ 1024**2)," MB")
+
+
+# Try and reset index so that concat can occur
+#df_models = df_models.reset_index()
+#df_h = df_h.reset_index()
+# Concatenating observation and model data frames
+#try:    # For some reason Portland, Portland International Airport throws this error "ValueError: Shape of passed values is (16, 103464), indices imply (16, 81096)", so this is my workaround
+#    df_all = pd.concat([df_models,df_h], axis=1)
+#    #df_all = df_h.join(df_models,how='outer')
+#except ValueError:
+#    continue
+
+df_sitenum = df_h # Set this to later on determine number of sites
+#Average the data monthly
+df_models = df_models.resample('M', convention='start').mean()
+df_h = df_h.resample('M', convention='start').mean()
+
+del(df_mod1)
+df_all = pd.merge(df_models,df_h, how ='outer',left_index=True,right_index=True)
+del(df_models)
+
+# Select variables, specify labels, units and y-limits, and plot model 
+# variables based on MesoWest variable names
+new_list = ['aqs_temp','aqs_pressure','aqs_rh','aqs_wspd','aqs_wdir'] # Remember to add in winds here
+for w in new_list:
+    var_name = str(w)
+    
+    temp1 = df_sitenum
+    temp1 = temp1.groupby(['Local Site Name']).count()
+    temp1 = len(temp1.index.get_level_values(0))
+    # Skip variable if all values are zeros or NaNs
+    if df_h[var_name].isnull().all()==True or all(df_h[var_name]==0):
+        continue
+    
+    #var_units = mw_data['UNITS'][var_name]
+    if var_name=='aqs_temp':
+        var_name_mod1 = 'TEMP2_1'
+        mod_var1 = temp1
+        st_name = 'AIRPACT Monthly Temperature'
+ 
+        var_label = 'Temperature (C°)'
+        var_units = 'C°'
+        ymin = 0
+        ymax = 40
+        
+    if var_name=='aqs_pressure':
+        var_name_mod1 = 'PRSFC_1'
+        mod_var1 = p1
+        st_name = 'AIRPACT Monthly Pressure'
+        
+        var_label = 'Pressure (mb)'
+        var_units = 'mb'
+        ymin = 850
+        ymax = 1050
+        
+    if var_name=='aqs_wspd':
+        var_name_mod1 = 'WS_1'
+        mod_var1 = ws1
+        st_name = 'AIRPACT Monthly Wind Speed'
+        
+        var_label = 'Wind Speed (m/s)'
+        var_units = 'm/s'
+        ymin = 0
+        ymax = 6
+        
+    if var_name=='aqs_wdir':  
+        var_name_mod1 = 'WD_1'
+        mod_var1 = wd1   
+        st_name = 'AIRPACT Monthly Wind Direction'
+
+        var_label = 'Wind Direction (°)'
+        var_units = '°'
+        ymin = -1
+        ymax = 1
+        
+    if var_name=='aqs_rh':
+        var_name_mod1 = 'RH_1'
+        mod_var1 = rh_new1   
+        st_name = 'AIRPACT Monthly Relative Humidity'
+        
+        var_label = 'Relative Humidity (%)'
+        var_units = '%'
+        ymin = 0
+        ymax = 110
+        
+   # if var_name=='precip_accum':
+    #    var_name_mod1 = 'PRECIP_1'
+     #   mod_var1 = df_mod1['RAINNC']
+        
+      #  var_label = 'Precipitation Accumulated (mm)'
+       # var_units = 'mm'
+        #ymin = 0 
+        #ymax = 10 
+    
+    
+    ################################################
+    ##########     COMPUTE STATISTICS     ##########
+    ################################################
+    
+    var_units = 'var units'
+    
+    stats1 = met.stats(df_all, var_name_mod1, var_name, var_units)
+    stats1.loc['model'] = ['AIRPACT']
+    stats_combined = pd.concat([stats1],axis=1,join_axes=[stats1.index])
+    
+    stats_T = stats_combined.T # transpose index and columns
+    #stats_T['lat'] = lat_mw
+    #stats_T['lon'] = lon_mw
+
+    
+    stats_all = stats_all.append(stats_T)
+    
+    # Fill data frame for computing overall statistics
+    if var_name not in df_overall.columns:
+        df_overall[[var_name_mod1,var_name]] \
+        = df_all[[var_name_mod1,var_name]]
+    else:
+        df_overall = df_overall.append(df_all[[var_name_mod1,
+                                               var_name]],ignore_index=True)
+    
+    if var_name not in vname_obs:
+        vname_obs.append(var_name)
+        vname_1.append(var_name_mod1)
+        vlabel.append(var_label)
+    
+    ###################################
+    ##########     PLOTS     ##########
+    ###################################
+    # this is needed for x-axis label
+    dfmt = dates.DateFormatter('%Y')
+    #dfmt = dates.DateFormatter('%m-%d')
+    
+    # Create a time series plot of a meteorological parameter
+    fig1, ax = plt.subplots(figsize=(8, 4))
+
+    '''
+    # MesoWest observations
+    if var_name == 'wind_direction':
+        ax.plot(df_h['date_time'],np.cos(df_h[var_name]*np.pi/180),c='k',label='Observations')
+        # UW WRF model output        
+        ax.plot(df_h['date_time'],np.cos(mod_var1*np.pi/180),c='b',label='Model')
+        # WRF-Chem model output
+        
+        ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
+    else:
+        ax.plot(df_h['date_time'],df_h[var_name],c='k',label='Observations')
+        # UW WRF model output        
+        ax.plot(df_h['date_time'],mod_var1,c='b',label='Model')
+        # WRF-Chem model output
+        
+        ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
+    '''
+    #df_all = df_all.resample('D').mean()
+
+ 
+    # MesoWest observations
+    if var_name == 'aqs_wdir':
+        ax.plot(df_all.index,np.cos(df_all[var_name]*np.pi/180),c='k',label='Observations')
+        # UW WRF model output        
+        ax.plot(df_all.index,np.cos(df_all[var_name_mod1]*np.pi/180),c='b',label='Model')
+        # WRF-Chem model output
+        
+        ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
+    else:
+        ax.plot(df_all.index,df_all[var_name],c='k',label='Observations')
+        # UW WRF model output        
+        ax.plot(df_all.index,df_all[var_name_mod1],c='b',label='Model')
+        # WRF-Chem model output
+        
+        ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
+        
+    ax.set_xlim(str(start),str(end))
+                
+    ax.xaxis.set_major_formatter(dfmt)
+    fig1.autofmt_xdate(rotation=60)
+    #df_all.plot(xticks=df_all.index)
+    # Display r^2 on plot
+    ax.text(1.15, 0.4,'$r^2$ = %s' %stats_T['R^2 [-]'][0], 
+            fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+    ax.text(1.15, 0.3,'RMSE= %s' %stats_T['RMSE [var units]'][0], 
+            fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+    ax.text(1.15, 0.2,'# of sites '+str(temp1), 
+            fontsize = 11, ha='center', va='center', transform=ax.transAxes)        # Plot number of sites
+    ax.legend(loc='upper right', bbox_to_anchor=(1.27, 0.9))
+    ax.fmt_xdata = mdates.DateFormatter('%Y-%m')
+    
+    yax = 0.02
+    yax2 = yax +0.011
+    size = 'medium'
+    # Create Airpact version change annotation
+    ax.annotate('AP3',xy=(0.09,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,yax2),color='red',size=size) # Left Arrow AP3
+    ax.annotate('AP3',xy=(0.33,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,yax2),color='red',size=size) # Right Arrow AP3
+ 
+    ax.annotate('AP4',xy=(0.33,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.421,yax2),color='red',size=size) # Left Arrow AP4       
+    ax.annotate('AP4',xy=(0.512,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.421,yax2),color='red',size=size) # Right Arrow AP4
+    
+    ax.annotate('AP5',xy=(0.512,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.646,yax2),color='red',size=size) # Left Arrow AP5
+    ax.annotate('AP5',xy=(0.8,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.646,yax2),color='red',size=size) # Right Arrow AP5
+    '''
+    ax.annotate('AP3',xy=(0.09,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.235,yax2),color='red',size=size) # Left Arrow AP3
+    ax.annotate('AP3',xy=(0.405,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.235,yax2),color='red',size=size) # Right Arrow AP3
+    
+    ax.annotate('AP4',xy=(0.632,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.512,yax2),color='red',size=size) # Right Arrow AP4
+    ax.annotate('AP4',xy=(0.405,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.512,yax2),color='red',size=size) # Left Arrow AP4
+    
+    ax.annotate('AP5',xy=(0.632,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.78,yax2),color='red',size=size) # Left Arrow AP5
+    ax.annotate('AP5',xy=(0.94,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.78,yax2),color='red',size=size) # Right Arrow AP5
+    '''
+    # Add significant event annotations to plots
+    #ax.annotate('12km to 4km',xy=(0.405,0.75),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(0.405,.8),color='red',size='x-small') # Right Arrow AP3
+    
+    plt.show()
+    fig1.savefig(outputdir + '/time_series/type/aqs_%s_timeseries_site.png' %(var_name),bbox_inches='tight')
+    plt.close()
+    
+
+    
+    '''
+    # Create a scatter plot with linear regression lines and 
+    # correlation coefficients "r" (models vs. obs)
+    fig2, ax = plt.subplots(figsize=(6, 4.5))
+    
+    ax.scatter(df_h[var_name], mod_var1, s=50, c='b', label='UW WRF')
+    ax.scatter(df_h[var_name], mod_var2, s=50, c='r', label='WSU WRF')
+    ax.scatter(df_h[var_name], mod_var3, s=50, c='g', label='HRRR') 
+    
+    # Perform linear regression
+    m1, b1 = np.polyfit(df_h[var_name], mod_var1, deg=1)
+    m2, b2 = np.polyfit(df_h[var_name], mod_var2, deg=1)
+    m3, b3 = np.polyfit(df_h[var_name], mod_var3, deg=1)
+    
+    #ax.plot(df_h[var_name], m1*df_h[var_name] + b1, '--b', label='UW_WRF')
+    #ax.plot(df_h[var_name], m2*df_h[var_name] + b2, ':r', label='WRF-Chem')
+    #ax.plot(df_h[var_name], m3*df_h[var_name] + b3, '-.g', label='HRRR')
+    
+    
+    # Get correlation coefficients
+    cc1 = round(np.corrcoef(df_h[var_name], mod_var1)[0, 1],3)
+    cc2 = round(np.corrcoef(df_h[var_name], mod_var2)[0, 1],3)
+    cc3 = round(np.corrcoef(df_h[var_name], mod_var3)[0, 1],3)
+    
+    ax.text(1.15, 0.9,'UW WRF: r = %s' %cc1, fontsize = 11, ha='center', 
+            va='center', transform=ax.transAxes)
+    ax.text(1.15, 0.8,'WSU WRF: r = %s' %cc2, fontsize = 11, ha='center', 
+            va='center', transform=ax.transAxes)
+    ax.text(1.15, 0.7,'HRRR: r = %s' %cc3, fontsize = 11, ha='center', 
+            va='center', transform=ax.transAxes)
+    
+    
+    # Define x and y-limits
+    xy_min = min(np.nanmin(df_h[var_name]),np.nanmin(mod_var1),np.nanmin(mod_var2),np.nanmin(mod_var3))
+    xy_max = max(np.nanmax(df_h[var_name]),np.nanmax(mod_var1),np.nanmax(mod_var2),np.nanmax(mod_var3))
+
+    # Add 1:1 line
+    ax.plot([xy_min,xy_max], [xy_min,xy_max], '-k', label = '1:1 line')
+    
+    ax.set(title=st_name,xlabel='Observed %s' %var_label,
+           ylabel='Predicted %s' %var_label,xlim=(xy_min,xy_max),ylim=(xy_min,xy_max))
+    ax.legend(loc='center right', bbox_to_anchor=(1.3, 0.5))
+    
+    plt.show()
+    fig2.savefig(outputdir + '%s_%s_regression.png' %(st_id, var_name),bbox_inches='tight')
+    '''
+
+
+#Create large dataframe with all the model data
+#df_mod1 = df_mod1.reset_index(drop=True)
+#site_name = pd.DataFrame([st_name],columns=['site_name'])
+#df_mod2 = pd.concat([df_h,site_name], axis=1)
+#df_mod2 = df_mod2.rename(columns={'date_time':'DateTime'})
+#df_mod2.site_name = df_mod2.site_name.fillna(st_name)
+#df_temp = pd.merge(df_mod1,df_mod2, on='DateTime', how='outer')
+#df_met_all = pd.concat([df_met_all,df_temp])
+
+#ix1 = pd.concat([pd.DataFrame([ix1]),site_name], axis=1)
+#iy1 = pd.concat([pd.DataFrame([iy1]),site_name], axis=1)
+
+#iy = iy.append(iy1)
+#ix = ix.append(ix1)
+#df_met_all = pd.concat([df_met_all,df_mod1])
+print('plots complete')    
+stats_all = stats_all.reset_index()
+stats_all.to_csv(base_dir+'/AQS_stats/aqs_stats.csv')
 #%%
 # List how many sites are used for each type
 temp1 = df_obs.loc[(df_obs['Location Setting'] == 'RURAL')].rename(columns={'Location Setting': 'type'})

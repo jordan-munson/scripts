@@ -84,7 +84,7 @@ df_obs['Site Num'] = ["%04d" % n for n in df_obs['Site Num'] ]
 df_obs['AQSID'] = (df_obs['State Code']).astype(str) + (df_obs['County Code']).astype(str)+(df_obs['Site Num']).astype(str)
 
 # Drop columns of data we are not looking at so as to increase the speed of the script
-df_obs = df_obs.drop(['Unnamed: 0','Unnamed: 1','State Name','County Name','State Code','County Code','Site Num','Units of Measure'],axis=1)
+df_obs = df_obs.drop(['Unnamed: 0','Unnamed: 1','State Name','County Name','State Code','County Code','Site Num','Units of Measure','Latitude','Longitude'],axis=1)
 df_obs = df_obs.rename(columns={'Date Local_Time Local': 'datetime','Parameter Name':'Parameter_Name'})
 print('Observed data read and combined')
 
@@ -139,7 +139,7 @@ print('Combined dataframe finished')
 
 # Set plot parameters
 mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 20.0
+mpl.rcParams['font.size'] = 10.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -155,7 +155,8 @@ mpl.rcParams['xtick.direction']   = 'in'
 df_mod.loc[:,'O3_mod'] = pd.to_numeric(df_mod.loc[:,'O3_mod'], errors='coerce')
 df_mod.loc[:,'PM2.5_mod'] = pd.to_numeric(df_mod.loc[:,'PM2.5_mod'], errors='coerce')
 
-df_com = df_com.dropna()
+df_com_test = df_com
+#df_com = df_com.dropna()
 #%%
 stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
@@ -180,6 +181,7 @@ for species in pollutant:
     m.drawcoastlines()
     m.drawstates()
     m.drawcountries()
+
     for AQSID in list(set(df_com['AQSID'])):
 
         #This section selects only data relevant to the aqs site
@@ -213,11 +215,12 @@ for species in pollutant:
             sp = 3 # Fractional Bias
             size = 10*aq_stats[species+'_mod'][sp]
             m.scatter(x, y, marker=marker_shape,c = aq_stats[species+'_mod'][sp], s = size)
+            plt.clim(-50,50)
             #print(aq_stats[species+'_mod'][sp])
         # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
    
             # Merge stats into single dataframe
-            aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + site_nameinfo)    
+            aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + str(site_nameinfo))    
             stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
             #print('Stats check okay')
             
@@ -225,17 +228,12 @@ for species in pollutant:
             
         except (ZeroDivisionError):
             pass
-                # colorbar
-    # compute auto color-scale using maximum concentrations
-    down_scale = 0 #np.percentile(stats_com[sp], 5)
-    up_scale = 100 #np.percentile(stats_com[sp], 95)
-    clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10),2)
-    clevs = [-100,-75,-50,-25,0,25,50,75,100]
-    cbticks = True
-    cbar = m.colorbar(location='bottom',pad="-12%")    # Disable this for the moment
-    cbar.set_label(unit_list)
-    plt.show()
 
+    cbticks = True
+    cbar = m.colorbar(location='bottom')#,pad="-12%")    # Disable this for the moment
+    cbar.set_label(unit_list)
+    
+    plt.show()
 #stats_com.to_csv(inputDir + 'stats/bias_map_stats.csv')
 
 
