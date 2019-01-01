@@ -398,15 +398,15 @@ for species in pollutant:
     print(species)
     da = df_com.dropna(subset=['Location Setting'])
     # Create the overal plot and its settings
-    fig = plt.figure(figsize=(26,10))#10,18))
+    fig = plt.figure(figsize=(26,10))#10,18)) # seems to do nothing here really
     if species == 'PM2.5':
         #fig.set_ylabel('$PM_{2.5} (ug/m^3)$')
-        fig.text(-0.02, 0.5, '$PM_{2.5} (ug/m^3)$', va='center', rotation='vertical')
+        fig.text(-0.01, 0.5, '$PM_{2.5} (ug/m^3)$', va='center', rotation='vertical')
        
     else:
         #fig.set_ylabel('Ozone (ppb)') 
-        fig.text(-0.02, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
-    fig.suptitle('Seasonal Variations by AIRPACT Version',y=1.02) # title
+        fig.text(-0.01, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
+    fig.suptitle('Seasonal Variations by AIRPACT Version',y=1.03) # title
     fig.tight_layout() # spaces the plots out a bit
 
     #Annotate versions in
@@ -475,7 +475,7 @@ for species in pollutant:
                     s = '6/1/2009'
                     e = '8/31/2009'
                     dates = pd.date_range(start=s,end=e)
-                    ax = fig.add_subplot(2,3,4+i)#(6,2,3+i)
+                    ax = fig.add_subplot(2,3,1+i)#(6,2,3+i)
                     
                 if season == 'Fall':
                     year = str(year)
@@ -509,7 +509,7 @@ for species in pollutant:
                     s = '12/1/2009'
                     e = '2/28/2010'
                     dates = pd.date_range(start=s,end=e)
-                    ax = fig.add_subplot(2,3,1+i)#(6,2,1+i)
+                    ax = fig.add_subplot(2,3,4+i)#(6,2,1+i)
 
                     
                 if season == 'Spring':
@@ -564,7 +564,7 @@ for species in pollutant:
             ax.xaxis.set_major_formatter(myFmt)
             ax.set_xlabel('')        # Gets rid of the 'DateTime' x label and replaces with a space
             ax.set_title(str(season),fontsize=12) # sets the titles of individ plots as the season, and makes the font smaller
-            plt.legend(prop={'size': 10})#,loc=3) # Places the legend in the lower left corner at a size of 10
+            plt.legend(prop={'size': 12})#,loc=3) # Places the legend in the lower left corner at a size of 10
             sze = 10 #size of annotation text
             
             plt.grid(True)    # Add grid lines to make graph interpretation easier

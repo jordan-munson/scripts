@@ -6,7 +6,7 @@ Created on Thu Dec 20 08:51:54 2018
 """
 
 import matplotlib as mpl
-#mpl.use('Agg')
+mpl.use('Agg')
 import pandas as pd
 import matplotlib.dates as mdates
 import datetime as dt
@@ -23,19 +23,18 @@ from mpl_toolkits.basemap import Basemap
 starttime = time.time()
 begin_time = time.time()
 
-day='01'
-month = '04' 
-year  = '2018' 
+inputDir = '/data/lar/users/jmunson/longterm_airpact/'
+stat_path = '/data/lar/users/jmunson/statistical_functions.py'
+ben_path = '/data/lar/users/jmunson/Met_functions_for_Ben.py'
 
-endday = '31'
-endmonth='05'
-endyear='2018'
+# =============================================================================
+# #Set directory
+# inputDir = r'E:/Research/AIRPACT_eval/'
+# # Open statistics script
+# stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
+# ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
+# =============================================================================
 
-#Set directory
-inputDir = r'E:/Research/AIRPACT_eval/'
-# Open statistics script
-stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
-ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
 exec(open(stat_path).read())
 #aqsidd = pd.read_csv(r'G:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison/Aqsid.csv')
 #aqsidd = aqsidd.drop(['Unnamed: 4','Unnamed: 5','Unnamed: 6','Latitude','Longitude'], axis=1)
@@ -155,7 +154,6 @@ mpl.rcParams['xtick.direction']   = 'in'
 df_mod.loc[:,'O3_mod'] = pd.to_numeric(df_mod.loc[:,'O3_mod'], errors='coerce')
 df_mod.loc[:,'PM2.5_mod'] = pd.to_numeric(df_mod.loc[:,'PM2.5_mod'], errors='coerce')
 
-df_com_test = df_com
 #df_com = df_com.dropna()
 #%%
 stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
@@ -177,7 +175,7 @@ for species in pollutant:
         unit_list = 'ppb'
     else:
         unit_list = '$ug/m^3$'
-    m.drawcounties()
+    #m.drawcounties()
     m.drawcoastlines()
     m.drawstates()
     m.drawcountries()
@@ -232,8 +230,15 @@ for species in pollutant:
     cbticks = True
     cbar = m.colorbar(location='bottom')#,pad="-12%")    # Disable this for the moment
     cbar.set_label(unit_list)
+    plt.title(species + ' Fractional Bias Map')
+    
+    plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map.png',  pad_inches=0.1, bbox_inches='tight')
     
     plt.show()
+    plt.close()
+end_time = time.time()
+print("Run time was %s minutes"%(round((end_time-begin_time)/60)))
+print('done')
 #stats_com.to_csv(inputDir + 'stats/bias_map_stats.csv')
 
 
