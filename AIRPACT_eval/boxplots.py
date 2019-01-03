@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Dec 20 08:51:54 2018
+Created on Wed Jan  2 14:19:07 2019
 
-@author: Jordan
+@author: Jordan Munson
 """
-
 import matplotlib as mpl
 mpl.use('Agg')
 import pandas as pd
@@ -70,10 +69,9 @@ df_or = pd.read_csv(inputDir + 'AQS_data/Oregon_aqs.csv', sep = ',',parse_dates=
 df_id = pd.read_csv(inputDir + 'AQS_data/Idaho_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 #df_cc = pd.read_csv(inputDir + 'Canada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 df_mt = pd.read_csv(inputDir + 'AQS_data/Montana_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_ca = pd.read_csv(inputDir + 'AQS_data/California_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 
 #  Combine AQS data
-df_list = [df_wa,df_or,df_id,df_mt,df_ca]
+df_list = [df_wa,df_or,df_id,df_mt]
 df_obs = pd.concat(df_list)
 
 
@@ -160,106 +158,41 @@ df_com = df_com.dropna(thresh = 6) # setting threshold to 6 means that any site 
 
 # create lits to use in calcs of site ids
 used_AQSID = list(set(df_com['AQSID']))
-
 #%%
-stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
-stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
-stats_com = stats_com.drop(0,1)
-lats = []
-lons = []
-
-m = Basemap(projection='merc',
-              #lat_0=lat, lon_0=lon,
-              llcrnrlat=40.5, urcrnrlat=49.5,
-              llcrnrlon=-125, urcrnrlon=-109,
-              area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
-
-# Calculate stats for each site and add to list
 pollutant = ['O3','PM2.5']
+
 for species in pollutant:
-#    if species == 'O3':
-    unit_list = 'FB (%)'
-#    else:
-#        unit_list = '$ug/m^3$'
-    m.drawcounties()
-    m.drawcoastlines()
-    m.drawstates()
-    m.drawcountries()
-    cmap = plt.get_cmap('jet')
-    
-    #used_AQSID = ['410050004','530090013'] # to test map
-    for AQSID in used_AQSID:
+    data=[]
+    names=[]
+    sites=[]
+    if species == 'O3':
+        unit_list = 'ppb'
+    else:
+        unit_list = '$ug/m^3$'
         
-        #This section selects only data relevant to the aqs site
+    #used_AQSID = ['410050004','530090013'] # to test map
+    for AQSID in used_AQSID:        
+        print(AQSID)
         d = df_com.loc[df_com['AQSID']==AQSID]
         d=d.reset_index()
-        site_nameinfo = d.loc[0,'Local Site Name'] #Gets the longname of the site to title the plot
         
-        lat = d.loc[0,'Latitude']
-        lon = d.loc[0,'Longitude']
-        #lats.append(lat)
-        #lons.append(lon)
-        
-        #site_type = d.loc[0,'Location Setting']
-        d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
-        #d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
-        d['date'] = d['datetime'] #format="%m/%d/%y %H:%M")
-        
-        
-        #d = d.set_index('datetime') 
-        
-        #print(species+ ' ' + str(site_nameinfo))
-        #Calculate Statistics
-        try:
-            #Run stats functions
-            aq_stats = stats(d, species+'_mod', species+'_obs')
-            
-                    #Mapping
-            x, y = m(lon, lat)
-            marker_shape = 'o'
-            #marker_color = 'r'
-            sp = 3 # Fractional Bias
-            size = abs(6*aq_stats[species+'_mod'][sp])
-            m.scatter(x, y, marker=marker_shape,c = aq_stats[species+'_mod'][sp], s = size, alpha = 0.7,cmap=cmap)
-            print(AQSID,aq_stats[species+'_mod'][sp])
-            plt.clim(-50,50)
-            #print(aq_stats[species+'_mod'][sp])
-        # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
-   
-            # Merge stats into single dataframe
-            aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + str(site_nameinfo))    
-            stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
-            #print('Stats check okay')
-            
+        site_nameinfo = d.loc[0,'Local Site Name'] #Gets the longname of the site to title the plot 
+        names.append(site_nameinfo)
 
-            
-        except (ZeroDivisionError):
-            pass
+        data.append(list(d[species+'_mod'].dropna()))
+        
 
-    cbticks = True
-    cbar = m.colorbar(location='bottom')#,pad="-12%")    # Disable this for the moment
-    cbar.set_label(unit_list)
-    plt.title(species + ' Fractional Bias Map')
-    
-    plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map.png',  pad_inches=0.1, bbox_inches='tight')
+      
+    sites = len(data)
+    # Plotting section
+    fig1, ax1 = plt.subplots()
+    ax1.set_title(species)
+
+    ax1.boxplot(data)
+    plt.xticks([sites],[names])
     
     plt.show()
     plt.close()
-end_time = time.time()
-print("Run time was %s minutes"%(round((end_time-begin_time)/60)))
-print('done')
-#stats_com.to_csv(inputDir + 'stats/bias_map_stats.csv')
-
-
-
-
-
-
-
-
-
-
-
 
 
 

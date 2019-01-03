@@ -49,14 +49,17 @@ def aqs(state,ac):
                           'Qualifier','Method Type','Method Code','Method Name','Date of Last Change'], axis=1)
    
     
-    AQS_df.to_csv(r'E:/Research/AIRPACT_eval/AQS_data/'+state+'_met_aqs.csv')
+    AQS_df.to_csv(r'E:/Research/AIRPACT_eval/AQS_data/'+state+'_aqs.csv')
     print(state + ' Done')
 
-aqs('Washington','_WA')
-aqs('Oregon','_OR')
-aqs('Idaho','_ID')
-aqs('Canada','_CC')
-
+#aqs('Washington','_WA')
+#aqs('Oregon','_OR')
+#aqs('Idaho','_ID')
+#aqs('Canada','_CC')
+#aqs('Montana','_MT')
+aqs('California','_CA')
+aqs('Nevada','_NV')
+aqs('Utah','_UT')
 
 
 
