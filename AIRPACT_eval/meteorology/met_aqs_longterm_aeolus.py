@@ -182,6 +182,19 @@ stations = site_list
 #aqsid.to_csv(base_dir+'/aqsid_waorid.csv')
 print('Data combined')
 
+# Set plot parameters
+mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 24.0
+mpl.rcParams['xtick.major.size']  = 10
+mpl.rcParams['xtick.major.width'] = 2
+mpl.rcParams['xtick.minor.size']  = 5
+mpl.rcParams['xtick.minor.width'] = 1
+mpl.rcParams['ytick.major.size']  = 10
+mpl.rcParams['ytick.major.width'] = 2
+mpl.rcParams['ytick.minor.size']  = 5
+mpl.rcParams['ytick.minor.width'] = 1
+mpl.rcParams['ytick.direction']   = 'in'
+mpl.rcParams['xtick.direction']   = 'in'
 
 ####################################
 #########     AIRPACT     ##########
@@ -507,9 +520,9 @@ for i in stations:
         #df_all.plot(xticks=df_all.index)
         # Display r^2 on plot
         ax.text(1.15, 0.4,'$r^2$ = %s' %stats_T['R^2 [-]'][0], 
-                fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+                 ha='center', va='center', transform=ax.transAxes)
         ax.text(1.15, 0.3,'RMSE= %s' %stats_T['RMSE [var units]'][0], 
-                fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+                 ha='center', va='center', transform=ax.transAxes)
         
         ax.legend(loc='upper right', bbox_to_anchor=(1.27, 0.9))
         ax.fmt_xdata = mdates.DateFormatter('%Y-%m')
@@ -783,11 +796,11 @@ del(aqsid)
 #         #df_all.plot(xticks=df_all.index)
 #         # Display r^2 on plot
 #         ax.text(1.15, 0.4,'$r^2$ = %s' %stats_T['R^2 [-]'][0], 
-#                 fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+#                  ha='center', va='center', transform=ax.transAxes)
 #         ax.text(1.15, 0.3,'RMSE= %s' %stats_T['RMSE [var units]'][0], 
-#                 fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+#                  ha='center', va='center', transform=ax.transAxes)
 #         ax.text(1.15, 0.2,'# of sites '+str(temp1), 
-#                 fontsize = 11, ha='center', va='center', transform=ax.transAxes)        # Plot number of sites
+#                  ha='center', va='center', transform=ax.transAxes)        # Plot number of sites
 #         ax.legend(loc='upper right', bbox_to_anchor=(1.27, 0.9))
 #         ax.fmt_xdata = mdates.DateFormatter('%Y-%m')
 #         
@@ -846,11 +859,11 @@ del(aqsid)
 #         cc2 = round(np.corrcoef(df_h[var_name], mod_var2)[0, 1],3)
 #         cc3 = round(np.corrcoef(df_h[var_name], mod_var3)[0, 1],3)
 #         
-#         ax.text(1.15, 0.9,'UW WRF: r = %s' %cc1, fontsize = 11, ha='center', 
+#         ax.text(1.15, 0.9,'UW WRF: r = %s' %cc1,  ha='center', 
 #                 va='center', transform=ax.transAxes)
-#         ax.text(1.15, 0.8,'WSU WRF: r = %s' %cc2, fontsize = 11, ha='center', 
+#         ax.text(1.15, 0.8,'WSU WRF: r = %s' %cc2,  ha='center', 
 #                 va='center', transform=ax.transAxes)
-#         ax.text(1.15, 0.7,'HRRR: r = %s' %cc3, fontsize = 11, ha='center', 
+#         ax.text(1.15, 0.7,'HRRR: r = %s' %cc3,  ha='center', 
 #                 va='center', transform=ax.transAxes)
 #         
 #         
@@ -1158,9 +1171,9 @@ for version in versions:
             #df_all.plot(xticks=df_all.index)
             # Display r^2 on plot
             ax.text(1.15, 0.4,'$r^2$ = %s' %stats_T['R^2 [-]'][0], 
-                    fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+                     ha='center', va='center', transform=ax.transAxes)
             ax.text(1.15, 0.3,'RMSE= %s' %stats_T['RMSE [var units]'][0], 
-                    fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+                     ha='center', va='center', transform=ax.transAxes)
             
             ax.legend(loc='upper right', bbox_to_anchor=(1.27, 0.9))
             ax.fmt_xdata = mdates.DateFormatter('%Y-%m')
@@ -1193,11 +1206,11 @@ for version in versions:
             cc2 = round(np.corrcoef(df_h[var_name], mod_var2)[0, 1],3)
             cc3 = round(np.corrcoef(df_h[var_name], mod_var3)[0, 1],3)
             
-            ax.text(1.15, 0.9,'UW WRF: r = %s' %cc1, fontsize = 11, ha='center', 
+            ax.text(1.15, 0.9,'UW WRF: r = %s' %cc1,  ha='center', 
                     va='center', transform=ax.transAxes)
-            ax.text(1.15, 0.8,'WSU WRF: r = %s' %cc2, fontsize = 11, ha='center', 
+            ax.text(1.15, 0.8,'WSU WRF: r = %s' %cc2,  ha='center', 
                     va='center', transform=ax.transAxes)
-            ax.text(1.15, 0.7,'HRRR: r = %s' %cc3, fontsize = 11, ha='center', 
+            ax.text(1.15, 0.7,'HRRR: r = %s' %cc3,  ha='center', 
                     va='center', transform=ax.transAxes)
             
             
@@ -1512,9 +1525,9 @@ for version in versions:
         #df_all.plot(xticks=df_all.index)
         # Display r^2 on plot
         ax.text(1.15, 0.4,'$r^2$ = %s' %stats_T['R^2 [-]'][0], 
-                fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+                 ha='center', va='center', transform=ax.transAxes)
         ax.text(1.15, 0.3,'RMSE= %s' %stats_T['RMSE [var units]'][0], 
-                fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+                 ha='center', va='center', transform=ax.transAxes)
         
         ax.legend(loc='upper right', bbox_to_anchor=(1.27, 0.9))
         ax.fmt_xdata = mdates.DateFormatter('%Y-%m')
@@ -1548,11 +1561,11 @@ for version in versions:
         cc2 = round(np.corrcoef(df_h[var_name], mod_var2)[0, 1],3)
         cc3 = round(np.corrcoef(df_h[var_name], mod_var3)[0, 1],3)
         
-        ax.text(1.15, 0.9,'UW WRF: r = %s' %cc1, fontsize = 11, ha='center', 
+        ax.text(1.15, 0.9,'UW WRF: r = %s' %cc1,  ha='center', 
                 va='center', transform=ax.transAxes)
-        ax.text(1.15, 0.8,'WSU WRF: r = %s' %cc2, fontsize = 11, ha='center', 
+        ax.text(1.15, 0.8,'WSU WRF: r = %s' %cc2,  ha='center', 
                 va='center', transform=ax.transAxes)
-        ax.text(1.15, 0.7,'HRRR: r = %s' %cc3, fontsize = 11, ha='enter', 
+        ax.text(1.15, 0.7,'HRRR: r = %s' %cc3,  ha='enter', 
                 va='center', transform=ax.transAxes)
         
         
@@ -2037,11 +2050,11 @@ for w in new_list:
     #df_all.plot(xticks=df_all.index)
     # Display r^2 on plot
     ax.text(1.15, 0.4,'$r^2$ = %s' %stats_T['R^2 [-]'][0], 
-            fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+             ha='center', va='center', transform=ax.transAxes)
     ax.text(1.15, 0.3,'RMSE= %s' %stats_T['RMSE [var units]'][0], 
-            fontsize = 11, ha='center', va='center', transform=ax.transAxes)
+             ha='center', va='center', transform=ax.transAxes)
     ax.text(1.15, 0.2,'# of sites '+str(temp1), 
-            fontsize = 11, ha='center', va='center', transform=ax.transAxes)        # Plot number of sites
+             ha='center', va='center', transform=ax.transAxes)        # Plot number of sites
     ax.legend(loc='upper right', bbox_to_anchor=(1.27, 0.9))
     ax.fmt_xdata = mdates.DateFormatter('%Y-%m')
     
@@ -2100,11 +2113,11 @@ for w in new_list:
     cc2 = round(np.corrcoef(df_h[var_name], mod_var2)[0, 1],3)
     cc3 = round(np.corrcoef(df_h[var_name], mod_var3)[0, 1],3)
     
-    ax.text(1.15, 0.9,'UW WRF: r = %s' %cc1, fontsize = 11, ha='center', 
+    ax.text(1.15, 0.9,'UW WRF: r = %s' %cc1,  ha='center', 
             va='center', transform=ax.transAxes)
-    ax.text(1.15, 0.8,'WSU WRF: r = %s' %cc2, fontsize = 11, ha='center', 
+    ax.text(1.15, 0.8,'WSU WRF: r = %s' %cc2,  ha='center', 
             va='center', transform=ax.transAxes)
-    ax.text(1.15, 0.7,'HRRR: r = %s' %cc3, fontsize = 11, ha='center', 
+    ax.text(1.15, 0.7,'HRRR: r = %s' %cc3,  ha='center', 
             va='center', transform=ax.transAxes)
     
     
