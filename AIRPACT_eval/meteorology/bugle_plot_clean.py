@@ -7,13 +7,14 @@ Created on Mon Sep 24 14:42:41 2018
 
 # Load libraries
 import pandas as pd
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
 
 # Set directories
-inputdir = r'G:/Research/AIRPACT_eval/stats/'
-outputdir = r'G:/Research/AIRPACT_eval/plots/bugle'
+inputdir = r'E:/Research/AIRPACT_eval/stats/'
+outputdir = r'E:/Research/AIRPACT_eval/plots/bugle'
 
 #Load data
 df_stats = pd.read_csv(inputdir+'aqs_version_stats.csv').drop(['Unnamed: 0'],axis=1)
@@ -22,11 +23,27 @@ df_stats = pd.read_csv(inputdir+'aqs_version_stats.csv').drop(['Unnamed: 0'],axi
 df_o3 = df_stats.loc[df_stats['index']=='O3_mod']
 df_pm = df_stats.loc[df_stats['index']=='PM2.5_mod']
 
+# Set plot parameters
+mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 20.0
+mpl.rcParams['xtick.major.size']  = 10
+mpl.rcParams['xtick.major.width'] = 2
+mpl.rcParams['xtick.minor.size']  = 5
+mpl.rcParams['xtick.minor.width'] = 1
+mpl.rcParams['ytick.major.size']  = 10
+mpl.rcParams['ytick.major.width'] = 2
+mpl.rcParams['ytick.minor.size']  = 5
+mpl.rcParams['ytick.minor.width'] = 1
+mpl.rcParams['ytick.direction']   = 'in'
+mpl.rcParams['xtick.direction']   = 'in'
+
+figsize = (6,4)
+legend_loc = 'upper right'
 #%%
 # Plot
 
 # PM
-fig, ax = plt.subplots(figsize=(8, 4))
+fig, ax = plt.subplots(figsize=figsize)
 
 # Set axis so that the plot resembles a soccer plot
 plt.ylim((-100,100))
@@ -45,15 +62,15 @@ props = dict(boxstyle='square', facecolor='white', alpha=0.0)
 props1 = dict(boxstyle='square', facecolor='white', alpha=0.3)
 
 # Draw legends
-ax.text(1.03,0.5,'AP3',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.5,'AP3',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='red')
-ax.text(1.03,0.43,'AP4',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.41,'AP4',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='green')
-ax.text(1.03,0.36,'AP5',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.32,'AP5',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='blue')
 
 #ax.legend()
-legend = plt.legend(loc=(1.02,0.6))
+legend = plt.legend(loc=legend_loc)
 plt.setp(legend.get_texts(), color='black')
 
 #Draw grid
@@ -77,7 +94,7 @@ fig.savefig(outputdir + '/airpact_bugle_version_pm.png' ,bbox_inches='tight')
 
 #%%
 # 03
-fig, ax = plt.subplots(figsize=(8, 4))
+fig, ax = plt.subplots(figsize=figsize)
 
 # Set axis so that the plot resembles a soccer plot
 plt.ylim((-100,100))
@@ -97,15 +114,15 @@ props = dict(boxstyle='square', facecolor='white', alpha=0.0)
 props1 = dict(boxstyle='square', facecolor='white', alpha=0.3)
 
 # Draw legends
-ax.text(1.03,0.5,'AP3',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.5,'AP3',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='red')
-ax.text(1.03,0.43,'AP4',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.41,'AP4',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='green')
-ax.text(1.03,0.36,'AP5',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.32,'AP5',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='blue')
 
 #ax.legend()
-legend = plt.legend(loc=(1.02,0.6))
+legend = plt.legend(loc=legend_loc)
 plt.setp(legend.get_texts(), color='black')
 
 #Draw grid

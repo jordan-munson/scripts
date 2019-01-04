@@ -57,8 +57,8 @@ def aqs(state,ac):
 #aqs('Idaho','_ID')
 #aqs('Canada','_CC')
 #aqs('Montana','_MT')
-aqs('California','_CA')
-aqs('Nevada','_NV')
+#aqs('California','_CA')
+#aqs('Nevada','_NV')
 aqs('Utah','_UT')
 
 

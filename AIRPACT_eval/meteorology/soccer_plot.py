@@ -11,8 +11,8 @@ import matplotlib.patches as patches
 import numpy as np
 
 # Set directories
-inputdir = r'G:/Research/AIRPACT_eval/meteorology/'
-outputdir = r'G:/Research/AIRPACT_eval/meteorology/AQS_plots/soccer_plots'
+inputdir = r'E:/Research/AIRPACT_eval/meteorology/'
+outputdir = r'E:/Research/AIRPACT_eval/meteorology/AQS_plots/soccer_plots'
 
 #Load data
 #df_airpact = pd.read_csv(inputdir+'df_airpact.csv').drop(['Unnamed: 0','lat','lon'],axis=1)
@@ -35,6 +35,21 @@ df_wd = df_stats.loc[df_stats['index']=='WD_1']
 #list site types
 sites = ['URBAN AND CENTER CITY','SUBURBAN','RURAL']
 
+# Set plot parameters
+mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 24.0
+mpl.rcParams['xtick.major.size']  = 10
+mpl.rcParams['xtick.major.width'] = 2
+mpl.rcParams['xtick.minor.size']  = 5
+mpl.rcParams['xtick.minor.width'] = 1
+mpl.rcParams['ytick.major.size']  = 10
+mpl.rcParams['ytick.major.width'] = 2
+mpl.rcParams['ytick.minor.size']  = 5
+mpl.rcParams['ytick.minor.width'] = 1
+mpl.rcParams['ytick.direction']   = 'in'
+mpl.rcParams['xtick.direction']   = 'in'
+
+legend_loc = 'upper right'
 #%%
 # Plot MB and ME
 fig, ax = plt.subplots(figsize=(8, 4))
@@ -92,16 +107,16 @@ props = dict(boxstyle='square', facecolor='white', alpha=0.0)
 props1 = dict(boxstyle='square', facecolor='white', alpha=0.3)
 
 # Draw legends
-ax.text(1.03,0.5,'Urban',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.5,'Urban',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='red')
-ax.text(1.03,0.43,'Suburban',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.41,'Suburban',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='green')
-ax.text(1.03,0.36,'Rural',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.32,'Rural',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='blue')
 
 
 #ax.legend()
-legend = plt.legend(loc=(1.02,0.6))
+legend = plt.legend(loc=legend_loc)
 plt.setp(legend.get_texts(), color='black')
 
 #Draw rectangle to encompass the sitetypes
@@ -163,16 +178,16 @@ props = dict(boxstyle='square', facecolor='white', alpha=0.0)
 props1 = dict(boxstyle='square', facecolor='white', alpha=0.3)
 
 # Draw legends
-ax.text(1.03,0.5,'Urban',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.5,'Urban',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='red')
-ax.text(1.03,0.43,'Suburban',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.41,'Suburban',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='green')
-ax.text(1.03,0.36,'Rural',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.32,'Rural',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='blue')
 
 
 #ax.legend()
-legend = plt.legend(loc=(1.02,0.6))
+legend = plt.legend(loc=legend_loc)
 plt.setp(legend.get_texts(), color='black')
 
 #Draw rectangle to encompass the sitetypes
@@ -249,16 +264,16 @@ props = dict(boxstyle='square', facecolor='white', alpha=0.0)
 props1 = dict(boxstyle='square', facecolor='white', alpha=0.3)
 
 # Draw legends
-ax.text(1.03,0.5,'AP3',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.5,'AP3',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='red')
-ax.text(1.03,0.43,'AP4',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.41,'AP4',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='green')
-ax.text(1.03,0.36,'AP5',transform=ax.transAxes, fontsize=10,
+ax.text(1.03,0.32,'AP5',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='blue')
 
 
 #ax.legend()
-legend = plt.legend(loc=(1.02,0.6))
+legend = plt.legend(loc=legend_loc)
 plt.setp(legend.get_texts(), color='black')
 
 #Draw rectangle to encompass the sitetypes
@@ -320,16 +335,16 @@ def soccer(x,y,axismax,size1,size2,temp,press,rh,ws,wd):    # x and y are stats 
     props = dict(boxstyle='square', facecolor='white', alpha=0.0)
     
     # Draw legends
-    ax.text(1.03,0.5,'AP3',transform=ax.transAxes, fontsize=10,
+    ax.text(1.03,0.5,'AP3',transform=ax.transAxes,
             verticalalignment='top', bbox=props, color='red')
-    ax.text(1.03,0.43,'AP4',transform=ax.transAxes, fontsize=10,
+    ax.text(1.03,0.41,'AP4',transform=ax.transAxes,
             verticalalignment='top', bbox=props, color='green')
-    ax.text(1.03,0.36,'AP5',transform=ax.transAxes, fontsize=10,
+    ax.text(1.03,0.32,'AP5',transform=ax.transAxes,
             verticalalignment='top', bbox=props, color='blue')
     
     
     #ax.legend()
-    legend = plt.legend(loc=(1.02,0.6))
+    legend = plt.legend(loc=legend_loc)
     plt.setp(legend.get_texts(), color='black')
     
     # Save the plot

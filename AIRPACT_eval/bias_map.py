@@ -71,9 +71,11 @@ df_id = pd.read_csv(inputDir + 'AQS_data/Idaho_aqs.csv', sep = ',',parse_dates=[
 #df_cc = pd.read_csv(inputDir + 'Canada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 df_mt = pd.read_csv(inputDir + 'AQS_data/Montana_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 df_ca = pd.read_csv(inputDir + 'AQS_data/California_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_nv = pd.read_csv(inputDir + 'AQS_data/Nevada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_ut = pd.read_csv(inputDir + 'AQS_data/Utah_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 
 #  Combine AQS data
-df_list = [df_wa,df_or,df_id,df_mt,df_ca]
+df_list = [df_wa,df_or,df_id,df_mt,df_ca,df_nv,df_ut]
 df_obs = pd.concat(df_list)
 
 
@@ -139,7 +141,7 @@ print('Combined dataframe finished')
 
 # Set plot parameters
 mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 10.0
+mpl.rcParams['font.size'] = 24.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -158,10 +160,12 @@ df_mod.loc[:,'PM2.5_mod'] = pd.to_numeric(df_mod.loc[:,'PM2.5_mod'], errors='coe
 #Removes rows without any useful information to speed script up
 df_com = df_com.dropna(thresh = 6) # setting threshold to 6 means that any site without ANY data is dropped
 
+
+
+#%%
 # create lits to use in calcs of site ids
 used_AQSID = list(set(df_com['AQSID']))
 
-#%%
 stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 stats_com = stats_com.drop(0,1)
@@ -177,6 +181,7 @@ m = Basemap(projection='merc',
 # Calculate stats for each site and add to list
 pollutant = ['O3','PM2.5']
 for species in pollutant:
+    plt.figure(figsize=(10,11))
 #    if species == 'O3':
     unit_list = 'FB (%)'
 #    else:
@@ -219,10 +224,11 @@ for species in pollutant:
             marker_shape = 'o'
             #marker_color = 'r'
             sp = 3 # Fractional Bias
-            size = abs(6*aq_stats[species+'_mod'][sp])
+            spp = sp # Change this if you want the size to correlate to a different statistic
+            size = abs(6*aq_stats[species+'_mod'][spp])
             m.scatter(x, y, marker=marker_shape,c = aq_stats[species+'_mod'][sp], s = size, alpha = 0.7,cmap=cmap)
             print(AQSID,aq_stats[species+'_mod'][sp])
-            plt.clim(-50,50)
+            plt.clim(-100,100)
             #print(aq_stats[species+'_mod'][sp])
         # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
    
@@ -235,14 +241,23 @@ for species in pollutant:
             
         except (ZeroDivisionError):
             pass
+    
+
 
     cbticks = True
     cbar = m.colorbar(location='bottom')#,pad="-12%")    # Disable this for the moment
     cbar.set_label(unit_list)
     plt.title(species + ' Fractional Bias Map')
     
-    plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map.png',  pad_inches=0.1, bbox_inches='tight')
+    # Circle size chart
+    msizes = [0,30,150,300,450,600]
+    labels = ['FB (%)',5,25,50,75,100]
+    markers = []
+    for size,label in zip(msizes,labels):
+        markers.append(plt.scatter([],[], s=size, label=label,c='black',alpha = 0.7))
+    plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left',handles=markers)    
     
+    plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map.png',  pad_inches=0.1, bbox_inches='tight')
     plt.show()
     plt.close()
 end_time = time.time()

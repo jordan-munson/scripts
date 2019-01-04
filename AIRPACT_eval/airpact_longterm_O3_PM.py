@@ -5,7 +5,7 @@ Created on Thu Jul  5 12:01:19 2018
 @author: Jordan Munson
 """
 import matplotlib as mpl
-#mpl.use('Agg')
+mpl.use('Agg')
 import pandas as pd
 import matplotlib.dates as mdates
 import datetime as dt
@@ -42,51 +42,59 @@ endday = '31'
 endmonth='05'
 endyear='2018'
 
+# =============================================================================
+# # Aeolus directories
+# inputDir = '/data/lar/users/jmunson/longterm_airpact/'
+# stat_path = '/data/lar/users/jmunson/statistical_functions.py'
+# aqsid = pd.read_csv(inputDir+'aqs_sites.csv')
+# ben_path = inputDir + 'Met_functions_for_Ben.py'
+# =============================================================================
+
 #Set directory
-inputDir = r'G:/Research/AIRPACT_eval/'
+inputDir = r'E:/Research/AIRPACT_eval/'
 # Open statistics script
-stat_path = r'G:/Research/scripts/Urbanova/statistical_functions.py'
-ben_path = r'G:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
+stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
+ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
 exec(open(stat_path).read())
-aqsid = pd.read_csv(r'G:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison/Aqsid.csv')
-aqsid = aqsid.drop(['Unnamed: 4','Unnamed: 5','Unnamed: 6','Latitude','Longitude'], axis=1)
-aqsid = aqsid.drop([0,0], axis=0)
-'''
-##############################################################################
-# Combine hrly model data
-##############################################################################
 
-df_1 = pd.read_csv('http://lar.wsu.edu/R_apps/2009ap3/data/2009hrly.csv', sep=',')
-df_2 = pd.read_csv('http://lar.wsu.edu/R_apps/2010ap3/data/2010hrly.csv', sep=',')
-df_3 = pd.read_csv('http://lar.wsu.edu/R_apps/2011ap3/data/hrly2011ap3.csv', sep=',')
-df_4 = pd.read_csv('http://lar.wsu.edu/R_apps/2012ap3/data/hrly2012ap3.csv', sep=',') #Whole years data
-#df_5 = pd.read_csv('http://lar.wsu.edu/R_apps/2012ap4/data/hrly2012.csv', sep=',') #Second half of years data
-df_5 = pd.read_csv('http://lar.wsu.edu/R_apps/2013ap4/data/hrly2013.csv', sep=',')
-df_6 = pd.read_csv('http://lar.wsu.edu/R_apps/2014ap4/data/hrly2014.csv', sep=',')
-df_7 = pd.read_csv('http://lar.wsu.edu/R_apps/2015ap4/data/hrly2015.csv', sep=',') #Full year data
-#df_8 = pd.read_csv('http://lar.wsu.edu/R_apps/2015ap5/data/hrly2015.csv', sep=',')
-df_8 = pd.read_csv('http://lar.wsu.edu/R_apps/2016ap5/data/hrly2016.csv', sep=',')
-df_9 = pd.read_csv('http://lar.wsu.edu/R_apps/2017ap5/data/hrly2017.csv', sep=',')
-df_10 = pd.read_csv('http://lar.wsu.edu/R_apps/2018ap5/data/hrly2018.csv', sep=',')
 
-#Combine data
-df_list = [df_1,df_2,df_3,df_4,df_5,df_6,df_7,df_8,df_9,df_10]
-df_mod = pd.concat(df_list)
+# =============================================================================
+# ##############################################################################
+# # Combine hrly model data
+# ##############################################################################
+# 
+# df_1 = pd.read_csv('http://lar.wsu.edu/R_apps/2009ap3/data/2009hrly.csv', sep=',')
+# df_2 = pd.read_csv('http://lar.wsu.edu/R_apps/2010ap3/data/2010hrly.csv', sep=',')
+# df_3 = pd.read_csv('http://lar.wsu.edu/R_apps/2011ap3/data/hrly2011ap3.csv', sep=',')
+# df_4 = pd.read_csv('http://lar.wsu.edu/R_apps/2012ap3/data/hrly2012ap3.csv', sep=',') #Whole years data
+# #df_5 = pd.read_csv('http://lar.wsu.edu/R_apps/2012ap4/data/hrly2012.csv', sep=',') #Second half of years data
+# df_5 = pd.read_csv('http://lar.wsu.edu/R_apps/2013ap4/data/hrly2013.csv', sep=',')
+# df_6 = pd.read_csv('http://lar.wsu.edu/R_apps/2014ap4/data/hrly2014.csv', sep=',')
+# df_7 = pd.read_csv('http://lar.wsu.edu/R_apps/2015ap4/data/hrly2015.csv', sep=',') #Full year data
+# #df_8 = pd.read_csv('http://lar.wsu.edu/R_apps/2015ap5/data/hrly2015.csv', sep=',')
+# df_8 = pd.read_csv('http://lar.wsu.edu/R_apps/2016ap5/data/hrly2016.csv', sep=',')
+# df_9 = pd.read_csv('http://lar.wsu.edu/R_apps/2017ap5/data/hrly2017.csv', sep=',')
+# df_10 = pd.read_csv('http://lar.wsu.edu/R_apps/2018ap5/data/hrly2018.csv', sep=',')
+# 
+# #Combine data
+# df_list = [df_1,df_2,df_3,df_4,df_5,df_6,df_7,df_8,df_9,df_10]
+# df_mod = pd.concat(df_list)
+# 
+# #Drop uneccesary columns
+# df_mod = df_mod.drop(['O3_obs','PM2.5_obs'], axis=1)
+# 
+# #df_mod = pd.merge(df_mod,aqsid, on='AQSID', how='outer')   
+# 
+# # Convert to datetime and adjust to PST
+# print('Converting datetime, this may take a while')
+# df_mod['datetime'] = pd.to_datetime(df_mod['DateTime'], infer_datetime_format=True)
+# df_mod["datetime"] = df_mod["datetime"].apply(lambda x: x - dt.timedelta(hours=8)) #Adjust to PST
+# df_mod = df_mod.drop(['DateTime'], axis=1)
+# 
+# df_mod.to_csv(inputDir + '/model_aqs.csv')
+# print('Model data combined')
+# =============================================================================
 
-#Drop uneccesary columns
-df_mod = df_mod.drop(['O3_obs','PM2.5_obs'], axis=1)
-
-#df_mod = pd.merge(df_mod,aqsid, on='AQSID', how='outer')   
-
-# Convert to datetime and adjust to PST
-print('Converting datetime, this may take a while')
-df_mod['datetime'] = pd.to_datetime(df_mod['DateTime'], infer_datetime_format=True)
-df_mod["datetime"] = df_mod["datetime"].apply(lambda x: x - dt.timedelta(hours=8)) #Adjust to PST
-df_mod = df_mod.drop(['DateTime'], axis=1)
-
-df_mod.to_csv(inputDir + '/model_aqs.csv')
-print('Model data combined')
-'''
 
 ##############################################################################
 # Read AQS data. csv's created from 'AQS_grabbing.py' script, and the model data from the previous lines of code
@@ -97,7 +105,7 @@ df_mod['datetime'] = pd.to_datetime(df_mod['datetime']) #Must convert to date ti
 df_mod = df_mod.drop('Unnamed: 0',axis=1)
 
 #Create AQSID Column form state code, county code, and site num
-aqsid = pd.read_csv(r'G:\Research\AIRPACT_eval/aqs_sites.csv')
+aqsid = pd.read_csv(inputDir+'aqs_sites.csv')
 aqsid = aqsid.ix[:,['State Code','County Code','Site Number','Local Site Name','Location Setting']]
 
 aqsid['County Code'] = ["%03d" % n for n in aqsid['County Code'] ]
@@ -118,9 +126,13 @@ df_wa = pd.read_csv(inputDir + 'AQS_data/Washington_aqs.csv', sep = ',',parse_da
 df_or = pd.read_csv(inputDir + 'AQS_data/Oregon_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 df_id = pd.read_csv(inputDir + 'AQS_data/Idaho_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 #df_cc = pd.read_csv(inputDir + 'Canada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_mt = pd.read_csv(inputDir + 'AQS_data/Montana_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_ca = pd.read_csv(inputDir + 'AQS_data/California_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_nv = pd.read_csv(inputDir + 'AQS_data/Nevada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_ut = pd.read_csv(inputDir + 'AQS_data/Utah_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 
 #  Combine AQS data
-df_list = [df_wa,df_or,df_id]
+df_list = [df_wa,df_or,df_id,df_mt,df_ca,df_nv,df_ut]
 df_obs = pd.concat(df_list)
 
 
@@ -199,7 +211,7 @@ print('Combined dataframe finished')
 
 # Set plot parameters
 mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 20.0
+mpl.rcParams['font.size'] = 24.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -280,150 +292,154 @@ stats_com = stats_com.drop(0,1)
 # =============================================================================
 
 #%%        
-stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
-stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
-stats_com = stats_com.drop(0,1)
-'''
-# Scatter plots of modeled vs observed
-pollutant = ['O3','PM2.5']
-for species in pollutant:
-    for AQSID in list(set(df_com['AQSID'])):
-        #This section selects only data relevant to the aqs site
-        d = df_com.loc[df_com['AQSID']==AQSID]
-        d=d.reset_index()
-        site_nameinfo = d.loc[0,'Local Site Name'] #Gets the longname of the site to title the plot
-        site_type = d.loc[0,'Location Setting']
-        d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
-        d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
-        d = d.set_index('datetime') 
-        d = d.resample('D').mean()
-        fig,ax=plt.subplots(1,1, figsize=(8,8)) #Set figure dimensions
-        #Find max values to set axis
-        #axismax = max(max(d['PM2.5_mod'],numeric_only=True),max(d['O3_mod']))     #This works on some PC's but not others
-        try:    #The axis max makes sure the x and y axis are the same
-            axismax= max(d.max(numeric_only=True))
-            ax.set_ylim(0,axismax)
-            ax.set_xlim(0,axismax)
-            plt.plot([0,axismax], [0,axismax], color='black')
-        except ValueError:
-            pass
-    
-        #Plot first section of year
-        mask = (d.index > '2014-7-1') & (d.index <= '2015-6-30')
-        da=d.loc[mask]
-        ax.scatter(da[species+'_obs'], da[species+'_mod'], c='b', label = '07/14-07/15',linewidths=None, alpha=0.8) #Plotting the data
-    
-        #Plot first section of year
-        mask = (d.index > '2015-7-1') & (d.index <= '2016-6-30')
-        db=d.loc[mask]
-        ax.scatter(db[species+'_obs'], db[species+'_mod'], c='r', label = '07/15-07/16',linewidths=None, alpha=0.7) #Plotting the data
-    
-        #Plot first section of year
-        mask = (d.index > '2016-7-1') & (d.index <= '2017-6-30')
-        dc=d.loc[mask]
-        ax.scatter(dc[species+'_obs'], dc[species+'_mod'], c='g', label = '07/16-07/17',linewidths=None, alpha=0.7) #Plotting the data
-    
-        ax.set_aspect('equal', 'box')
-        plt.axis('equal')
-        if species =='PM2.5':
-            ax.set_ylabel('$PM_{2.5}$ Modeled')
-            ax.set_xlabel('$PM_{2.5}$ Observed')
-        else:
-            ax.set_ylabel('Ozone Modeled')
-            ax.set_xlabel('Ozone Observed')
-            
-        ax.set_title(str(site_nameinfo) +', Type: '+str(site_type)) 
-        plt.legend()
-
-        #plt.plot()
-        try:
-            if species == 'PM2.5':
-                if axismax>1:
-                    plt.savefig(inputDir +'/plots/scatter/scatter_PM_' + str(site_nameinfo)+'.png', pad_inches=0.1, bbox_inches='tight')
-                else:
-                    pass
-            else:
-                if axismax>1:
-                    plt.savefig(inputDir +'/plots/scatter/scatter_O3_' + str(site_nameinfo)+'.png', pad_inches=0.1, bbox_inches='tight')
-                else:
-                    pass
-        except(FileNotFoundError):
-            pass
-'''
+# =============================================================================
+# stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
+# stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
+# stats_com = stats_com.drop(0,1)
+# 
+# # Scatter plots of modeled vs observed
+# pollutant = ['O3','PM2.5']
+# for species in pollutant:
+#     for AQSID in list(set(df_com['AQSID'])):
+#         #This section selects only data relevant to the aqs site
+#         d = df_com.loc[df_com['AQSID']==AQSID]
+#         d=d.reset_index()
+#         site_nameinfo = d.loc[0,'Local Site Name'] #Gets the longname of the site to title the plot
+#         site_type = d.loc[0,'Location Setting']
+#         d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
+#         d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
+#         d = d.set_index('datetime') 
+#         d = d.resample('D').mean()
+#         fig,ax=plt.subplots(1,1, figsize=(8,8)) #Set figure dimensions
+#         #Find max values to set axis
+#         #axismax = max(max(d['PM2.5_mod'],numeric_only=True),max(d['O3_mod']))     #This works on some PC's but not others
+#         try:    #The axis max makes sure the x and y axis are the same
+#             axismax= max(d.max(numeric_only=True))
+#             ax.set_ylim(0,axismax)
+#             ax.set_xlim(0,axismax)
+#             plt.plot([0,axismax], [0,axismax], color='black')
+#         except ValueError:
+#             pass
+#     
+#         #Plot first section of year
+#         mask = (d.index > '2014-7-1') & (d.index <= '2015-6-30')
+#         da=d.loc[mask]
+#         ax.scatter(da[species+'_obs'], da[species+'_mod'], c='b', label = '07/14-07/15',linewidths=None, alpha=0.8) #Plotting the data
+#     
+#         #Plot first section of year
+#         mask = (d.index > '2015-7-1') & (d.index <= '2016-6-30')
+#         db=d.loc[mask]
+#         ax.scatter(db[species+'_obs'], db[species+'_mod'], c='r', label = '07/15-07/16',linewidths=None, alpha=0.7) #Plotting the data
+#     
+#         #Plot first section of year
+#         mask = (d.index > '2016-7-1') & (d.index <= '2017-6-30')
+#         dc=d.loc[mask]
+#         ax.scatter(dc[species+'_obs'], dc[species+'_mod'], c='g', label = '07/16-07/17',linewidths=None, alpha=0.7) #Plotting the data
+#     
+#         ax.set_aspect('equal', 'box')
+#         plt.axis('equal')
+#         if species =='PM2.5':
+#             ax.set_ylabel('$PM_{2.5}$ Modeled')
+#             ax.set_xlabel('$PM_{2.5}$ Observed')
+#         else:
+#             ax.set_ylabel('Ozone Modeled')
+#             ax.set_xlabel('Ozone Observed')
+#             
+#         ax.set_title(str(site_nameinfo) +', Type: '+str(site_type)) 
+#         plt.legend()
+# 
+#         #plt.plot()
+#         try:
+#             if species == 'PM2.5':
+#                 if axismax>1:
+#                     plt.savefig(inputDir +'/plots/scatter/scatter_PM_' + str(site_nameinfo)+'.png', pad_inches=0.1, bbox_inches='tight')
+#                 else:
+#                     pass
+#             else:
+#                 if axismax>1:
+#                     plt.savefig(inputDir +'/plots/scatter/scatter_O3_' + str(site_nameinfo)+'.png', pad_inches=0.1, bbox_inches='tight')
+#                 else:
+#                     pass
+#         except(FileNotFoundError):
+#             pass
+# 
+# =============================================================================
 #%%
 stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 stats_com = stats_com.drop(0,1)
-'''        
-# Time series
-pollutant = ['O3','PM2.5']
-for species in pollutant:
-    for AQSID in list(set(df_com['AQSID'])):
-        #This section selects only data relevant to the aqs site
-        d = df_com.loc[df_com['AQSID']==AQSID]
-        d=d.reset_index()
-        site_nameinfo = d.loc[0,'Local Site Name'] #Gets the longname of the site to title the plot
-        site_type = d.loc[0,'Location Setting']
-        d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
-        d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
-        dc = d.groupby(d.date.dt.year)
-        #print(dc)
-        
-        d = d.set_index('datetime') 
-        
-        #Calculate mb and fb
-        #for months in d:
-        #db=fb(d.groupby(d.index.month),species+'_mod', species+'_obs')#.rolling('24H').mean().ix[:,[species+'_mod', species+'_obs']]
-        
-        d = d.resample('M', convention='start').mean()
-        fig,ax=plt.subplots(1,1, figsize=(10,8)) #Set figure dimensions
-
-        #Plot
-        d.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
-        
-        if species == 'PM2.5':
-            ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
-        else:
-            ax.set_ylabel('Ozone (ppb)')
-        ax.set_xlim('2009-1-1','2018-7-1')
-        ax.set_xlabel('DateTime')        
-        ax.set_title(str(site_nameinfo) +', Type: '+str(site_type))
-        #ax.text(0.95,1.03,'Site type: '+str(site_type),ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='white', edgecolor='black', boxstyle='round'))
-        plt.legend()
-
-        #plt.plot()
-        print(species+ ' ' + site_nameinfo)
-        #Calculate Statistics
-        try:
-            #Run stats functions
-            aq_stats = stats(d, species+'_mod', species+'_obs')
-        
-        # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
-   
-            # Merge stats into single dataframe
-            aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + site_nameinfo)    
-            stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
-            
-            #Drop some stats to put on plots
-            aq_stats = aq_stats.drop('MB',0)        
-            aq_stats = aq_stats.drop('ME',0)
-            aq_stats = aq_stats.drop('RMSE',0)
-            aq_stats = aq_stats.drop('NMB',0)
-            aq_stats = aq_stats.drop('NME',0)
-            
-            ax.text(0.15,-0.15, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
-            try:
-                if species == 'O3':
-                    plt.savefig(inputDir+'/plots/monthly/ozone/'+'O3_diurnal_'+site_nameinfo+'.png',  pad_inches=0.1, bbox_inches='tight')
-                else:
-                    plt.savefig(inputDir+'/plots/monthly/pm/'+'PM_diurnal_'+site_nameinfo+'.png',  pad_inches=0.1, bbox_inches='tight')
-            except(FileNotFoundError):
-                pass
-            plt.close()
-        except (ZeroDivisionError):
-            pass
-stats_com.to_csv(inputDir + 'longterm_statistics.csv')
-'''
+# =============================================================================
+#         
+# # Time series
+# pollutant = ['O3','PM2.5']
+# for species in pollutant:
+#     for AQSID in list(set(df_com['AQSID'])):
+#         #This section selects only data relevant to the aqs site
+#         d = df_com.loc[df_com['AQSID']==AQSID]
+#         d=d.reset_index()
+#         site_nameinfo = d.loc[0,'Local Site Name'] #Gets the longname of the site to title the plot
+#         site_type = d.loc[0,'Location Setting']
+#         d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
+#         d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
+#         dc = d.groupby(d.date.dt.year)
+#         #print(dc)
+#         
+#         d = d.set_index('datetime') 
+#         
+#         #Calculate mb and fb
+#         #for months in d:
+#         #db=fb(d.groupby(d.index.month),species+'_mod', species+'_obs')#.rolling('24H').mean().ix[:,[species+'_mod', species+'_obs']]
+#         
+#         d = d.resample('M', convention='start').mean()
+#         fig,ax=plt.subplots(1,1, figsize=(10,8)) #Set figure dimensions
+# 
+#         #Plot
+#         d.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
+#         
+#         if species == 'PM2.5':
+#             ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
+#         else:
+#             ax.set_ylabel('Ozone (ppb)')
+#         ax.set_xlim('2009-1-1','2018-7-1')
+#         ax.set_xlabel('DateTime')        
+#         ax.set_title(str(site_nameinfo) +', Type: '+str(site_type))
+#         #ax.text(0.95,1.03,'Site type: '+str(site_type),ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='white', edgecolor='black', boxstyle='round'))
+#         plt.legend()
+# 
+#         #plt.plot()
+#         print(species+ ' ' + site_nameinfo)
+#         #Calculate Statistics
+#         try:
+#             #Run stats functions
+#             aq_stats = stats(d, species+'_mod', species+'_obs')
+#         
+#         # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
+#    
+#             # Merge stats into single dataframe
+#             aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + site_nameinfo)    
+#             stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
+#             
+#             #Drop some stats to put on plots
+#             aq_stats = aq_stats.drop('MB',0)        
+#             aq_stats = aq_stats.drop('ME',0)
+#             aq_stats = aq_stats.drop('RMSE',0)
+#             aq_stats = aq_stats.drop('NMB',0)
+#             aq_stats = aq_stats.drop('NME',0)
+#             
+#             ax.text(0.15,-0.15, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
+#             try:
+#                 if species == 'O3':
+#                     plt.savefig(inputDir+'/plots/monthly/ozone/'+'O3_diurnal_'+site_nameinfo+'.png',  pad_inches=0.1, bbox_inches='tight')
+#                 else:
+#                     plt.savefig(inputDir+'/plots/monthly/pm/'+'PM_diurnal_'+site_nameinfo+'.png',  pad_inches=0.1, bbox_inches='tight')
+#             except(FileNotFoundError):
+#                 pass
+#             plt.close()
+#         except (ZeroDivisionError):
+#             pass
+# stats_com.to_csv(inputDir + 'longterm_statistics.csv')
+# 
+# =============================================================================
 # =============================================================================
 # #%%
 #     
@@ -510,7 +526,7 @@ pollutant = ['O3','PM2.5']
 for species in pollutant:
     da = df_com.dropna(subset=['Location Setting'])
     fig = plt.figure(figsize=(14,16))
-    fig.suptitle('Monthly Averaged '+str(species),y=0.94,fontsize=28,ha='center') # title
+    fig.suptitle('Monthly Averaged '+str(species),y=0.94,fontsize=27,ha='center') # title
     fig.tight_layout() # spaces the plots out a bit
     
     for setting,i in zip(settings,[1,2,3]):    #list(set(da['Location Setting'])):
@@ -551,16 +567,18 @@ for species in pollutant:
             ax.set_ylim(0,25)
             height = 20 # Height of annotations in graphs
             spc = 1.2 # Space the annotations are moved up and down
+            plt.legend(prop={'size': 20},loc=2)
         else:
             ax.set_ylabel('Ozone (ppb)')
             ax.set_ylim(0,50)
             height=10
             spc = 2
+            plt.legend(prop={'size': 20},loc=3)
         
         ax.set_xlim('2009-1-1','2018-7-1')
         ax.set_xlabel(' ')        
         ax.set_title(str(site_type))
-        plt.legend(prop={'size': 10},loc=2)
+       # plt.legend(prop={'size': 20},loc=2)
         sze = 10 #size of annotation text
         
         plt.grid(True)    # Add grid lines to make graph interpretation easier
@@ -593,19 +611,21 @@ for species in pollutant:
             ax.annotate('AP5',xy=(x2,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Left Arrow AP5
             ax.annotate('AP5',xy=(x3,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Right Arrow AP5
         
-        # Add significant event annotations to plots
-        ax.annotate('Species Increased',xy=('2010-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2010-7-1',height-spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-        ax.annotate('12km to 4km',xy=('2012-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2012-7-1',height),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km       
-        ax.annotate('Switch to WRF 3.4.1',xy=('2012-10-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2012-10-1',height+spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-        ax.annotate('MOVES replaces MOBILE6',xy=('2013-10-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2013-10-1',height+spc*2),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-        ax.annotate('Canadian Fire Incorporated',xy=('2015-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2015-7-1',height-spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-        ax.annotate('Switch to WRF 3.7.1',xy=('2015-11-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2015-11-1',height),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-        ax.annotate('Increased Layers',xy=('2016-4-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2016-4-1',height+spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-        ax.annotate('Updated Road Dust Emissions',xy=('2016-12-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2016-12-1',height+spc*2),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-
+# =============================================================================
+#         # Add significant event annotations to plots
+#         ax.annotate('Species Increased',xy=('2010-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2010-7-1',height-spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+#         ax.annotate('12km to 4km',xy=('2012-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2012-7-1',height),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km       
+#         ax.annotate('Switch to WRF 3.4.1',xy=('2012-10-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2012-10-1',height+spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+#         ax.annotate('MOVES replaces MOBILE6',xy=('2013-10-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2013-10-1',height+spc*2),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+#         ax.annotate('Canadian Fire Incorporated',xy=('2015-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2015-7-1',height-spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+#         ax.annotate('Switch to WRF 3.7.1',xy=('2015-11-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2015-11-1',height),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+#         ax.annotate('Increased Layers',xy=('2016-4-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2016-4-1',height+spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+#         ax.annotate('Updated Road Dust Emissions',xy=('2016-12-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2016-12-1',height+spc*2),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
+# 
+# =============================================================================
 
         #ax.text(1.01, 0.4,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes)  
-        ax.text(0.98, 0.92,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes)  
+        ax.text(0.98, 0.92,'# of Observation sites '+str(temp1),fontsize = 20, ha='right', va='center', transform=ax.transAxes)  
 
         #Calculate Statistics
         try:
@@ -630,9 +650,9 @@ for species in pollutant:
             #ax.text(0.15,-0.15, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
     try:
         if species == 'O3':
-            plt.savefig(inputDir+'/plots/monthly/ozone/'+'O3_monthly_sitetype.png',  pad_inches=0.1, bbox_inches='tight')
+            plt.savefig(inputDir+'/plots/monthly/O3_monthly_sitetype.png',  pad_inches=0.1, bbox_inches='tight')
         else:
-            plt.savefig(inputDir+'/plots/monthly/pm/'+'PM_monthly_sitetype.png',  pad_inches=0.1, bbox_inches='tight')
+            plt.savefig(inputDir+'/plots/monthly/PM_monthly_sitetype.png',  pad_inches=0.1, bbox_inches='tight')
         plt.show()
         plt.close()
     except(FileNotFoundError):
@@ -1097,8 +1117,8 @@ ozone_max_fe = max([max(stats_ozone_rural['FE']),max(stats_ozone_urban['FE']),ma
 ozone_max_fb = max([max(stats_ozone_rural['FB']),max(stats_ozone_urban['FB']),max(stats_ozone_suburban['FB'])])
 ozone_max_r2 = max([max(stats_ozone_rural['r_squared']),max(stats_ozone_urban['r_squared']),max(stats_ozone_suburban['r_squared'])])
 
-pm_max_fe = max([max(stats_pm_rural['FE']),max(stats_pm_urban['FE']),max(stats_pm_suburban['FE'])])
-pm_max_fb = max([max(stats_pm_rural['FB']),max(stats_pm_urban['FB']),max(stats_pm_suburban['FB'])])+5
+pm_max_fe = max([max(stats_pm_rural['FE']),max(stats_pm_urban['FE']),max(stats_pm_suburban['FE'])])+5
+pm_max_fb = max([max(stats_pm_rural['FB']),max(stats_pm_urban['FB']),max(stats_pm_suburban['FB'])])+10
 pm_max_r2 = max([max(stats_pm_rural['r_squared']),max(stats_pm_urban['r_squared']),max(stats_pm_suburban['r_squared'])])
 #Plot some statistics
 stat_list = [stats_ozone_rural,stats_ozone_urban,stats_ozone_suburban,stats_pm_rural,stats_pm_urban,stats_pm_suburban]
@@ -1106,7 +1126,7 @@ for dataframe in stat_list:
     d=dataframe
     d.index= pd.to_datetime(d.index,yearfirst=True)
     fig,ax=plt.subplots(1,1, figsize=(12,4))
-    ax.set_title(str(dataframe.name))
+    ax.set_title(str(dataframe.name)+' FE and FB')
            
     # Identify which axis is what
     axis1 = 'FE'
@@ -1178,18 +1198,20 @@ for dataframe in stat_list:
     #par2.tick_params(axis='y', colors=p3.get_color(), **tkw)
     par3.tick_params(axis='y', colors=p4.get_color(), **tkw)
     ax.tick_params(axis='x', **tkw)
+    plt.grid(True)
     plt.savefig(inputDir+'/plots/stats/'+dataframe.name+'_monthly_stats.png',  pad_inches=0.1, bbox_inches='tight')
     plt.show()
     plt.close()
     
     # Plot r^2
     fig,ax=plt.subplots(1,1, figsize=(12,4))
-    ax.set_title(str(dataframe.name))
+    ax.set_title(str(dataframe.name)+' $r^2$')
     p4, = ax.plot(d[axis4], 'g-', label = '$r^2$')
     ax.set_ylim(0,1)
     ax.set_ylabel('$r^2$')
     ax.yaxis.label.set_color(p4.get_color())
     ax.tick_params(axis='y', colors=p4.get_color(), **tkw)
+    plt.grid(True)
     plt.savefig(inputDir+'/plots/stats/'+dataframe.name+'_monthly_r2_stats.png',  pad_inches=0.1, bbox_inches='tight')
     plt.show()
     plt.close()

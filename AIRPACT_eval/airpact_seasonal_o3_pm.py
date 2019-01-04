@@ -71,9 +71,13 @@ df_wa = pd.read_csv(inputDir + 'AQS_data/Washington_aqs.csv', sep = ',',parse_da
 df_or = pd.read_csv(inputDir + 'AQS_data/Oregon_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 df_id = pd.read_csv(inputDir + 'AQS_data/Idaho_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 #df_cc = pd.read_csv(inputDir + 'Canada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_mt = pd.read_csv(inputDir + 'AQS_data/Montana_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_ca = pd.read_csv(inputDir + 'AQS_data/California_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_nv = pd.read_csv(inputDir + 'AQS_data/Nevada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_ut = pd.read_csv(inputDir + 'AQS_data/Utah_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 
 #  Combine AQS data
-df_list = [df_wa,df_or,df_id]
+df_list = [df_wa,df_or,df_id,df_mt,df_ca,df_nv,df_ut]
 df_obs = pd.concat(df_list)
 
 
@@ -152,7 +156,7 @@ print('Combined dataframe finished')
 
 # Set plot parameters
 mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 20.0
+mpl.rcParams['font.size'] = 28.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -406,7 +410,7 @@ for species in pollutant:
     else:
         #fig.set_ylabel('Ozone (ppb)') 
         fig.text(-0.01, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
-    fig.suptitle('Seasonal Variations by AIRPACT Version',y=1.03) # title
+    fig.suptitle('Seasonal Variations by AIRPACT Version',y=1.06) # title
     fig.tight_layout() # spaces the plots out a bit
 
     #Annotate versions in
@@ -415,9 +419,9 @@ for species in pollutant:
 #     fig.text(0.5, 0.66, 'AIRPACT 4', va='center',ha='center')
 #     fig.text(0.5, 0.33, 'AIRPACT 5', va='center',ha='center')
 # =============================================================================
-    fig.text(0.184, 0.98, 'AIRPACT 3', va='center',ha='center')
-    fig.text(0.51, 0.98, 'AIRPACT 4', va='center',ha='center')
-    fig.text(0.835, 0.98, 'AIRPACT 5', va='center',ha='center')
+    fig.text(0.184, 0.99, 'AIRPACT 3', va='center',ha='center')
+    fig.text(0.51, 0.99, 'AIRPACT 4', va='center',ha='center')
+    fig.text(0.835, 0.99, 'AIRPACT 5', va='center',ha='center')
     for version,i in zip(versions,[0,1,2]):#[0,4,8]):
         print(version)
     # Set date range used based of versions
@@ -475,7 +479,7 @@ for species in pollutant:
                     s = '6/1/2009'
                     e = '8/31/2009'
                     dates = pd.date_range(start=s,end=e)
-                    ax = fig.add_subplot(2,3,1+i)#(6,2,3+i)
+                    ax = fig.add_subplot(2,3,4+i)#(6,2,3+i)
                     
                 if season == 'Fall':
                     year = str(year)
@@ -509,7 +513,7 @@ for species in pollutant:
                     s = '12/1/2009'
                     e = '2/28/2010'
                     dates = pd.date_range(start=s,end=e)
-                    ax = fig.add_subplot(2,3,4+i)#(6,2,1+i)
+                    ax = fig.add_subplot(2,3,1+i)#(6,2,1+i)
 
                     
                 if season == 'Spring':
@@ -563,8 +567,8 @@ for species in pollutant:
             myFmt = DateFormatter("%b")
             ax.xaxis.set_major_formatter(myFmt)
             ax.set_xlabel('')        # Gets rid of the 'DateTime' x label and replaces with a space
-            ax.set_title(str(season),fontsize=12) # sets the titles of individ plots as the season, and makes the font smaller
-            plt.legend(prop={'size': 12})#,loc=3) # Places the legend in the lower left corner at a size of 10
+            ax.set_title(str(season),fontsize=28) # sets the titles of individ plots as the season, and makes the font smaller
+            plt.legend(prop={'size': 16})#,loc=3) # Places the legend in the lower left corner at a size of 10
             sze = 10 #size of annotation text
             
             plt.grid(True)    # Add grid lines to make graph interpretation easier
