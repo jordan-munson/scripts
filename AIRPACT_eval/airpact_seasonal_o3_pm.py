@@ -551,7 +551,7 @@ for species in pollutant:
             #Plot
             db.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
             ax.set_xlim(s,e) # set limits in the hopes of removing doubled last label
-            plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right') # angle x axis labels
+            plt.setp(ax.get_xticklabels(), rotation=30)#, horizontalalignment='right') # angle x axis labels
             if species == 'PM2.5':
                 #ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
                 ax.set_ylim(0,30)
@@ -565,7 +565,11 @@ for species in pollutant:
             
             #ax.set_xlim('2009-1-1','2018-7-1')
             myFmt = DateFormatter("%b")
+            months = mdates.MonthLocator() 
+            days = mdates.DayLocator(bymonthday=(1,1))  
             ax.xaxis.set_major_formatter(myFmt)
+            ax.xaxis.set_major_locator(months)
+            ax.xaxis.set_minor_locator(days)
             ax.set_xlabel('')        # Gets rid of the 'DateTime' x label and replaces with a space
             ax.set_title(str(season),fontsize=28) # sets the titles of individ plots as the season, and makes the font smaller
             plt.legend(prop={'size': 16})#,loc=3) # Places the legend in the lower left corner at a size of 10

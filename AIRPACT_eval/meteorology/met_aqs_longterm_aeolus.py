@@ -29,8 +29,8 @@ import time
 import matplotlib.dates as mdates
 starttime = time.time()
 begin_time = time.time()
-
-# Set a directory containing python scripts
+import matplotlib as mpl
+ # Set a directory containing python scripts
 #base_dir = "/data/lar/users/jmunson/longterm_airpact/"
 base_dir = r'E:\Research\AIRPACT_eval\meteorology/'
 
@@ -176,6 +176,7 @@ site_list=pd.concat([site_list1,site_list2,site_list3])
 site_list = site_list['AQS_ID'].tolist()
 stations = site_list
 
+setting = ['URBAN AND CENTER CITY','SUBURBAN','RURAL']
 # Save the data so that this process does not have to be done over and over again
 #df_airpact.to_csv(base_dir+'/df_airpact.csv')
 #df_obs.to_csv(base_dir+'/df_obs.csv')
@@ -1895,7 +1896,7 @@ del(df_models)
 
 # Select variables, specify labels, units and y-limits, and plot model 
 # variables based on MesoWest variable names
-new_list = ['aqs_temp','aqs_pressure','aqs_rh','aqs_wspd','aqs_wdir'] # Remember to add in winds here
+new_list = ['aqs_temp','aqs_pressure','aqs_rh','aqs_wspd']#,'aqs_wdir'] # Remember to add in winds here
 for w in new_list:
     var_name = str(w)
     
@@ -2005,7 +2006,7 @@ for w in new_list:
     #dfmt = dates.DateFormatter('%m-%d')
     
     # Create a time series plot of a meteorological parameter
-    fig1, ax = plt.subplots(figsize=(8, 4))
+    fig1, ax = plt.subplots(figsize=(8, 5))
 
     '''
     # MesoWest observations
@@ -2046,30 +2047,42 @@ for w in new_list:
     ax.set_xlim(str(start),str(end))
                 
     ax.xaxis.set_major_formatter(dfmt)
-    fig1.autofmt_xdate(rotation=60)
+    fig1.autofmt_xdate(rotation=25)
     #df_all.plot(xticks=df_all.index)
     # Display r^2 on plot
-    ax.text(1.15, 0.4,'$r^2$ = %s' %stats_T['R^2 [-]'][0], 
+    ax.text(1.17, 0.44,'$r^2$ = %s' %stats_T['R^2 [-]'][0], 
              ha='center', va='center', transform=ax.transAxes)
-    ax.text(1.15, 0.3,'RMSE= %s' %stats_T['RMSE [var units]'][0], 
+    ax.text(1.17, 0.32,'RMSE= %s' %stats_T['RMSE [var units]'][0], 
              ha='center', va='center', transform=ax.transAxes)
-    ax.text(1.15, 0.2,'# of sites '+str(temp1), 
+    ax.text(1.17, 0.2,'# of sites '+str(temp1), 
              ha='center', va='center', transform=ax.transAxes)        # Plot number of sites
-    ax.legend(loc='upper right', bbox_to_anchor=(1.27, 0.9))
+    ax.legend(loc='upper right',fontsize=16, bbox_to_anchor=(1.4, 0.9))
     ax.fmt_xdata = mdates.DateFormatter('%Y-%m')
     
-    yax = 0.02
-    yax2 = yax +0.011
+    yax = 0.015
+    yax2 = yax +0.015
     size = 'medium'
-    # Create Airpact version change annotation
-    ax.annotate('AP3',xy=(0.09,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,yax2),color='red',size=size) # Left Arrow AP3
-    ax.annotate('AP3',xy=(0.33,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,yax2),color='red',size=size) # Right Arrow AP3
- 
-    ax.annotate('AP4',xy=(0.33,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.421,yax2),color='red',size=size) # Left Arrow AP4       
-    ax.annotate('AP4',xy=(0.512,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.421,yax2),color='red',size=size) # Right Arrow AP4
     
-    ax.annotate('AP5',xy=(0.512,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.646,yax2),color='red',size=size) # Left Arrow AP5
-    ax.annotate('AP5',xy=(0.8,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.646,yax2),color='red',size=size) # Right Arrow AP5
+    mod = 0.05
+    
+    xax1 = .2-mod
+    xax2 = .421-mod
+    xax3 = .646-mod
+    
+    xax4 = 0.33-mod
+    xax5 = 0.512-mod
+    xax6 = 0.8-mod
+    
+    
+    # Create Airpact version change annotation
+    ax.annotate('AP3',xy=(0.09,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax1,yax2),color='red',size=size) # Left Arrow AP3
+    ax.annotate('AP3',xy=(xax4,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax1,yax2),color='red',size=size) # Right Arrow AP3
+ 
+    ax.annotate('AP4',xy=(xax4,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax2,yax2),color='red',size=size) # Left Arrow AP4       
+    ax.annotate('AP4',xy=(xax5,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax2,yax2),color='red',size=size) # Right Arrow AP4
+    
+    ax.annotate('AP5',xy=(xax5,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax3,yax2),color='red',size=size) # Left Arrow AP5
+    ax.annotate('AP5',xy=(xax6,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax3,yax2),color='red',size=size) # Right Arrow AP5
     '''
     ax.annotate('AP3',xy=(0.09,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.235,yax2),color='red',size=size) # Left Arrow AP3
     ax.annotate('AP3',xy=(0.405,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.235,yax2),color='red',size=size) # Right Arrow AP3
@@ -2082,7 +2095,7 @@ for w in new_list:
     '''
     # Add significant event annotations to plots
     #ax.annotate('12km to 4km',xy=(0.405,0.75),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(0.405,.8),color='red',size='x-small') # Right Arrow AP3
-    
+    ax.set_xlabel('')
     plt.show()
     fig1.savefig(outputdir + '/time_series/type/aqs_%s_timeseries_site.png' %(var_name),bbox_inches='tight')
     plt.close()

@@ -6,6 +6,9 @@ Created on Wed Dec 12 12:05:27 2018
 """
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import pandas as pd
+from matplotlib.dates import DateFormatter
+import matplotlib.dates as mdates
 
 # Set plot parameters
 mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
@@ -31,6 +34,20 @@ fig.tight_layout() # spaces the plots out a bit
 fig.text(0.184, .98, 'AIRPACT 3', va='center',ha='center')
 fig.text(0.51, 0.98, 'AIRPACT 4', va='center',ha='center')
 fig.text(0.835, 0.98, 'AIRPACT 5', va='center',ha='center')
+
+# Make winter month 
+db = pd.DataFrame()
+s = '12/1/2009'
+e = '2/28/2010'
+
+#s = '6/1/2009'
+#e = '8/31/2009'
+                    
+dates = pd.date_range(start=s,end=e)
+db['datetime'] = dates
+db = db.set_index('datetime')
+db['data'] = 5
+
 for i in [1,2,3,4,5,6]:
     ax = fig.add_subplot(2,3,i)
     plt.rcParams["figure.figsize"] = (8,4)
@@ -41,9 +58,18 @@ for i in [1,2,3,4,5,6]:
     plt.legend(prop={'size': 10})#,loc=3) # Places the legend in the lower left corner at a size of 10
     sze = 10 #size of annotation text
     
+    db.plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
+    
     plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right')
     #ax.xaxis.labelpad = 100
-    
+    # format x axis
+    myFmt = DateFormatter("%b")
+    months = mdates.MonthLocator() 
+    days = mdates.DayLocator(bymonthday=(1,1))  
+    ax.xaxis.set_major_formatter(myFmt)
+    ax.xaxis.set_major_locator(months)
+    ax.xaxis.set_minor_locator(days)
+    ax.set_xlim(s,e) # set limits in the hopes of removing doubled last label
     
     plt.grid(True)    # Add grid lines to make graph interpretation easier
 #%%
