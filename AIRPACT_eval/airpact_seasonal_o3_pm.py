@@ -27,14 +27,16 @@ starttime = time.time()
 begin_time = time.time()
 
 #Set directorys
-#inputDir = r'G:/Research/AIRPACT_eval/'
-#stat_path = r'G:/Research/scripts/Urbanova/statistical_functions.py'
-#aqsid = pd.read_csv(r'G:\Research\AIRPACT_eval/aqs_sites.csv')
+inputDir = r'E:/Research/AIRPACT_eval/'
+stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
+aqsid = pd.read_csv(r'E:\Research\AIRPACT_eval/aqs_sites.csv')
 
-# Aeolus directories
-inputDir = '/data/lar/users/jmunson/longterm_airpact/'
-stat_path = '/data/lar/users/jmunson/statistical_functions.py'
-aqsid = pd.read_csv(inputDir+'aqs_sites.csv')
+# =============================================================================
+# # Aeolus directories
+# inputDir = '/data/lar/users/jmunson/longterm_airpact/'
+# stat_path = '/data/lar/users/jmunson/statistical_functions.py'
+# aqsid = pd.read_csv(inputDir+'aqs_sites.csv')
+# =============================================================================
 
 # Open statistics script
 exec(open(stat_path).read())
@@ -398,6 +400,9 @@ seasons = ['Summer','Winter']
 pollutant = ['PM2.5','O3']
 versions = ['AP3','AP4','AP5']
 
+# Short version to make running on pc faster
+pollutant = ['O3']
+
 for species in pollutant:
     print(species)
     da = df_com.dropna(subset=['Location Setting'])
@@ -612,3 +617,29 @@ for species in pollutant:
 end_time = time.time()
 print("Run time was %s minutes"%(round((end_time-begin_time)/60)))
 print('done')
+
+
+#%%
+apples = d[:][0:100]
+
+df_t = apples.rolling('8H').mean()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
