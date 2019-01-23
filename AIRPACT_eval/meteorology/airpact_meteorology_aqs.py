@@ -52,101 +52,112 @@ exec(open(base_dir +"Met_functions_for_Ben.py").read())
 print(base_dir +"Met_functions_for_Ben.py")
 
 #exec(open(base_dir + "/airpact_functions.py").read())
-'''
-start_year = 2009    #2009
-start_month = 5    #5
-start_day = 1    #1
 
-end_year = 2010
-end_month = 8    #8
-#end_day = monthrange(end_year, end_month)[1]
-end_day = 18    #15
-
-start_year = 2010    #2009
-start_month = 9    #5
-start_day = 1    #1
-
-end_year = 2014
-end_month = 7    #8
-#end_day = monthrange(end_year, end_month)[1]
-end_day = 1    #15
-
-start_year = 2013    #2009
-start_month = 3    #5
-start_day = 26    #1
-
-end_year = 2014
-end_month = 7    #8
-#end_day = monthrange(end_year, end_month)[1]
-end_day = 1    #15
-
-start_year = 2015    #2009
-start_month = 1    #5
-start_day = 11    #1
-
-end_year = 2016
+# =============================================================================
+# start_year = 2009    #2009
+# start_month = 5    #5
+# start_day = 1    #1
+# 
+# end_year = 2010
+# end_month = 8    #8
+# #end_day = monthrange(end_year, end_month)[1]
+# end_day = 18    #15
+# 
+# start_year = 2010    #2009
+# start_month = 9    #5
+# start_day = 1    #1
+# 
+# end_year = 2014
+# end_month = 7    #8
+# #end_day = monthrange(end_year, end_month)[1]
+# end_day = 1    #15
+# 
+# start_year = 2013    #2009
+# start_month = 3    #5
+# start_day = 26    #1
+# 
+# end_year = 2014
+# end_month = 7    #8
+# #end_day = monthrange(end_year, end_month)[1]
+# end_day = 1    #15
+# 
+# start_year = 2015    #2009
+# start_month = 1    #5
+# start_day = 11    #1
+# 
+# end_year = 2016
+# end_month = 12    #8
+# #end_day = monthrange(end_year, end_month)[1]
+# end_day = 10    #15
+# 
+# start_year = 2016    #2009
+# start_month = 12    #5
+# start_day = 11    #1
+# 
+# end_year = 2018
+# end_month = 8    #8
+# #end_day = monthrange(end_year, end_month)[1]
+# end_day = 1    #15
+# 
+# # Start of redesigned days
+# 
+# start_year = 2010    #2009
+# start_month = 9    #5
+# start_day = 1    #1
+# 
+# end_year = 2012
+# end_month = 10    #8
+# #end_day = monthrange(end_year, end_month)[1]
+# end_day = 20    #15
+# 
+# start_year = 2015    #2009
+# start_month = 1    #5
+# start_day = 1    #1
+# 
+# end_year = 2016
+# end_month = 1    #8
+# #end_day = monthrange(end_year, end_month)[1]
+# end_day = 12    #15
+# 
+# # Missing section of time here I accidently didnt put here, but I did run it.
+# 
+# start_year = 2017    #2009
+# start_month = 1    #5
+# start_day = 2    #1
+# 
+# end_year = 2017
+# end_month = 5    #8
+# #end_day = monthrange(end_year, end_month)[1]
+# end_day = 31    #15
+# 
+# start_year = 2018    #2009
+# start_month = 1    #5
+# start_day = 2    #1
+# 
+# end_year = 2018
+# end_month = 8    #8
+# #end_day = monthrange(end_year, end_month)[1]
+# end_day = 14    #15
+# 
+# start_year = 2017    #2009
+# start_month = 6    #5
+# start_day = 1    #1
+# 
+# end_year = 2018
+# end_month = 1    #8
+# #end_day = monthrange(end_year, end_month)[1]
+# end_day = 1    #15
+# 
+# =============================================================================
+start_year = 2018    #2009
+start_month = 8    #5
+start_day = 15    #1
+ 
+end_year = 2018
 end_month = 12    #8
 #end_day = monthrange(end_year, end_month)[1]
-end_day = 10    #15
-
-start_year = 2016    #2009
-start_month = 12    #5
-start_day = 11    #1
-
-end_year = 2018
-end_month = 8    #8
-#end_day = monthrange(end_year, end_month)[1]
-end_day = 1    #15
-
-# Start of redesigned days
-
-start_year = 2010    #2009
-start_month = 9    #5
-start_day = 1    #1
-
-end_year = 2012
-end_month = 10    #8
-#end_day = monthrange(end_year, end_month)[1]
-end_day = 20    #15
-
-start_year = 2015    #2009
-start_month = 1    #5
-start_day = 1    #1
-
-end_year = 2016
-end_month = 1    #8
-#end_day = monthrange(end_year, end_month)[1]
-end_day = 12    #15
-
-# Missing section of time here I accidently didnt put here, but I did run it.
-'''
-start_year = 2017    #2009
-start_month = 1    #5
-start_day = 2    #1
-
-end_year = 2017
-end_month = 5    #8
-#end_day = monthrange(end_year, end_month)[1]
 end_day = 31    #15
-'''
-start_year = 2018    #2009
-start_month = 1    #5
-start_day = 2    #1
 
-end_year = 2018
-end_month = 8    #8
-#end_day = monthrange(end_year, end_month)[1]
-end_day = 14    #15
-
-start_year = 2017    #2009
-start_month = 6    #5
-start_day = 1    #1
-
-end_year = 2018
-end_month = 1    #8
-#end_day = monthrange(end_year, end_month)[1]
-end_day = 1    #15
-'''
 # set start and end date
 start = datetime.datetime(start_year, start_month, start_day, hour=0)
 end = datetime.datetime(end_year, end_month, end_day, hour=0)

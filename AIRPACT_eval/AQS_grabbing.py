@@ -32,7 +32,7 @@ def aqs(state,ac):
     AQS={}
     for i in range(0,3):
         print(species[i])
-        for j in range(2009,2018):
+        for j in range(2009,2019):
             dataframename = species[i]+ac+str(j)
             start = time.time()
             print(j)
@@ -55,13 +55,11 @@ def aqs(state,ac):
 #aqs('Washington','_WA')
 #aqs('Oregon','_OR')
 #aqs('Idaho','_ID')
-#aqs('Canada','_CC')
 #aqs('Montana','_MT')
 #aqs('California','_CA')
-#aqs('Nevada','_NV')
-aqs('Utah','_UT')
-
-
+#aqs('Utah','_UT')
+aqs('Nevada','_NV')
+aqs('Canada','_CC')
 
 
 

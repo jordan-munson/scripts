@@ -8,6 +8,8 @@ Created on Tue Sep 18 07:38:43 2018
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import matplotlib as mpl
+
 import numpy as np
 
 # Set directories
@@ -37,7 +39,7 @@ sites = ['URBAN AND CENTER CITY','SUBURBAN','RURAL']
 
 # Set plot parameters
 mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 24.0
+mpl.rcParams['font.size'] = 20.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -344,7 +346,7 @@ def soccer(x,y,axismax,size1,size2,temp,press,rh,ws,wd):    # x and y are stats 
     
     
     #ax.legend()
-    legend = plt.legend(loc=legend_loc)
+    legend = plt.legend(loc=legend_loc,fontsize=12)
     plt.setp(legend.get_texts(), color='black')
     
     # Save the plot

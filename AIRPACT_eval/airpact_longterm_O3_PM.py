@@ -39,7 +39,8 @@ month = '04'
 year  = '2018' 
 
 endday = '31'
-endmonth='05'
+#endmonth='05'
+endmonth='12'
 endyear='2018'
 
 # =============================================================================
@@ -575,7 +576,7 @@ for species in pollutant:
             spc = 2
             plt.legend(prop={'size': 20},loc=3)
         
-        ax.set_xlim('2009-1-1','2018-7-1')
+        ax.set_xlim('2009-1-1','2018-12-31')
         ax.set_xlabel(' ')        
         ax.set_title(str(site_type))
        # plt.legend(prop={'size': 20},loc=2)

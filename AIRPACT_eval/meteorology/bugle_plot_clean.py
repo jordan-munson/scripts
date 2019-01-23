@@ -107,6 +107,7 @@ ax.set(title='O3 per AIRPACT Version',xlabel='Mean',ylabel='FB (%)')
 colors = ['r','g','b']
 
 ax.scatter(df_o3['Mean'],df_o3['FB'],c=colors, marker = 'o',label='Ozone')
+
 #ax.scatter(df_pm['Mean'],df_pm['NMB [%]'],c=colors, marker = 'D', label = 'PM_2.5')
 
 # Define props
