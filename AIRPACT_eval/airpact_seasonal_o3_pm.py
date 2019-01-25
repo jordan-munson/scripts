@@ -587,7 +587,7 @@ for species in pollutant:
             else:
                 #ax.set_ylabel('Ozone (ppb)')
                 #ax.set_ylim(0,55)
-                ax.set_ylim(0,110) # for use with 8 hour max ave
+                ax.set_ylim(0,120) # for use with 8 hour max ave
                 height=10
                 spc = 2
             
