@@ -415,6 +415,8 @@ for species in pollutant:
     else:
         #fig.set_ylabel('Ozone (ppb)') 
         fig.text(-0.01, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
+
+        
     fig.suptitle('Seasonal Variations by AIRPACT Version',y=1.06) # title
     fig.tight_layout() # spaces the plots out a bit
 
@@ -482,8 +484,8 @@ for species in pollutant:
                     d33=d.loc[mask]
                     d3 = d3.append(d33)
                     s = '6/1/2009'
-                    e = '8/31/2009'
-                    dates = pd.date_range(start=s,end=e)
+                    e = '8/30/2009' # change back to 31 if 8-hour ozone doesn't work
+                    dates = pd.date_range(start=s,end=e) 
                     ax = fig.add_subplot(2,3,4+i)#(6,2,3+i)
                     
                 if season == 'Fall':
@@ -516,7 +518,7 @@ for species in pollutant:
                     d33=d.loc[mask]
                     d3 = d3.append(d33)
                     s = '12/1/2009'
-                    e = '2/28/2010'
+                    e = '2/27/2010' # change back to 28 if 8-hour ozone doesn't work
                     dates = pd.date_range(start=s,end=e)
                     ax = fig.add_subplot(2,3,1+i)#(6,2,1+i)
 
@@ -542,13 +544,33 @@ for species in pollutant:
             plt.tight_layout() # spaces the plots out a bit
 
             # Change data to monthly averages
-            d1 = d1.groupby(d1.index.day).mean()
-            d2 = d2.groupby(d2.index.day).mean()
-            d3 = d3.groupby(d3.index.day).mean()
-            cat = [d1,d2,d3]
-            db = pd.concat(cat).reset_index(drop=True)
-            db['datetime'] = dates
-            db = db.set_index('datetime')
+            if species == 'O3':
+                # 8-hour ozone script from http://danielrothenberg.com/gcpy/examples/timeseries/calc_mda8_timeseries.html
+                cat = [d1,d2,d3]
+                db = pd.concat(cat).reset_index(drop=True).set_index('date')
+
+                # find daily max 8 hour average
+                dbc = pd.DataFrame()
+                for x in cat:
+                    x = x.drop('date',axis=1)
+                    avg_8hr_o3 = x.rolling(8,min_periods=6).mean()
+                    times = avg_8hr_o3.index.values - pd.Timedelta('8h')
+                    avg_8hr_o3.index.values[:] = times
+                    x1 = avg_8hr_o3.resample('D').max().dropna()
+                    
+                    dbc = dbc.append(x1.groupby(x1.index.day).mean())
+                db = dbc.dropna()
+                
+                db['datetime'] = dates
+                db = db.set_index('datetime')
+            else:
+                d1 = d1.groupby(d1.index.day).mean()
+                d2 = d2.groupby(d2.index.day).mean()
+                d3 = d3.groupby(d3.index.day).mean()
+                cat = [d1,d2,d3]
+                db = pd.concat(cat).reset_index(drop=True)
+                db['datetime'] = dates
+                db = db.set_index('datetime')
             #db = db.resample('D', convention='start').mean()
             
             # Plotting section
@@ -564,7 +586,8 @@ for species in pollutant:
                 spc = 1.2 # Space the annotations are moved up and down
             else:
                 #ax.set_ylabel('Ozone (ppb)')
-                ax.set_ylim(0,55)
+                #ax.set_ylim(0,55)
+                ax.set_ylim(0,110) # for use with 8 hour max ave
                 height=10
                 spc = 2
             
@@ -620,17 +643,27 @@ print('done')
 
 
 #%%
+# grab some data to test script with
 apples = d[:][0:100]
+apples = apples.drop('date',axis=1)
 
-df_t = apples.rolling('8H').mean()
+# compute 8-hour rolling averages
+avg_8hr_o3 = apples.rolling(8,min_periods=6).mean()
 
+# By default, this takes the last timestamp in a rolling interval; i.e. the
+# timestamps correspond to the preceding 8 hours. We want them to refer to
+# the proeding 8 hours, so we can adjust them using datetime arithmetic
+times = avg_8hr_o3.index.values - pd.Timedelta('8h')
+avg_8hr_o3.index.values[:] = times
 
+# Finally, aggregate by calendar day and compute the maxima of the set of
+# 8-hour averages for each day
+mda8_o3 = avg_8hr_o3.resample('D').max()
 
-
-
-
-
-
+# Plot just one year of data
+ax = mda8_o3.plot(figsize=(8, 4), color='k')
+ax.set_ylabel("MDA8 O$_3$ [ppb]")
+plt.show()
 
 
 
