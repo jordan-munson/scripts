@@ -96,7 +96,6 @@ exec(open(stat_path).read())
 # print('Model data combined')
 # =============================================================================
 
-
 ##############################################################################
 # Read AQS data. csv's created from 'AQS_grabbing.py' script, and the model data from the previous lines of code
 ##############################################################################
@@ -586,8 +585,8 @@ for species in pollutant:
         
         #text_height = 0.061
         text_height = 0.05
-        x1 = 0.395
-        x2 = 0.622
+        x1 = 0.429
+        x2 = 0.689
         x3 = 0.95
         
         t1 = (x1-0.07)/2+0.07
@@ -924,13 +923,13 @@ for version in versions:
     # Set date range used based of versions
     if version == 'ap3':
         start_date ='2009-05-01'
-        end_date = '2014-07-01'
+        end_date = '2012-12-31'
     elif version == 'ap4':
-        start_date ='2014-07-01'
-        end_date = '2015-12-01'
+        start_date ='2013-01-01'
+        end_date = '2015-12-31'
     elif version == 'ap5':
-        start_date ='2015-12-01'
-        end_date = '2018-07-01'
+        start_date ='2016-01-01'
+        end_date = '2018-12-31'
         
     # Locate correct site model data
     mask = (df_com['datetime'] > start_date) & (df_com['datetime'] <= end_date) # Create a mask to determine the date range used

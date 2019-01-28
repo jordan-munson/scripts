@@ -11,22 +11,14 @@ import pandas as pd
 import time
 #Set state
 
-latlon =  pd.read_csv(r'E:/Research/AIRPACT_eval/All_model-monitor_paired_daily_PM2.5_data.csv')
-latlon = latlon.drop('date',axis=1)
-latlon = latlon.drop('Parameter.Name',axis=1)
-latlon = latlon.drop('Daily_mean_Conc',axis=1)
-latlon = latlon.drop('AP4.PM2.5.Daily_mean_Conc',axis=1)
 
-latlon = latlon.dropna()
-latlon = latlon.drop_duplicates(subset = 'Sitename')
+# =============================================================================
+# species = ['o3','pm_FRM/FEM','pm_non_FRM/FEM'] # when changing bacl, don't forget to rename the save file line
+# species_code = ['44201','88101','88502']
+# =============================================================================
 
-
-
-species = ['o3','pm_FRM/FEM','pm_non_FRM/FEM']
-species_code = ['44201','88101','88502']
-
-#species = ['Winds']#,'Temperature','Pressure','RH']
-#species_code = ['WIND']#,'TEMP','PRESS','RH_DP']
+species = ['Winds','Temperature','Pressure','RH']
+species_code = ['WIND','TEMP','PRESS','RH_DP']
 
 def aqs(state,ac):
     AQS={}
@@ -49,15 +41,15 @@ def aqs(state,ac):
                           'Qualifier','Method Type','Method Code','Method Name','Date of Last Change'], axis=1)
    
     
-    AQS_df.to_csv(r'E:/Research/AIRPACT_eval/AQS_data/'+state+'_aqs.csv')
+    AQS_df.to_csv(r'E:/Research/AIRPACT_eval/AQS_data/'+state+'_aqs_met.csv')
     print(state + ' Done')
 
-#aqs('Washington','_WA')
-#aqs('Oregon','_OR')
-#aqs('Idaho','_ID')
-#aqs('Montana','_MT')
-#aqs('California','_CA')
-#aqs('Utah','_UT')
+aqs('Washington','_WA')
+aqs('Oregon','_OR')
+aqs('Idaho','_ID')
+aqs('Montana','_MT')
+aqs('California','_CA')
+aqs('Utah','_UT')
 aqs('Nevada','_NV')
 aqs('Canada','_CC')
 

@@ -26,17 +26,17 @@ from matplotlib.dates import DateFormatter
 starttime = time.time()
 begin_time = time.time()
 
-#Set directorys
-inputDir = r'E:/Research/AIRPACT_eval/'
-stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
-aqsid = pd.read_csv(r'E:\Research\AIRPACT_eval/aqs_sites.csv')
+# =============================================================================
+# #Set directorys
+# inputDir = r'E:/Research/AIRPACT_eval/'
+# stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
+# aqsid = pd.read_csv(r'E:\Research\AIRPACT_eval/aqs_sites.csv')
+# =============================================================================
 
-# =============================================================================
-# # Aeolus directories
-# inputDir = '/data/lar/users/jmunson/longterm_airpact/'
-# stat_path = '/data/lar/users/jmunson/statistical_functions.py'
-# aqsid = pd.read_csv(inputDir+'aqs_sites.csv')
-# =============================================================================
+# Aeolus directories
+inputDir = '/data/lar/users/jmunson/longterm_airpact/'
+stat_path = '/data/lar/users/jmunson/statistical_functions.py'
+aqsid = pd.read_csv(inputDir+'aqs_sites.csv')
 
 # Open statistics script
 exec(open(stat_path).read())
@@ -401,7 +401,7 @@ pollutant = ['PM2.5','O3']
 versions = ['AP3','AP4','AP5']
 
 # Short version to make running on pc faster
-pollutant = ['O3']
+#pollutant = ['O3']
 
 for species in pollutant:
     print(species)
@@ -436,12 +436,12 @@ for species in pollutant:
             start_date ='2009-05-01'
             #end_date = '2014-07-01'
             end_date = '2014-06-30'
-            years = [2009,2010,2011,2012,2013,2014]
+            years = [2009,2010,2011,2012]
         elif version == 'AP4':
             start_date ='2014-07-01'
             #end_date = '2015-12-01'
             end_date = '2015-11-30'
-            years = [2014,2015]
+            years = [2013,2014,2015]
         elif version == 'AP5':
             start_date ='2015-12-01'
             #end_date = '2018-07-01'
@@ -484,7 +484,10 @@ for species in pollutant:
                     d33=d.loc[mask]
                     d3 = d3.append(d33)
                     s = '6/1/2009'
-                    e = '8/30/2009' # change back to 31 if 8-hour ozone doesn't work
+                    if species == 'O3':    
+                        e = '8/30/2009'
+                    else:
+                        e = '8/31/2009'
                     dates = pd.date_range(start=s,end=e) 
                     ax = fig.add_subplot(2,3,4+i)#(6,2,3+i)
                     
@@ -518,7 +521,10 @@ for species in pollutant:
                     d33=d.loc[mask]
                     d3 = d3.append(d33)
                     s = '12/1/2009'
-                    e = '2/27/2010' # change back to 28 if 8-hour ozone doesn't work
+                    if species == 'O3':
+                        e = '2/27/2010' 
+                    else:
+                        e = '2/28/2010'
                     dates = pd.date_range(start=s,end=e)
                     ax = fig.add_subplot(2,3,1+i)#(6,2,1+i)
 

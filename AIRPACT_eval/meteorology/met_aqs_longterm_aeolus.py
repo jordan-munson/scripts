@@ -111,9 +111,14 @@ del([df1,df2,df3,df4,df5,df6,df7,df8,df9])
 # Read AQS data. csv's created from 'AQS_grabbing.py' script, and the model data from the previous lines of code
 ##############################################################################
 # Read AQS data
-df_wa = pd.read_csv(base_dir + 'AQS_data/Washington_met_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_or = pd.read_csv(base_dir + 'AQS_data/Oregon_met_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_id = pd.read_csv(base_dir + 'AQS_data/Idaho_met_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_wa = pd.read_csv(base_dir + 'AQS_data/Washington_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_or = pd.read_csv(base_dir + 'AQS_data/Oregon_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_id = pd.read_csv(base_dir + 'AQS_data/Idaho_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+#df_cc = pd.read_csv(inputDir + 'Canada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_mt = pd.read_csv(base_dir + 'AQS_data/Montana_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_ca = pd.read_csv(base_dir + 'AQS_data/California_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_nv = pd.read_csv(base_dir + 'AQS_data/Nevada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_ut = pd.read_csv(base_dir + 'AQS_data/Utah_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 
 df_wa_winds = pd.read_csv(base_dir + 'AQS_data/Washington_met_aqs_winds.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 df_or_winds = pd.read_csv(base_dir + 'AQS_data/Oregon_met_aqs_winds.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
