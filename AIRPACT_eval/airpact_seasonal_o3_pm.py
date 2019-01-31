@@ -411,13 +411,13 @@ for species in pollutant:
     if species == 'PM2.5':
         #fig.set_ylabel('$PM_{2.5} (ug/m^3)$')
         fig.text(-0.01, 0.5, '$PM_{2.5} (ug/m^3)$', va='center', rotation='vertical')
-       
+        fig.suptitle('Daily Averaged Seasonal Variations',y=1.06) # title
     else:
         #fig.set_ylabel('Ozone (ppb)') 
         fig.text(-0.01, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
-
+        fig.suptitle('Daily Averaged 8-Hr Max Ozone Seasonal Variations',y=1.06) # title
         
-    fig.suptitle('Seasonal Variations by AIRPACT Version',y=1.06) # title
+    
     fig.tight_layout() # spaces the plots out a bit
 
     #Annotate versions in
@@ -550,35 +550,34 @@ for species in pollutant:
             plt.tight_layout() # spaces the plots out a bit
 
             # Change data to monthly averages
-# =============================================================================
-#             if species == 'O3':
-#                 # 8-hour ozone script from http://danielrothenberg.com/gcpy/examples/timeseries/calc_mda8_timeseries.html
-#                 cat = [d1,d2,d3]
-#                 db = pd.concat(cat).reset_index(drop=True).set_index('date')
-# 
-#                 # find daily max 8 hour average
-#                 dbc = pd.DataFrame()
-#                 for x in cat:
-#                     x = x.drop('date',axis=1)
-#                     avg_8hr_o3 = x.rolling(8,min_periods=6).mean()
-#                     times = avg_8hr_o3.index.values - pd.Timedelta('8h')
-#                     avg_8hr_o3.index.values[:] = times
-#                     x1 = avg_8hr_o3.resample('D').max().dropna()
-#                     
-#                     dbc = dbc.append(x1.groupby(x1.index.day).mean())
-#                 db = dbc.dropna()
-#                 
-#                 db['datetime'] = dates
-#                 db = db.set_index('datetime')
-#             else:
-# =============================================================================
-            d1 = d1.groupby(d1.index.day).mean()
-            d2 = d2.groupby(d2.index.day).mean()
-            d3 = d3.groupby(d3.index.day).mean()
-            cat = [d1,d2,d3]
-            db = pd.concat(cat).reset_index(drop=True)
-            db['datetime'] = dates
-            db = db.set_index('datetime')
+            if species == 'O3':
+                # 8-hour ozone script from http://danielrothenberg.com/gcpy/examples/timeseries/calc_mda8_timeseries.html
+                cat = [d1,d2,d3]
+                db = pd.concat(cat).reset_index(drop=True).set_index('date')
+
+                # find daily max 8 hour average
+                dbc = pd.DataFrame()
+                for x in cat:
+                    x = x.drop('date',axis=1)
+                    x = x.resample('H').mean()
+                    avg_8hr_o3 = x.rolling(8,min_periods=6).mean()
+                    times = avg_8hr_o3.index.values - pd.Timedelta('8h')
+                    avg_8hr_o3.index.values[:] = times
+                    x1 = avg_8hr_o3.resample('D').max().dropna()
+                    
+                    dbc = dbc.append(x1.groupby(x1.index.day).mean())
+                db = dbc.dropna()
+                
+                db['datetime'] = dates
+                db = db.set_index('datetime')
+            else:
+                d1 = d1.groupby(d1.index.day).mean()
+                d2 = d2.groupby(d2.index.day).mean()
+                d3 = d3.groupby(d3.index.day).mean()
+                cat = [d1,d2,d3]
+                db = pd.concat(cat).reset_index(drop=True)
+                db['datetime'] = dates
+                db = db.set_index('datetime')
             #db = db.resample('D', convention='start').mean()
             
             # Plotting section
