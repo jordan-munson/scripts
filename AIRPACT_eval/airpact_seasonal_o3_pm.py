@@ -484,10 +484,10 @@ for species in pollutant:
                     d33=d.loc[mask]
                     d3 = d3.append(d33)
                     s = '6/1/2009'
-                    #if species == 'O3':    
-                     #   e = '8/30/2009'
-                    #else:
-                    e = '8/31/2009'
+                    if species == 'O3':    
+                        e = '8/30/2009'
+                    else:
+                        e = '8/31/2009'
                     dates = pd.date_range(start=s,end=e) 
                     ax = fig.add_subplot(2,3,4+i)#(6,2,3+i)
                     
@@ -521,10 +521,10 @@ for species in pollutant:
                     d33=d.loc[mask]
                     d3 = d3.append(d33)
                     s = '12/1/2009'
-                    #if species == 'O3':
-                     #   e = '2/27/2010' 
-                    #else:
-                    e = '2/28/2010'
+                    if species == 'O3':
+                        e = '2/27/2010' 
+                    else:
+                        e = '2/28/2010'
                     dates = pd.date_range(start=s,end=e)
                     ax = fig.add_subplot(2,3,1+i)#(6,2,1+i)
 
@@ -636,7 +636,7 @@ for species in pollutant:
     try:
         if species == 'O3':
             print('O3')
-            plt.savefig(inputDir+'/plots/seasons/'+'O3_seasons.png',  pad_inches=0.1, bbox_inches='tight')
+            plt.savefig(inputDir+'/plots/seasons/'+'O3_8hr_seasons.png',  pad_inches=0.1, bbox_inches='tight')
         else:
             print('PM')
             plt.savefig(inputDir+'/plots/seasons/'+'PM_seasons.png',  pad_inches=0.1, bbox_inches='tight')
