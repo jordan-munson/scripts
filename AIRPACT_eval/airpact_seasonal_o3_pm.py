@@ -415,7 +415,7 @@ for species in pollutant:
     else:
         #fig.set_ylabel('Ozone (ppb)') 
         fig.text(-0.01, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
-        fig.suptitle('Daily Averaged 8-Hr Max Ozone Seasonal Variations',y=1.06) # title
+        fig.suptitle('8-Hr Max Daily Average Ozone Seasonal Variations',y=1.06) # title
         
     
     fig.tight_layout() # spaces the plots out a bit

@@ -7,29 +7,8 @@ Created on Thu Jul  5 12:01:19 2018
 import matplotlib as mpl
 mpl.use('Agg')
 import pandas as pd
-import matplotlib.dates as mdates
-import datetime as dt
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import pytz
-import numpy as np
 import time
-from subprocess import check_call 
-
-import pandas as pd
-import numpy as np
-import time
-import datetime as dt
-from datetime import timedelta
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import pytz
-from matplotlib.cm import get_cmap
-from mpl_toolkits.basemap import Basemap
-import os
-from netCDF4 import Dataset
-from matplotlib.backends.backend_pdf import PdfPages
-from calendar import monthrange
 
 starttime = time.time()
 begin_time = time.time()
@@ -43,21 +22,19 @@ endday = '31'
 endmonth='12'
 endyear='2018'
 
+# Aeolus directories
+inputDir = '/data/lar/users/jmunson/longterm_airpact/'
+stat_path = '/data/lar/users/jmunson/statistical_functions.py'
+ben_path = inputDir + 'Met_functions_for_Ben.py'
+
 # =============================================================================
-# # Aeolus directories
-# inputDir = '/data/lar/users/jmunson/longterm_airpact/'
-# stat_path = '/data/lar/users/jmunson/statistical_functions.py'
-# aqsid = pd.read_csv(inputDir+'aqs_sites.csv')
-# ben_path = inputDir + 'Met_functions_for_Ben.py'
+# #Set directory
+# inputDir = r'E:/Research/AIRPACT_eval/'
+# stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
+# ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
 # =============================================================================
 
-#Set directory
-inputDir = r'E:/Research/AIRPACT_eval/'
-# Open statistics script
-stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
-ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
 exec(open(stat_path).read())
-
 
 # =============================================================================
 # ##############################################################################
@@ -790,9 +767,9 @@ for species in pollutant:
                 # Save diurnal plots
                 try:
                     if species == 'O3':
-                        plt.savefig(inputDir+'/plots/diurnal/ozone/'+'O3_diurnal_'+site_type+'_'+year+'.png',  pad_inches=0.1, bbox_inches='tight')
+                        plt.savefig(inputDir+'/plots/diurnal/'+'O3_diurnal_'+site_type+'_'+year+'.png',  pad_inches=0.1, bbox_inches='tight')
                     else:
-                        plt.savefig(inputDir+'/plots/diurnal/pm/'+'PM_diurnal_'+site_type+'_'+year+'.png',  pad_inches=0.1, bbox_inches='tight')
+                        plt.savefig(inputDir+'/plots/diurnal/'+'PM_diurnal_'+site_type+'_'+year+'.png',  pad_inches=0.1, bbox_inches='tight')
                 except(FileNotFoundError):
                     pass
                 plt.close()
@@ -805,9 +782,9 @@ for species in pollutant:
 #     # Attempt to run ffmpeg not working
 #     os.chdir('G:/Research/Urbanova_Jordan')
 #     if species == 'O3':
-#         check_call(['ffmpeg', '-y', '-framerate','1', '-i',inputDir+'/plots/diurnal/ozone/O3_diurnal_'+site_type+'_%04.png','-b:v','5000k', inputDir+'/plots/diurnal/ozone/O3_diurnal_'+site_type+'animation.gif'])
+#         check_call(['ffmpeg', '-y', '-framerate','1', '-i',inputDir+'/plots/diurnal/O3_diurnal_'+site_type+'_%04.png','-b:v','5000k', inputDir+'/plots/diurnal/O3_diurnal_'+site_type+'animation.gif'])
 #     else:
-#         check_call(['ffmpeg','-y',  '-framerate','1', '-i',inputDir+'plots/diurnal/pm/PM_diurnal_'+site_type+'_%04.png','-b:v','5000k', inputDir+'plots/diurnal/pm/PM_diurnal_'+site_type+'animation.gif'])
+#         check_call(['ffmpeg','-y',  '-framerate','1', '-i',inputDir+'plots/diurnal/PM_diurnal_'+site_type+'_%04.png','-b:v','5000k', inputDir+'plots/diurnal/PM_diurnal_'+site_type+'animation.gif'])
 #     print('Videos made')        
 # =============================================================================
 
@@ -916,7 +893,7 @@ setting =['total']
 versions = ['ap3','ap4','ap5'] #List versions
 stats_all = pd.DataFrame() # statistics for each station
 
-exec(open(ben_path).read())
+#exec(open(ben_path).read())
 #import Met_functions_for_Ben as met
 for version in versions:
 
