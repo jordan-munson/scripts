@@ -14,7 +14,7 @@ import pandas as pd
 # Set directory
 inputDir = r'E:/Research/AIRPACT_eval/'
 stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
-
+ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
 # Load stat functions
 exec(open(stat_path).read())
 
@@ -56,7 +56,10 @@ d = df_mod.resample('M', convention='start').mean()
 print(d.O3_mod.median())
 print(d.O3_mod.quantile(0.5))
 print(d.O3_mod.quantile(0.98))
-
+#%%
+exec(open(ben_path).read())
+    
+taco = stats(d,'O3_mod','PM2.5_mod','test_units')
 
 
 

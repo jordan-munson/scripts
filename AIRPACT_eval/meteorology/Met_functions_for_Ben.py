@@ -149,6 +149,17 @@ def mean(df,name_var1,name_var2):  #var1 is model var2 is observed)
     df_new[name_var2]=df[name_var2]
     MEAN = df_new[name_var1].mean()
     return MEAN
+
+def percentile(df,name_var1,name_var2):
+    df_new=pd.DataFrame()
+    percentile_98=pd.DataFrame()
+    name1 = name_var1+' 98th'
+    name2 = name_var2+' 98th'
+    df_new[name_var1]=df[name_var1]
+    df_new[name_var2]=df[name_var2]
+    percentile_98[name1] = [df_new[name_var1].quantile(0.98)]
+    percentile_98[name2] = [df_new[name_var2].quantile(0.98)]
+    return percentile_98
     
 #Calculates and combines into a labeled dataframe
 def stats(df,name_var1,name_var2,var_units):
@@ -161,16 +172,22 @@ def stats(df,name_var1,name_var2,var_units):
     RMSE = rmse(df,name_var1,name_var2)
     r_squared = r2(df,name_var1,name_var2)
     MEAN = mean(df,name_var1,name_var2)
-    g = pd.DataFrame([MEAN,MB,ME,FB,FE,NMB,NME,RMSE,r_squared])
-    g.index = ['Mean','MB','ME','FB','FE',"NMB [%]", "NME [%]", "RMSE [%s]" %var_units, "R^2 [-]"]
+    percentile_98 = percentile(df,name_var1,name_var2)
+    name1 = name_var1+' 98th'
+    name2 = name_var2+' 98th'
+    
+    g = pd.DataFrame([MEAN,MB,ME,FB,FE,NMB,NME,RMSE,r_squared, percentile_98[name1],percentile_98[name2]])
+    g.index = ['Mean','MB','ME','FB','FE',"NMB [%]", "NME [%]", "RMSE [%s]" %var_units, "R^2 [-]",name1,name2]
     g.columns = [name_var1]
     return g
 
-#Create a test dataframe to ensure the functions are correct
-df_test=pd.DataFrame()
-df_test['M']= [7,6,5,11]
-df_test['O']= [6,8,6,12]
-df_test_results = stats(df_test,'M','O','test')    # Comment out when not debugging to avoid pointless dataframes
+# =============================================================================
+# #Create a test dataframe to ensure the functions are correct
+# df_test=pd.DataFrame()
+# df_test['M']= [7,6,5,11]
+# df_test['O']= [6,8,6,12]
+# df_test_results = stats(df_test,'M','O','test')    # Comment out when not debugging to avoid pointless dataframes
+# =============================================================================
 
 # Calculate mean
 def mean_stat(df,name_var):   

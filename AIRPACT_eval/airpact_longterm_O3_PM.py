@@ -894,7 +894,7 @@ versions = ['ap3','ap4','ap5'] #List versions
 stats_all = pd.DataFrame() # statistics for each station
 
 exec(open(ben_path).read())
-import Met_functions_for_Ben as met
+#import Met_functions_for_Ben as met
 for version in versions:
 
     # Set date range used based of versions
