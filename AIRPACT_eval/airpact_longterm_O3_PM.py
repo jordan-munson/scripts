@@ -893,8 +893,8 @@ setting =['total']
 versions = ['ap3','ap4','ap5'] #List versions
 stats_all = pd.DataFrame() # statistics for each station
 
-#exec(open(ben_path).read())
-#import Met_functions_for_Ben as met
+exec(open(ben_path).read())
+import Met_functions_for_Ben as met
 for version in versions:
 
     # Set date range used based of versions
@@ -959,7 +959,9 @@ for version in versions:
 
 stats_all = stats_all.reset_index()        
 stats_all.to_csv(inputDir+'/stats/aqs_version_stats.csv')
-print(stats_all['FB'],stats_all['FE'])
+#print(stats_all['FB'],stats_all['FE'])
+print('stats_all')
+print(stats_all)
 #%%
 ##############################################################################
 #Run stats for duration of airpact
@@ -1192,6 +1194,11 @@ for dataframe in stat_list:
     plt.savefig(inputDir+'/plots/stats/'+dataframe.name+'_monthly_r2_stats.png',  pad_inches=0.1, bbox_inches='tight')
     plt.show()
     plt.close()
+#%%
+# =============================================================================
+# Find percentile
+# =============================================================================
+    
 end_time = time.time()
 print("Run time was %s minutes"%(round((end_time-begin_time)/60)))
 print('done')
