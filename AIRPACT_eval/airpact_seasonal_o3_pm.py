@@ -602,7 +602,7 @@ for species in pollutant:
                 spc = 1.2 # Space the annotations are moved up and down
             else:
                 #ax.set_ylabel('Ozone (ppb)')
-                ax.set_ylim(0,55)
+                ax.set_ylim(20,75)
                 #ax.set_ylim(0,120) # for use with 8 hour max ave
                 height=10
                 spc = 2
