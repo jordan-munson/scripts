@@ -13,8 +13,8 @@ import matplotlib.patches as patches
 import numpy as np
 
 # Set directories
-inputdir = r'E:/Research/AIRPACT_eval/stats/'
-outputdir = r'E:/Research/AIRPACT_eval/plots/bugle'
+inputdir = r'G:/Research/AIRPACT_eval/stats/'
+outputdir = r'G:/Research/AIRPACT_eval/plots/bugle'
 
 #Load data
 df_stats = pd.read_csv(inputdir+'aqs_version_stats.csv').drop(['Unnamed: 0'],axis=1)
@@ -98,10 +98,10 @@ fig, ax = plt.subplots(figsize=figsize)
 
 # Set axis so that the plot resembles a soccer plot
 plt.ylim((-100,100))
-plt.xlim((0,40))
+plt.xlim((20,60))
 
 # Label plot
-ax.set(title='O3 per AIRPACT Version',xlabel='Mean',ylabel='FB (%)')
+ax.set(title='8-Hour Max Ozone Bugle',xlabel='Mean',ylabel='FB (%)')
 
 # Add color to the plot, colors signifying which site type
 colors = ['r','g','b']
@@ -135,7 +135,7 @@ def graph(func, x_range,color):
    y = func(x)
    plt.plot(x, y,color = color,alpha =0.7)
 
-line_lim = 50
+line_lim = 70
 # Criteria lines
 criteria = 30
 graph(lambda x: 70*(np.power(0.3, x))+criteria, (0,line_lim),'red') # Top

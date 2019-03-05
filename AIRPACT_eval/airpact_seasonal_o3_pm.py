@@ -558,21 +558,27 @@ for species in pollutant:
                 # find daily max 8 hour average
                 dbc = pd.DataFrame()
                 for x in cat:
-# =============================================================================
-#                     x = x.drop('date',axis=1)
-#                     x = x.resample('H').mean()
-#                     avg_8hr_o3 = x.rolling(8,min_periods=6).mean()
-#                     times = avg_8hr_o3.index.values - pd.Timedelta('8h')
-#                     avg_8hr_o3.index.values[:] = times
-#                     x1 = avg_8hr_o3.resample('D').max().dropna()
-# =============================================================================
-                    # this way performs the calc like Joe suggested 2/6/19
                     x = x.drop('date',axis=1)
+                    x = x.resample('H').mean()
                     avg_8hr_o3 = x.rolling(8,min_periods=6).mean()
                     times = avg_8hr_o3.index.values - pd.Timedelta('8h')
                     avg_8hr_o3.index.values[:] = times
-                    avg_8hr_o3 = avg_8hr_o3.resample('H').mean()
-                    x1 = avg_8hr_o3.resample('D').max().dropna()
+                    
+                    avg_8hr_o3['date'] = avg_8hr_o3.index.strftime('%H')
+                    intervals = ['00','01','02','03','04','05','06','24'] # remove these hours as per EPA regulation
+                    for interval in intervals:
+                        avg_8hr_o3 = avg_8hr_o3[~avg_8hr_o3.date.str.contains(interval)]
+                        
+                    x1 = avg_8hr_o3.resample('D').max().drop('date',axis=1)
+# =============================================================================
+#                     # this way performs the calc like Joe suggested 2/6/19
+#                     x = x.drop('date',axis=1)
+#                     avg_8hr_o3 = x.rolling(8,min_periods=6).mean()
+#                     times = avg_8hr_o3.index.values - pd.Timedelta('8h')
+#                     avg_8hr_o3.index.values[:] = times
+#                     avg_8hr_o3 = avg_8hr_o3.resample('H').mean()
+#                     x1 = avg_8hr_o3.resample('D').max().dropna()
+# =============================================================================
                     
                     dbc = dbc.append(x1.groupby(x1.index.day).mean())
                 db = dbc.dropna()

@@ -36,6 +36,7 @@ ben_path = inputDir + 'Met_functions_for_Ben.py'
 
 exec(open(stat_path).read())
 
+
 # =============================================================================
 # ##############################################################################
 # # Combine hrly model data
@@ -180,7 +181,7 @@ df_com['datetime'] = pd.to_datetime(df_com['datetime'], infer_datetime_format=Tr
 df_com.loc[:,'O3_mod'] = pd.to_numeric(df_com.loc[:,'O3_mod'], errors='coerce')
 df_com.loc[:,'PM2.5_mod'] = pd.to_numeric(df_com.loc[:,'PM2.5_mod'], errors='coerce')
 df_com.loc[:,'O3_obs'] = pd.to_numeric(df_com.loc[:,'O3_obs'], errors='coerce')
-df_com['O3_obs'] = df_com['O3_obs']*1000
+df_com['O3_obs'] = df_com['O3_obs']*1000 #convert to ppb
 df_obs['O3_obs'] = df_obs['O3_obs']*1000
 df_com.loc[:,'PM2.5_obs'] = pd.to_numeric(df_com.loc[:,'PM2.5_obs'], errors='coerce')
 df_com = df_com.drop(['State Code','County Code','Site Number'],axis=1) # drop unecessary columns
@@ -501,7 +502,7 @@ settings = ['RURAL', 'SUBURBAN', 'URBAN AND CENTER CITY']
             
 pollutant = ['O3','PM2.5']
 for species in pollutant:
-    da = df_com.dropna(subset=['Location Setting'])
+    da = df_com.copy().dropna(subset=['Location Setting'])
     fig = plt.figure(figsize=(14,16))
     fig.suptitle('Monthly Averaged '+str(species),y=0.94,fontsize=27,ha='center') # title
     fig.tight_layout() # spaces the plots out a bit
@@ -674,7 +675,7 @@ years = [2009,2010,2011,2012,2013,2014,2015,2016,2017]
 pollutant = ['O3','PM2.5']
 
 for species in pollutant:
-    da = df_com.dropna(subset=['Location Setting'])
+    da = df_com.copy().dropna(subset=['Location Setting'])
     for setting in settings:    #list(set(da['Location Setting'])):
         for year in years:       
             d = da.loc[df_com['Location Setting']==setting]
@@ -892,11 +893,12 @@ for dataframe in stat_list:
 setting =['total']
 versions = ['ap3','ap4','ap5'] #List versions
 stats_all = pd.DataFrame() # statistics for each station
+pollutant = ['O3','PM2.5','O3_hourly']
 
 exec(open(ben_path).read())
 #import Met_functions_for_Ben as met
 for version in versions:
-
+    print(version)
     # Set date range used based of versions
     if version == 'ap3':
         start_date ='2009-05-01'
@@ -911,9 +913,10 @@ for version in versions:
     # Locate correct site model data
     mask = (df_com['datetime'] > start_date) & (df_com['datetime'] <= end_date) # Create a mask to determine the date range used
 
-    df_mod1 = df_com.loc[mask]        
+    df_mod1 = df_com.copy().loc[mask]       
     df_mod1 = df_mod1.reset_index(drop=True)
     df_mod1['version'] = version
+
     # If there is no site data, this skips the site and moves to the next
     '''
     try:
@@ -922,32 +925,46 @@ for version in versions:
         continue
     '''
     # variable names
-    new_list = ['O3_obs','PM2.5_obs'] # R
-    for w in new_list:
-        var_name = str(w)
+    new_list = ['O3_obs','PM2.5_obs'] # 
+    for species in pollutant:
+        print(species)
+        var_name = str(species+'_obs')
         
-        # Skip variable if all values are zeros or NaNs
-        if df_mod1[var_name].isnull().all()==True or all(df_mod1[var_name]==0):
-            continue
+        x=df_mod1.copy().ix[:,[species+'_obs',species+'_mod','datetime']]
+        x = x.set_index('datetime') # Set datetime column as index
         
         #var_units = mw_data['UNITS'][var_name]
         if var_name=='O3_obs':
             var_name_mod1 = 'O3_mod'
             var_units = 'ppb'
+            
+            
+            x = x.resample('H').mean()
+            avg_8hr_o3 = x.rolling(8,min_periods=6).mean()
+            times = avg_8hr_o3.index.values - pd.Timedelta('8h')
+            avg_8hr_o3.index.values[:] = times
+            df_mod2 = avg_8hr_o3.resample('D').max().dropna()
 
+        if species == 'O3_hourly':
+            var_name = 'O3_obs'
+            var_name_mod1 = 'O3_mod_hourly'
+            var_units = 'ppb'
+            df_mod2 = df_mod1.copy()
+            df_mod2 = df_mod2.rename(columns={'O3_mod':var_name_mod1})
             
         if var_name=='PM2.5_obs':
             var_name_mod1 = 'PM2.5_mod'            
             var_units = 'ug/m3'
+            df_mod2 = x.resample('D').mean() # resample to 24 hour average
 
             
         ################################################
         ##########     COMPUTE STATISTICS     ##########
         ################################################
         
-        var_units = 'var units'
-        
-        stats1 = stats(df_mod1, var_name_mod1, var_name, var_units)
+        var_units = 'var units' # eliminates a double column
+        #print(df_mod2.tail)
+        stats1 = stats(df_mod2, var_name_mod1, var_name, var_units)
 
         stats_combined = pd.concat([stats1],axis=1,join_axes=[stats1.index])
         
@@ -999,7 +1016,7 @@ months = [1,2,3,4,5,6,7,8,9,10,11,12]
 pollutant = ['O3','PM2.5']
 
 for species in pollutant:
-    da = df_com.dropna(subset=['Location Setting'])
+    da = df_com.copy().dropna(subset=['Location Setting'])
     for setting in settings:    #list(set(da['Location Setting'])):
         for year in years:  
             for month in months:

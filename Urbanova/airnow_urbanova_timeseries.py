@@ -41,12 +41,16 @@ endyear='2018'
 
 inputDir          = r'E:\Research\Urbanova_Jordan/'
 plotDir           =r'E:\Research\Urbanova_Jordan\output/'
+stats_dir = r'E:/Research/scripts/Urbanova/'
 urb_path = inputDir +  'Urbanova_ref_site_comparison/Urbanova/'
-air_path = inputDir + 'Urbanova_refEsite_comparison/AIRPACT/'
+air_path = inputDir + 'Urbanova_ref_site_comparison/AIRPACT/'
 
-#inputDir = '/data/lar/users/jmunson'       #Aeolus
-#urb_path = '/data/lar/projects/Urbanova' + '/'   #Aeolus
-#air_path = '/data/airpact5/AIRRUN' + '/'    #Aeolus
+# =============================================================================
+# inputDir = '/data/lar/users/jmunson'       #Aeolus
+# urb_path = '/data/lar/projects/Urbanova' + '/'   #Aeolus
+# air_path = '/data/airpact5/AIRRUN' + '/'    #Aeolus
+# stats_dir = inputDir
+# =============================================================================
 
 # Set file paths
 file_modelled_base = inputDir +'/merged.csv'
@@ -114,7 +118,7 @@ result.to_csv(inputDir + '/merged.csv',index=False)
 print('AIRNOW data concatenated')
 '''
 # Open statistics script
-exec(open(inputDir +"/statistical_functions.py").read()) 
+exec(open(stats_dir +"statistical_functions.py").read()) 
 #%%
 def airnow(pollutant, abrv, unit):
     print('Running ' + abrv)

@@ -67,16 +67,15 @@ def nmb(df,name_var1,name_var2):  #var1 is model var2 is observed
     df_new[name_var1]=df[name_var1]
     df_new[name_var2]=df[name_var2]
     df_new['dif_var']=df_new[name_var1]-df_new[name_var2]
-    NMB=round((df_new['dif_var'].sum()/df_new[name_var2].sum())*100)
+    NMB=round((df_new['dif_var'].sum()/df_new[name_var2].sum())*100,2)
     return NMB
-
 #Normalized Mean Error - NME
 def nme(df,name_var1,name_var2):  #var1 is model var2 is observed
     df_new=pd.DataFrame()
     df_new[name_var1]=df[name_var1]
     df_new[name_var2]=df[name_var2]
     df_new['dif_var']= abs(df_new[name_var1]-df_new[name_var2])
-    NME=round((df_new['dif_var'].sum()/df_new[name_var2].sum())*100)
+    NME=round((df_new['dif_var'].sum()/df_new[name_var2].sum())*100,2)
     return NME
 
 #Root Mean Squared Error - RMSE
@@ -85,7 +84,7 @@ def rmse(df,name_var1,name_var2):  #var1 is model var2 is observed
     df_new[name_var1]=df[name_var1]
     df_new[name_var2]=df[name_var2]
     df_new['dif_var']= (df_new[name_var1]-df_new[name_var2])**(2)
-    RMSE=round((df_new['dif_var'].sum()/len(df_new.index))**(0.5))
+    RMSE=round((df_new['dif_var'].sum()/len(df_new.index))**(0.5),2)
     return RMSE
 
 #Coefficient of Determination - r^2
@@ -176,8 +175,8 @@ def stats(df,name_var1,name_var2,var_units):
     name1 = name_var1+' 98th'
     name2 = name_var2+' 98th'
     
-    g = pd.DataFrame([MEAN,MB,ME,FB,FE,NMB,NME,RMSE,r_squared, percentile_98[name1],percentile_98[name2]])
-    g.index = ['Mean','MB','ME','FB','FE',"NMB [%]", "NME [%]", "RMSE [%s]" %var_units, "R^2 [-]",name1,name2]
+    g = pd.DataFrame([MEAN,MB,ME,FB,FE,NMB,NME,RMSE,r_squared, percentile_98[name1][0],percentile_98[name2][0]])
+    g.index = ['Mean','MB','ME','FB','FE',"NMB [%]", "NME [%]", "RMSE [%s]" %var_units, "R^2 [-]",'Model 98th','Observation 98th']
     g.columns = [name_var1]
     return g
 
