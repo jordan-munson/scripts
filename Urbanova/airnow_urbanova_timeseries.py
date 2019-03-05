@@ -120,7 +120,11 @@ print('AIRNOW data concatenated')
 # Open statistics script
 exec(open(stats_dir +"statistical_functions.py").read()) 
 #%%
-def airnow(pollutant, abrv, unit):
+species = ['PM2.5']
+for pollutant in species:
+    if pollutant == 'PM2.5':
+        abrv = 'PM2.5'
+        unit = '($ug/m^3$)'
     print('Running ' + abrv)
     global df_base
     # Read files
@@ -187,7 +191,6 @@ def airnow(pollutant, abrv, unit):
 
 
     df_tseries = df_obs_mod.copy() 
-    df_siteinfo = df_sites.set_index('site_id')
 
 # convert object to numeric (This is required to plot these columns)
     df_tseries.loc[:,abrv+'_AP5_4km'] = pd.to_numeric(df_tseries.loc[:,abrv+'_AP5_4km'])
@@ -216,150 +219,157 @@ def airnow(pollutant, abrv, unit):
     g = g.drop(0,1)
     #print(df_tseries)
 #Plot
-    for sid in list(set(df_tseries['site_id'])):
-        d = df_tseries.loc[df_tseries['site_id']==sid]
-        site_nameinfo = df_siteinfo.ix[sid, 'long_name']
-        d.drop('site_id',1)
-        fig,ax=plt.subplots(1,1, figsize=(12,4))
-        d.set_index('datetime').ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'blue', 'red'], label=['OBS', 'sens', 'base'])
-        ax.set_title(site_nameinfo)
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
-        ax.set_ylabel(abrv+' '+unit)
-        ax.set_xlabel('PST')        
-        ax.legend(['OBS', 'AP5_4km', 'AP5_1.33km'], fontsize=12)
+    d = df_tseries.copy().set_index('datetime')
+    d = d.resample('D').mean()
+    fig,ax=plt.subplots(1,1, figsize=(12,4))
+    d.ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'blue', 'red'], label=['OBS', 'sens', 'base'])
+    ax.set_title('Daily Mean '+pollutant)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
+    ax.set_ylabel(abrv+' '+unit)
+    ax.set_xlabel('PST')        
+    ax.legend(['OBS', 'AP5_4km', 'AP5_1.33km'], fontsize=12)
+
+#Calculate Statistics
+# =============================================================================
+#     try:
+#         #Run stats functions
+#         aq_stats_4km = stats(d, abrv+'_AP5_4km', abrv+'_obs')
+#         aq_stats_1p33km = stats(d, abrv+'_AP5_1.33km', abrv+'_obs')
+#         aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
+#     
+#         aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_1.33km', '1.33km ' + site_nameinfo)    
+#         aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
+#         g = pd.merge(g, aq_stats, how = 'inner', left_index = True, right_index = True)
+#    
+#     #Clean up column names
+#         aq_stats.columns = aq_stats.columns.str.replace('1.33km ' + site_nameinfo, '1.33km')    
+#         aq_stats.columns = aq_stats.columns.str.replace('4km ' + site_nameinfo, '4km')     
+#     
+#     #Drop some stats to put on plots
+#         aq_stats = aq_stats.drop('MB',0)        
+#         aq_stats = aq_stats.drop('ME',0)
+#         aq_stats = aq_stats.drop('RMSE',0)
+#         aq_stats = aq_stats.drop('NMB',0)
+#         aq_stats = aq_stats.drop('NME',0)
+# 
+# #            ax.text(0,-0.25, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
+#     
+#     except (ZeroDivisionError):
+#         print('No observed data, statistics cannot be calculated')
+# =============================================================================
+    plt.show()
+    plt.savefig(inputDir +'/airnow/timeseries_plot/daily_'+abrv+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf', pad_inches=0.1, bbox_inches='tight')
+    g.to_csv(inputDir +'/airnow/airnow_'+abrv+'_stats.csv')
+    plt.close()
+    #print(df_tseries)
     
-    #Calculate Statistics
-        try:
-            #Run stats functions
-            aq_stats_4km = stats(d, abrv+'_AP5_4km', abrv+'_obs')
-            aq_stats_1p33km = stats(d, abrv+'_AP5_1.33km', abrv+'_obs')
-            aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
-        
-            aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_1.33km', '1.33km ' + site_nameinfo)    
-            aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
-            g = pd.merge(g, aq_stats, how = 'inner', left_index = True, right_index = True)
-   
-        #Clean up column names
-            aq_stats.columns = aq_stats.columns.str.replace('1.33km ' + site_nameinfo, '1.33km')    
-            aq_stats.columns = aq_stats.columns.str.replace('4km ' + site_nameinfo, '4km')     
-        
-        #Drop some stats to put on plots
-            aq_stats = aq_stats.drop('MB',0)        
-            aq_stats = aq_stats.drop('ME',0)
-            aq_stats = aq_stats.drop('RMSE',0)
-            aq_stats = aq_stats.drop('NMB',0)
-            aq_stats = aq_stats.drop('NME',0)
-
-#            ax.text(0,-0.25, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
-        
-        except (ZeroDivisionError):
-            print('No observed data, statistics cannot be calculated')
-        plt.savefig(inputDir +'/airnow/'+month+'/timeseries_plot/hourly_'+abrv+'_'+site_nameinfo+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf', pad_inches=0.1, bbox_inches='tight')
-    g.to_csv(inputDir +'/airnow/'+month+ '/airnow_'+abrv+'_stats.csv')
-    print(df_tseries)
 # Scatter plots
-    for sid in list(set(df_tseries['site_id'])):
-        fig,ax=plt.subplots(1,1, figsize=(8,8))
-        d = df_tseries.loc[df_tseries['site_id']==sid]
-        site_nameinfo = df_siteinfo.ix[sid, 'long_name']
-        d.drop('site_id',1)
-        d=d.set_index('datetime')
-        d=d.groupby(d.index.hour).rolling('24H').mean().ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']]
-        ax.scatter(d[abrv+'_obs'], d[abrv+'_AP5_4km'], c='b', label = '4km',linewidths=None, alpha=0.8)
-        ax.scatter(d[abrv+'_obs'], d[abrv+'_AP5_1.33km'], c='r', marker='s', label = '1.33km',linewidths=None,alpha=0.8)        
-        axismax = max(max(d[abrv+'_AP5_4km']),max(d[abrv+'_AP5_1.33km']))
-        plt.plot([0,axismax], [0,axismax], color='black')
-        ax.set_aspect('equal', 'box')
-        plt.axis('equal')
-        ax.set_ylabel('Modeled '+abrv+' '+unit)
-        ax.set_xlabel('Observed '+abrv+' '+unit)        
-        ax.set_title(site_nameinfo) 
-        plt.legend()
-        ax.set_ylim(0,axismax)
-        ax.set_xlim(0,axismax)
-       # print(d)
+    fig,ax=plt.subplots(1,1, figsize=(8,8))
+    d = df_tseries.copy()
+    d=d.set_index('datetime')
+    d = d.resample('D').mean()
+    d=d.groupby(d.index.hour).rolling('24H').mean().ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']]
+    ax.scatter(d[abrv+'_obs'], d[abrv+'_AP5_4km'], c='b', label = '4km',linewidths=None, alpha=0.8)
+    ax.scatter(d[abrv+'_obs'], d[abrv+'_AP5_1.33km'], c='r', marker='s', label = '1.33km',linewidths=None,alpha=0.8)        
+    axismax = max(max(d[abrv+'_AP5_4km']),max(d[abrv+'_AP5_1.33km']))
+    plt.plot([0,axismax], [0,axismax], color='black')
+    ax.set_aspect('equal', 'box')
+    plt.axis('equal')
+    ax.set_ylabel('Modeled '+abrv+' '+unit)
+    ax.set_xlabel('Observed '+abrv+' '+unit)        
+    ax.set_title('Daily ' +pollutant) 
+    plt.legend()
+    ax.set_ylim(0,axismax)
+    ax.set_xlim(0,axismax)
+   # print(d)
 
 #Calculate Statistics
-        try:
-            #Run stats functions
-            aq_stats_4km = stats(d, abrv+'_AP5_4km', abrv+'_obs')
-            aq_stats_1p33km = stats(d, abrv+'_AP5_1.33km', abrv+'_obs')
-            aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
-        
-            aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_1.33km', '1.33km ' + site_nameinfo)    
-            aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
-   
-        #Clean up column names
-            aq_stats.columns = aq_stats.columns.str.replace('1.33km ' + site_nameinfo, '1.33km')    
-            aq_stats.columns = aq_stats.columns.str.replace('4km ' + site_nameinfo, '4km')     
-        
-        #Drop some stats to put on plots
-            aq_stats = aq_stats.drop('MB',0)        
-            aq_stats = aq_stats.drop('ME',0)
-            aq_stats = aq_stats.drop('RMSE',0)
-            aq_stats = aq_stats.drop('NMB',0)
-            aq_stats = aq_stats.drop('NME',0)
-
-#            ax.text(0,-0.12, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
-            plt.savefig(inputDir +'/airnow/'+month+'/scatter_plots/scatter_'+abrv+'_'+site_nameinfo+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf', pad_inches=0.1, bbox_inches='tight') #Placed this here so that if there is no oberved data, it won't save an empty plot
-
-        except (ZeroDivisionError):
-            pass
-        plt.savefig(inputDir +'/airnow/'+month+'/scatter_plots/scatter_'+abrv+'_'+site_nameinfo+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf', pad_inches=0.1, bbox_inches='tight')
-# Diurnal plots
-    for sid in list(set(df_tseries['site_id'])):
-        d = df_tseries.loc[df_tseries['site_id']==sid]
-        site_nameinfo = df_siteinfo.ix[sid, 'long_name']
-        d.drop('site_id',1)
-        fig,ax=plt.subplots(1,1, figsize=(12,4))
-        d=d.set_index('datetime')
-        b=d.groupby(d.index.hour).std()
-        d.groupby(d.index.hour).mean().ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'blue', 'red'], label=['OBS', 'sens', 'base'])
-        ax.set_title(site_nameinfo)
-        ax.set_ylabel(abrv+' '+unit)
-        ax.set_xlabel('Mean Diurnal (hours)')
-        d = d.groupby(d.index.hour).mean()
-        e = b
-        c = d-b
-        e = d+b
-        x = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
-        ax.set_ylim(bottom=0)
-        plt.fill_between(x, c[abrv+'_AP5_4km'], e[abrv+'_AP5_4km'], facecolor='blue', edgecolor='black',alpha = 0.1, label=['Std. Dev.']) 
-        plt.fill_between(x, c[abrv+'_AP5_1.33km'], e[abrv+'_AP5_1.33km'],facecolor='red', edgecolor='black',alpha = 0.1, label=['Std. Dev.'])     
-        ax.legend(['OBS', 'AP5_4km', 'AP5_1.33km', 'Std. Dev.'], fontsize=12)
-        print('Plotted ' + site_nameinfo)
-        
-#Calculate Statistics
-        try:
-            #Run stats functions
-            aq_stats_4km = stats(d, abrv+'_AP5_4km', abrv+'_obs')
-            aq_stats_1p33km = stats(d, abrv+'_AP5_1.33km', abrv+'_obs')
-            aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
-        
-            aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_1.33km', '1.33km ' + site_nameinfo)    
-            aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
-   
-        #Clean up column names
-            aq_stats.columns = aq_stats.columns.str.replace('1.33km ' + site_nameinfo, '1.33km')    
-            aq_stats.columns = aq_stats.columns.str.replace('4km ' + site_nameinfo, '4km')     
-        
-        #Drop some stats to put on plots
-            aq_stats = aq_stats.drop('MB',0)        
-            aq_stats = aq_stats.drop('ME',0)
-            aq_stats = aq_stats.drop('RMSE',0)
-            aq_stats = aq_stats.drop('NMB',0)
-            aq_stats = aq_stats.drop('NME',0)
-
-#            ax.text(0,-0.25, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
-        
-        except (ZeroDivisionError):
-            pass
-        plt.savefig(inputDir+'/airnow/'+month+'/diurnal_plot/'+abrv+'_'+site_nameinfo+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf',  pad_inches=0.1, bbox_inches='tight')
-
+# =============================================================================
+#     try:
+#         #Run stats functions
+#         aq_stats_4km = stats(d, abrv+'_AP5_4km', abrv+'_obs')
+#         aq_stats_1p33km = stats(d, abrv+'_AP5_1.33km', abrv+'_obs')
+#         aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
+#     
+#         aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_1.33km', '1.33km ' + site_nameinfo)    
+#         aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
+#    
+#     #Clean up column names
+#         aq_stats.columns = aq_stats.columns.str.replace('1.33km ' + site_nameinfo, '1.33km')    
+#         aq_stats.columns = aq_stats.columns.str.replace('4km ' + site_nameinfo, '4km')     
+#     
+#     #Drop some stats to put on plots
+#         aq_stats = aq_stats.drop('MB',0)        
+#         aq_stats = aq_stats.drop('ME',0)
+#         aq_stats = aq_stats.drop('RMSE',0)
+#         aq_stats = aq_stats.drop('NMB',0)
+#         aq_stats = aq_stats.drop('NME',0)
+# 
+# #            ax.text(0,-0.12, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
+#         plt.savefig(inputDir +'/airnow/'+month+'/scatter_plots/scatter_'+abrv+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf', pad_inches=0.1, bbox_inches='tight') #Placed this here so that if there is no oberved data, it won't save an empty plot
+# 
+#     except (ZeroDivisionError):
+#         pass
+# =============================================================================
+    plt.show()
+    plt.savefig(inputDir +'/airnow/scatter_plots/scatter_'+abrv+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf', pad_inches=0.1, bbox_inches='tight')
+    plt.close()
+# =============================================================================
+# # Diurnal plots
+#     for sid in list(set(df_tseries['site_id'])):
+#         d = df_tseries.loc[df_tseries['site_id']==sid]
+#         site_nameinfo = df_siteinfo.ix[sid, 'long_name']
+#         d.drop('site_id',1)
+#         fig,ax=plt.subplots(1,1, figsize=(12,4))
+#         d=d.set_index('datetime')
+#         b=d.groupby(d.index.hour).std()
+#         d.groupby(d.index.hour).mean().ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'blue', 'red'], label=['OBS', 'sens', 'base'])
+#         ax.set_title(site_nameinfo)
+#         ax.set_ylabel(abrv+' '+unit)
+#         ax.set_xlabel('Mean Diurnal (hours)')
+#         d = d.groupby(d.index.hour).mean()
+#         e = b
+#         c = d-b
+#         e = d+b
+#         x = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
+#         ax.set_ylim(bottom=0)
+#         plt.fill_between(x, c[abrv+'_AP5_4km'], e[abrv+'_AP5_4km'], facecolor='blue', edgecolor='black',alpha = 0.1, label=['Std. Dev.']) 
+#         plt.fill_between(x, c[abrv+'_AP5_1.33km'], e[abrv+'_AP5_1.33km'],facecolor='red', edgecolor='black',alpha = 0.1, label=['Std. Dev.'])     
+#         ax.legend(['OBS', 'AP5_4km', 'AP5_1.33km', 'Std. Dev.'], fontsize=12)
+#         print('Plotted ' + site_nameinfo)
+#         
+# #Calculate Statistics
+#         try:
+#             #Run stats functions
+#             aq_stats_4km = stats(d, abrv+'_AP5_4km', abrv+'_obs')
+#             aq_stats_1p33km = stats(d, abrv+'_AP5_1.33km', abrv+'_obs')
+#             aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
+#         
+#             aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_1.33km', '1.33km ' + site_nameinfo)    
+#             aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
+#    
+#         #Clean up column names
+#             aq_stats.columns = aq_stats.columns.str.replace('1.33km ' + site_nameinfo, '1.33km')    
+#             aq_stats.columns = aq_stats.columns.str.replace('4km ' + site_nameinfo, '4km')     
+#         
+#         #Drop some stats to put on plots
+#             aq_stats = aq_stats.drop('MB',0)        
+#             aq_stats = aq_stats.drop('ME',0)
+#             aq_stats = aq_stats.drop('RMSE',0)
+#             aq_stats = aq_stats.drop('NMB',0)
+#             aq_stats = aq_stats.drop('NME',0)
+# 
+# #            ax.text(0,-0.25, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
+#         
+#         except (ZeroDivisionError):
+#             pass
+#         plt.savefig(inputDir+'/airnow/'+month+'/diurnal_plot/'+abrv+'_'+site_nameinfo+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf',  pad_inches=0.1, bbox_inches='tight')
+# 
+# =============================================================================
 #%%
 # Run the function
 #airnow('OZONE','O3','($ppb$)')
-airnow('PM2.5','PM2.5','($ug/m^3$)')
+#airnow('PM2.5','PM2.5','($ug/m^3$)')
 #airnow('CO','CO','($ppb$)')
 #airnow('NOX','NOX','($ppb$)')
 #airnow('SO2','SO2','($ppb$)')     No SO2 data in airnow v5
