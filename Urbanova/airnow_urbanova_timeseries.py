@@ -28,11 +28,11 @@ print('Start of airnow Analysis')
 
 starttime = time.time()
 day='01'
-month = '04' 
+month = '01' 
 year  = '2018' 
 
 endday = '31'
-endmonth='05'
+endmonth='12'
 endyear='2018'
 
 #end_year=int(endyear)
@@ -53,7 +53,7 @@ air_path = inputDir + 'Urbanova_ref_site_comparison/AIRPACT/'
 # =============================================================================
 
 # Set file paths
-file_modelled_base = inputDir +'/merged.csv'
+file_modelled_base = inputDir +'/airnow/merged_2018_Urb_airnow_forecasts.csv'
 print(file_modelled_base)
 file_airnowsites  = inputDir+ '/aqsid.csv'
 #file_airnowsites  = '/data/lar/projects/Urbanova/2018/2018040400/POST/CCTM/aqsid.csv' # Hard coded as some aqsid files do not include all site ID's, this one does.
@@ -120,18 +120,24 @@ print('AIRNOW data concatenated')
 # Open statistics script
 exec(open(stats_dir +"statistical_functions.py").read()) 
 #%%
-species = ['PM2.5']
+species = ['PM2.5', 'OZONE']
 for pollutant in species:
     if pollutant == 'PM2.5':
         abrv = 'PM2.5'
         unit = '($ug/m^3$)'
+        y_max = 50
+    if pollutant == 'OZONE':
+        abrv = 'O3'
+        unit = '(ppb)'
+        y_max = 60
     print('Running ' + abrv)
     global df_base
     # Read files
     if abrv == 'O3' or abrv == 'PM2.5':
         col_names_modeled = ['date', 'time', 'site_id', 'pollutant', 'concentration']
         col_names_observed= ['datetime', 'site_id', 'O3_AP5_4km', 'PM2.5_AP5_4km', 'O3_obs', 'PM2.5_obs']
-        df_base  = pd.read_csv(file_modelled_base, header=None, names=col_names_modeled, sep='|',dtype='unicode')   #AIRNOW data is seperated by |, thus it has to be specified here
+        #df_base  = pd.read_csv(file_modelled_base, header=None, names=col_names_modeled, sep='|',dtype='unicode')   #AIRNOW data is seperated by |, thus it has to be specified here
+        df_base  = pd.read_csv(file_modelled_base).drop('Unnamed: 0',axis=1) # new method
         df_obs   = pd.read_csv('http://lar.wsu.edu/R_apps/2018ap5/data/hrly2018.csv', sep=',', names=col_names_observed, skiprows=[0],dtype='unicode')
         df_sites = pd.read_csv(file_airnowsites, skiprows=[1],dtype='unicode') # skip 2nd row which is blank
         df_sites.rename(columns={'AQSID':'site_id'}, inplace=True)
@@ -172,34 +178,36 @@ for pollutant in species:
     sites_common = set(df_obs['site_id']).intersection(set(df_base['site_id']))
 
 
-    ## take only the data which is for common sites
-    df_obs_new = pd.DataFrame(columns=df_obs.columns)
-    df_base_new = pd.DataFrame(columns=df_base.columns)
-    for sites in sites_common:
-        #    print sites
-        df1 = df_obs.loc[df_obs['site_id']==sites, df_obs.columns]
-        df3 = df_base.loc[df_base['site_id']==sites, df_base.columns]
-        df_obs_new = pd.concat([df_obs_new, df1], join='outer', ignore_index=True)
-        df_base_new = pd.concat([df_base_new, df3], join='outer', ignore_index=True)
-
-    # merge now
-    df_obs_mod = pd.merge(df_obs_new, df_base_new, on=['datetime', 'site_id'], how='outer')
-
+# =============================================================================
+#     ## take only the data which is for common sites
+#     df_obs_new = pd.DataFrame(columns=df_obs.columns)
+#     df_base_new = pd.DataFrame(columns=df_base.columns)
+#     for sites in sites_common:
+#         #    print sites
+#         df1 = df_obs.loc[df_obs['site_id']==sites, df_obs.columns]
+#         df3 = df_base.loc[df_base['site_id']==sites, df_base.columns]
+#         df_obs_new = pd.concat([df_obs_new, df1], join='outer', ignore_index=True)
+#         df_base_new = pd.concat([df_base_new, df3], join='outer', ignore_index=True)
+# 
+#     # merge now
+#     df_obs_mod = pd.merge(df_obs_new, df_base_new, on=['datetime', 'site_id'], how='outer')
+# =============================================================================
+    df_obs_mod = pd.merge(df_obs,df_base, how='outer')
     # get rid of rows if abrv base is not available
-    df_obs_mod = df_obs_mod[pd.notnull(df_obs_mod[abrv+'_AP5_1.33km'])]
+    #df_obs_mod = df_obs_mod[pd.notnull(df_obs_mod[abrv+'_AP5_1.33km'])]
 
 
 
     df_tseries = df_obs_mod.copy() 
 
 # convert object to numeric (This is required to plot these columns)
-    df_tseries.loc[:,abrv+'_AP5_4km'] = pd.to_numeric(df_tseries.loc[:,abrv+'_AP5_4km'])
-    df_tseries.loc[:,abrv+'_AP5_1.33km'] = pd.to_numeric(df_tseries.loc[:,abrv+'_AP5_1.33km'])
-    df_tseries.loc[:,abrv+'_obs'] = pd.to_numeric(df_tseries.loc[:,abrv+'_obs'])
+    df_tseries[abrv+'_AP5_4km'] = pd.to_numeric(df_tseries[abrv+'_AP5_4km'])
+    df_tseries[abrv+'_AP5_1.33km'] = pd.to_numeric(df_tseries[abrv+'_AP5_1.33km'])
+    df_tseries[abrv+'_obs'] = pd.to_numeric(df_tseries[abrv+'_obs'])
 
-    df_tseries['datetime'] = df_tseries['datetime'].dt.tz_localize('UTC').dt.tz_convert('US/Pacific')
-    print(set(df_tseries['site_id']))
-#%%
+    #df_tseries['datetime'] = df_tseries['datetime'].dt.tz_localize('UTC').dt.tz_convert('US/Pacific')
+    #print(set(df_tseries['site_id']))
+
     # Set plot parameters
     mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
     mpl.rcParams['font.size'] = 20.0
@@ -218,9 +226,27 @@ for pollutant in species:
     g.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
     g = g.drop(0,1)
     #print(df_tseries)
+    
+    if pollutant == 'OZONE':
+        df_tseries = df_tseries.copy().set_index('datetime')
+        df_tseries = df_tseries.resample('H').mean()
+        avg_8hr_o3 = df_tseries.rolling(8,min_periods=6).mean()
+        times = avg_8hr_o3.index.values - pd.Timedelta('8h')
+        avg_8hr_o3.index.values[:] = times
+        
+        avg_8hr_o3['date'] = avg_8hr_o3.index.strftime('%H')
+        intervals = ['00','01','02','03','04','05','06','24'] # remove these hours as per EPA regulation
+        for interval in intervals:
+            avg_8hr_o3 = avg_8hr_o3[~avg_8hr_o3.date.str.contains(interval)]
+            
+        d = avg_8hr_o3.resample('D').max().drop('date',axis=1)
+        
+    if pollutant == 'PM2.5':
+        d = df_tseries.copy().set_index('datetime')
+        d = d.resample('D').mean()
+    
 #Plot
-    d = df_tseries.copy().set_index('datetime')
-    d = d.resample('D').mean()
+
     fig,ax=plt.subplots(1,1, figsize=(12,4))
     d.ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'blue', 'red'], label=['OBS', 'sens', 'base'])
     ax.set_title('Daily Mean '+pollutant)
@@ -228,7 +254,8 @@ for pollutant in species:
     ax.set_ylabel(abrv+' '+unit)
     ax.set_xlabel('PST')        
     ax.legend(['OBS', 'AP5_4km', 'AP5_1.33km'], fontsize=12)
-
+    ax.set_ylim(0,y_max)
+    fig.autofmt_xdate()
 #Calculate Statistics
 # =============================================================================
 #     try:
@@ -279,8 +306,9 @@ for pollutant in species:
     ax.set_xlabel('Observed '+abrv+' '+unit)        
     ax.set_title('Daily ' +pollutant) 
     plt.legend()
-    ax.set_ylim(0,axismax)
+    ax.set_ylim(0,axismax) #axismax
     ax.set_xlim(0,axismax)
+    fig.autofmt_xdate()
    # print(d)
 
 #Calculate Statistics
