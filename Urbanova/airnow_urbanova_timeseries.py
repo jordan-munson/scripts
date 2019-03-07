@@ -120,16 +120,37 @@ print('AIRNOW data concatenated')
 # Open statistics script
 exec(open(stats_dir +"statistical_functions.py").read()) 
 #%%
-species = ['PM2.5', 'OZONE']
+g = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
+g.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
+g = g.drop(0,1)
+
+species = ['PM2.5', 'OZONE','CO','NOX']
 for pollutant in species:
     if pollutant == 'PM2.5':
         abrv = 'PM2.5'
         unit = '($ug/m^3$)'
-        y_max = 50
+        y_max = 30
+        t_title = 'Daily Mean '+pollutant
+        s_title = t_title
     if pollutant == 'OZONE':
         abrv = 'O3'
         unit = '(ppb)'
         y_max = 60
+        t_title = ' O3 Max Daily 8-Hour Average'
+        s_title = t_title
+    if pollutant == 'CO':
+        abrv = 'CO'
+        unit = '(ppb)'
+        y_max = 40
+        t_title = 'CO Max Daily 8-Hour Average'
+        s_title = t_title  
+    if pollutant == 'NOX':
+        abrv = 'NOX'
+        unit = '(ppb)'
+        y_max = 120
+        t_title = 'NOX Max Daily Hour Average'
+        s_title = t_title
+        
     print('Running ' + abrv)
     global df_base
     # Read files
@@ -178,20 +199,6 @@ for pollutant in species:
     sites_common = set(df_obs['site_id']).intersection(set(df_base['site_id']))
 
 
-# =============================================================================
-#     ## take only the data which is for common sites
-#     df_obs_new = pd.DataFrame(columns=df_obs.columns)
-#     df_base_new = pd.DataFrame(columns=df_base.columns)
-#     for sites in sites_common:
-#         #    print sites
-#         df1 = df_obs.loc[df_obs['site_id']==sites, df_obs.columns]
-#         df3 = df_base.loc[df_base['site_id']==sites, df_base.columns]
-#         df_obs_new = pd.concat([df_obs_new, df1], join='outer', ignore_index=True)
-#         df_base_new = pd.concat([df_base_new, df3], join='outer', ignore_index=True)
-# 
-#     # merge now
-#     df_obs_mod = pd.merge(df_obs_new, df_base_new, on=['datetime', 'site_id'], how='outer')
-# =============================================================================
     df_obs_mod = pd.merge(df_obs,df_base, how='outer')
     # get rid of rows if abrv base is not available
     #df_obs_mod = df_obs_mod[pd.notnull(df_obs_mod[abrv+'_AP5_1.33km'])]
@@ -222,12 +229,9 @@ for pollutant in species:
     mpl.rcParams['ytick.direction']   = 'in'
     mpl.rcParams['xtick.direction']   = 'in'
 
-    g = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
-    g.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
-    g = g.drop(0,1)
     #print(df_tseries)
     
-    if pollutant == 'OZONE':
+    if pollutant == 'OZONE' or pollutant == 'CO':
         df_tseries = df_tseries.copy().set_index('datetime')
         df_tseries = df_tseries.resample('H').mean()
         avg_8hr_o3 = df_tseries.rolling(8,min_periods=6).mean()
@@ -245,45 +249,44 @@ for pollutant in species:
         d = df_tseries.copy().set_index('datetime')
         d = d.resample('D').mean()
     
+    if pollutant == 'NOX':
+        d = df_tseries.copy().set_index('datetime')
+        d = avg_8hr_o3.resample('D').max()
+        
+    
 #Plot
 
     fig,ax=plt.subplots(1,1, figsize=(12,4))
     d.ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'blue', 'red'], label=['OBS', 'sens', 'base'])
-    ax.set_title('Daily Mean '+pollutant)
+    ax.set_title(t_title)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
     ax.set_ylabel(abrv+' '+unit)
-    ax.set_xlabel('PST')        
+    ax.set_xlabel('PST')
     ax.legend(['OBS', 'AP5_4km', 'AP5_1.33km'], fontsize=12)
     ax.set_ylim(0,y_max)
     fig.autofmt_xdate()
+    
 #Calculate Statistics
-# =============================================================================
-#     try:
-#         #Run stats functions
-#         aq_stats_4km = stats(d, abrv+'_AP5_4km', abrv+'_obs')
-#         aq_stats_1p33km = stats(d, abrv+'_AP5_1.33km', abrv+'_obs')
-#         aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
-#     
-#         aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_1.33km', '1.33km ' + site_nameinfo)    
-#         aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
-#         g = pd.merge(g, aq_stats, how = 'inner', left_index = True, right_index = True)
-#    
-#     #Clean up column names
-#         aq_stats.columns = aq_stats.columns.str.replace('1.33km ' + site_nameinfo, '1.33km')    
-#         aq_stats.columns = aq_stats.columns.str.replace('4km ' + site_nameinfo, '4km')     
-#     
-#     #Drop some stats to put on plots
-#         aq_stats = aq_stats.drop('MB',0)        
-#         aq_stats = aq_stats.drop('ME',0)
-#         aq_stats = aq_stats.drop('RMSE',0)
-#         aq_stats = aq_stats.drop('NMB',0)
-#         aq_stats = aq_stats.drop('NME',0)
-# 
-# #            ax.text(0,-0.25, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
-#     
-#     except (ZeroDivisionError):
-#         print('No observed data, statistics cannot be calculated')
-# =============================================================================
+    try:
+        #Run stats functions
+        aq_stats_4km = stats(d, abrv+'_AP5_4km', abrv+'_obs')
+        aq_stats_1p33km = stats(d, abrv+'_AP5_1.33km', abrv+'_obs')
+        aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
+        g = pd.merge(g, aq_stats, how = 'inner', left_index = True, right_index = True)
+        print(g)
+     
+    #Drop some stats to put on plots
+#        aq_stats = aq_stats.drop('MB',0)        
+#        aq_stats = aq_stats.drop('ME',0)
+#        aq_stats = aq_stats.drop('RMSE',0)
+#        aq_stats = aq_stats.drop('NMB',0)
+#        aq_stats = aq_stats.drop('NME',0)
+
+#            ax.text(0,-0.25, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
+    
+    except (ZeroDivisionError):
+        print('No observed data, statistics cannot be calculated')
+    
     plt.show()
     plt.savefig(inputDir +'/airnow/timeseries_plot/daily_'+abrv+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf', pad_inches=0.1, bbox_inches='tight')
     g.to_csv(inputDir +'/airnow/airnow_'+abrv+'_stats.csv')
@@ -292,10 +295,10 @@ for pollutant in species:
     
 # Scatter plots
     fig,ax=plt.subplots(1,1, figsize=(8,8))
-    d = df_tseries.copy()
-    d=d.set_index('datetime')
-    d = d.resample('D').mean()
-    d=d.groupby(d.index.hour).rolling('24H').mean().ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']]
+    #d = df_tseries.copy()
+    #d=d.set_index('datetime')
+    #d = d.resample('D').mean()
+    #d=d.groupby(d.index.hour).rolling('24H').mean().ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']]
     ax.scatter(d[abrv+'_obs'], d[abrv+'_AP5_4km'], c='b', label = '4km',linewidths=None, alpha=0.8)
     ax.scatter(d[abrv+'_obs'], d[abrv+'_AP5_1.33km'], c='r', marker='s', label = '1.33km',linewidths=None,alpha=0.8)        
     axismax = max(max(d[abrv+'_AP5_4km']),max(d[abrv+'_AP5_1.33km']))
@@ -304,7 +307,7 @@ for pollutant in species:
     plt.axis('equal')
     ax.set_ylabel('Modeled '+abrv+' '+unit)
     ax.set_xlabel('Observed '+abrv+' '+unit)        
-    ax.set_title('Daily ' +pollutant) 
+    ax.set_title(s_title) 
     plt.legend()
     ax.set_ylim(0,axismax) #axismax
     ax.set_xlim(0,axismax)
