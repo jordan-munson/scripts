@@ -31,9 +31,9 @@ endyear='2018'
 # =============================================================================
 
 #Set directory
-inputDir = r'G:/Research/AIRPACT_eval/'
-stat_path = r'G:/Research/scripts/Urbanova/statistical_functions.py'
-ben_path = r'G:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
+inputDir = r'E:/Research/AIRPACT_eval/'
+stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
+ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
 
 exec(open(stat_path).read())
 

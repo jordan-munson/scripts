@@ -124,7 +124,7 @@ g = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 g.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 g = g.drop(0,1)
 
-species = ['PM2.5', 'OZONE','CO','NOX']
+species = ['PM2.5', 'OZONE','CO','NO2']
 for pollutant in species:
     if pollutant == 'PM2.5':
         abrv = 'PM2.5'
@@ -141,14 +141,14 @@ for pollutant in species:
     if pollutant == 'CO':
         abrv = 'CO'
         unit = '(ppb)'
-        y_max = 40
+        y_max = 500
         t_title = 'CO Max Daily 8-Hour Average'
         s_title = t_title  
-    if pollutant == 'NOX':
-        abrv = 'NOX'
+    if pollutant == 'NO2':
+        abrv = 'NO2'
         unit = '(ppb)'
-        y_max = 120
-        t_title = 'NOX Max Daily Hour Average'
+        y_max = 200
+        t_title = 'NO2 Max Daily Hour Average'
         s_title = t_title
         
     print('Running ' + abrv)
@@ -163,11 +163,12 @@ for pollutant in species:
         df_sites = pd.read_csv(file_airnowsites, skiprows=[1],dtype='unicode') # skip 2nd row which is blank
         df_sites.rename(columns={'AQSID':'site_id'}, inplace=True)
         print('O3/PM2.5 files read')
-    elif abrv == 'CO' or abrv == 'NOX':
+    elif abrv == 'CO' or abrv == 'NO2':
         col_names_modeled = ['date', 'time', 'site_id', 'pollutant', 'concentration']
-        col_names_observed= ['datetime', 'site_id', 'CO_AP5_4km', 'NOX_AP5_4km', 'CO_obs', 'NOX_obs']
-        df_base   = pd.read_csv(file_modelled_base, header=None, names=col_names_modeled, sep='|',dtype='unicode')   #AIRNOW data is seperated by |, thus it has to be specified here
-        df_obs   = pd.read_csv('http://lar.wsu.edu/R_apps/2018ap5/data/hrly2018_conox.csv', sep=',', names=col_names_observed, skiprows=[0],dtype='unicode')
+        col_names_observed= ['datetime', 'site_id','CO_AP5_4km', 'NOX_AP5_4km','NO_AP5_4km', 'NO2_AP5_4km','CO_obs', 'NOX_obs','NO_obs','NO2_obs']
+        #df_base   = pd.read_csv(file_modelled_base, header=None, names=col_names_modeled, sep='|',dtype='unicode')   #AIRNOW data is seperated by |, thus it has to be specified here
+        df_base  = pd.read_csv(file_modelled_base).drop('Unnamed: 0',axis=1) # new method
+        df_obs   = pd.read_csv('http://lar.wsu.edu/R_apps/2018ap5/data/hrly2018_conoxnono2.csv', sep=',', names=col_names_observed, skiprows=[0],dtype='unicode')
         df_sites = pd.read_csv(file_airnowsites, skiprows=[1],dtype='unicode') # skip 2nd row which is blank
         df_sites.rename(columns={'AQSID':'site_id'}, inplace=True)
         print('CO/NOX files read')  
@@ -211,7 +212,7 @@ for pollutant in species:
     df_tseries[abrv+'_AP5_4km'] = pd.to_numeric(df_tseries[abrv+'_AP5_4km'])
     df_tseries[abrv+'_AP5_1.33km'] = pd.to_numeric(df_tseries[abrv+'_AP5_1.33km'])
     df_tseries[abrv+'_obs'] = pd.to_numeric(df_tseries[abrv+'_obs'])
-
+    print(max(df_tseries[abrv+'_AP5_4km']))
     #df_tseries['datetime'] = df_tseries['datetime'].dt.tz_localize('UTC').dt.tz_convert('US/Pacific')
     #print(set(df_tseries['site_id']))
 
@@ -249,9 +250,9 @@ for pollutant in species:
         d = df_tseries.copy().set_index('datetime')
         d = d.resample('D').mean()
     
-    if pollutant == 'NOX':
+    if pollutant == 'NO2':
         d = df_tseries.copy().set_index('datetime')
-        d = avg_8hr_o3.resample('D').max()
+        d = d.resample('D').max()
         
     
 #Plot
@@ -264,6 +265,7 @@ for pollutant in species:
     ax.set_xlabel('PST')
     ax.legend(['OBS', 'AP5_4km', 'AP5_1.33km'], fontsize=12)
     ax.set_ylim(0,y_max)
+    ax.yaxis.grid(True) # horizontal lines
     fig.autofmt_xdate()
     
 #Calculate Statistics
