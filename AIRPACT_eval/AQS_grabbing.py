@@ -11,7 +11,6 @@ import pandas as pd
 import time
 #Set state
 
-
 # =============================================================================
 # species = ['o3','pm_FRM/FEM','pm_non_FRM/FEM'] # when changing bacl, don't forget to rename the save file line
 # species_code = ['44201','88101','88502']
@@ -22,7 +21,7 @@ species_code = ['WIND','TEMP','PRESS','RH_DP']
 
 def aqs(state,ac):
     AQS={}
-    for i in range(0,3):
+    for i in range(0,4):
         print(species[i])
         for j in range(2009,2019):
             dataframename = species[i]+ac+str(j)
@@ -40,12 +39,11 @@ def aqs(state,ac):
     AQS_df = AQS_df.drop(['Parameter Code','POC','Datum','Date GMT','Time GMT','MDL','Uncertainty',
                           'Qualifier','Method Type','Method Code','Method Name','Date of Last Change'], axis=1)
    
-    
     AQS_df.to_csv(r'E:/Research/AIRPACT_eval/AQS_data/'+state+'_aqs_met.csv')
     print(state + ' Done')
 
-aqs('Washington','_WA')
-aqs('Oregon','_OR')
+#aqs('Washington','_WA')
+#aqs('Oregon','_OR')
 aqs('Idaho','_ID')
 aqs('Montana','_MT')
 aqs('California','_CA')

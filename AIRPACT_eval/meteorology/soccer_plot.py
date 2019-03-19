@@ -94,7 +94,7 @@ ax.set(title='AIRPACT 2009 - 2018',xlabel='MB',ylabel=' ME')
 #colors[df_stats["station ID"]=='RURAL'] = 'b'
 colors = ['r','g','b']
 
-ax.scatter(df_temp['MB'],df_temp['ME'],c=colors, marker = 'o',label='Temperature')
+ax.scatter(df_temp['MB'],df_temp['ME'],c=colors, marker = 'o',label='Temp')
 #ax.scatter(df_pres['MB'],df_pres['ME'],c=colors, marker = '*',label = 'Pressure')
 #ax.scatter(df_rh['MB'],df_rh['ME'],c=colors, marker = '^', label = 'RH')
 ax.scatter(df_ws['MB'],df_ws['ME'],c=colors, marker = 'D', label = 'WS')
@@ -165,7 +165,7 @@ ax.set(title='AIRPACT 2009 - 2018',xlabel='NMB (%)',ylabel='NME (%)')
 #colors[df_stats["station ID"]=='RURAL'] = 'b'
 colors = ['r','g','b']
 
-ax.scatter(df_temp['NMB [%]'],df_temp['NME [%]'],c=colors, marker = 'o',label='Temperature')
+ax.scatter(df_temp['NMB [%]'],df_temp['NME [%]'],c=colors, marker = 'o',label='Temp')
 ax.scatter(df_pres['NMB [%]'],df_pres['NME [%]'],c=colors, marker = '*',label = 'Pressure')
 ax.scatter(df_rh['NMB [%]'],df_rh['NME [%]'],c=colors, marker = '^', label = 'RH')
 ax.scatter(df_ws['NMB [%]'],df_ws['NME [%]'],c=colors, marker = 'D', label = 'WS')
@@ -251,7 +251,7 @@ ax.set(title='AIRPACT Versions',xlabel='NMB (%)',ylabel='NME (%)')
 #colors[df_stats["station ID"]=='RURAL'] = 'b'
 colors = ['r','g','b']
 
-ax.scatter(df_temp['NMB [%]'],df_temp['NME [%]'],c=colors, marker = 'o',label='Temperature')
+ax.scatter(df_temp['NMB [%]'],df_temp['NME [%]'],c=colors, marker = 'o',label='Temp')
 ax.scatter(df_pres['NMB [%]'],df_pres['NME [%]'],c=colors, marker = '*',label = 'Pressure')
 ax.scatter(df_rh['NMB [%]'],df_rh['NME [%]'],c=colors, marker = '^', label = 'RH')
 ax.scatter(df_ws['NMB [%]'],df_ws['NME [%]'],c=colors, marker = 'D', label = 'WS')
@@ -314,8 +314,8 @@ def soccer(x,y,axismax,size1,size2,temp,press,rh,ws,wd):    # x and y are stats 
     colors = ['r','g','b']
     
     if temp == 'yes':
-        ax.scatter(df_temp[x],df_temp[y],c=colors, marker = 'o',label='Temperature')
-        name='Temperature'
+        ax.scatter(df_temp[x],df_temp[y],c=colors, marker = 'o',label='Temp')
+        name='Temp'
     if press == 'yes':
         ax.scatter(df_pres[x],df_pres[y],c=colors, marker = '*',label = 'Pressure')
         name='Pressure'
@@ -331,7 +331,7 @@ def soccer(x,y,axismax,size1,size2,temp,press,rh,ws,wd):    # x and y are stats 
     if temp and ws and rh == 'yes':
         name = 'combined'
     # Label plot
-    ax.set(title='AIRPACT '+name,xlabel=x,ylabel=y)
+    ax.set(title='Hourly Meteorology',xlabel=x,ylabel=y)
     
     # Place textbox of color legend
     props = dict(boxstyle='square', facecolor='white', alpha=0.0)
@@ -353,11 +353,11 @@ def soccer(x,y,axismax,size1,size2,temp,press,rh,ws,wd):    # x and y are stats 
     fig.savefig(outputdir+'/' +name+ 'airpact_versions.png' ,bbox_inches='tight')
     
 #soccer('NMB [%]','NME [%]',10,15)
-soccer('MB','ME',1.5,0.5,0.5,'yes','no','no','no','no') # Temp
+#soccer('MB','ME',1.5,0.5,0.5,'yes','no','no','no','no') # Temp
 #soccer('MB','ME',1.5,0.5,1,'no','yes','no','no','no') # press
-soccer('MB','ME',1.5,1,1,'no','no','yes','no','no') # rh
-soccer('MB','ME',1.5,0.5,.5,'no','no','no','yes','no') # ws
-soccer('MB','ME',12,10,10,'no','no','no','no','yes') # wd
+#soccer('MB','ME',1.5,1,1,'no','no','yes','no','no') # rh
+#soccer('MB','ME',1.5,0.5,.5,'no','no','no','yes','no') # ws
+#soccer('MB','ME',12,10,10,'no','no','no','no','yes') # wd
 
 soccer('MB','ME',1.5,1,0.5,'yes','no','yes','yes','no') # temp,ws,rh
     

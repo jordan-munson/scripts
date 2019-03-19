@@ -203,8 +203,7 @@ for pollutant in species:
     df_obs_mod = pd.merge(df_obs,df_base, how='outer')
     # get rid of rows if abrv base is not available
     #df_obs_mod = df_obs_mod[pd.notnull(df_obs_mod[abrv+'_AP5_1.33km'])]
-
-
+    
 
     df_tseries = df_obs_mod.copy() 
 
@@ -215,6 +214,8 @@ for pollutant in species:
     print(max(df_tseries[abrv+'_AP5_4km']))
     #df_tseries['datetime'] = df_tseries['datetime'].dt.tz_localize('UTC').dt.tz_convert('US/Pacific')
     #print(set(df_tseries['site_id']))
+
+    df_tseries = df_tseries.dropna(subset = ['pollutant'])
 
     # Set plot parameters
     mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text

@@ -504,7 +504,7 @@ pollutant = ['O3','PM2.5']
 for species in pollutant:
     da = df_com.copy().dropna(subset=['Location Setting'])
     fig = plt.figure(figsize=(14,16))
-    fig.suptitle('Monthly Averaged '+str(species),y=0.94,fontsize=27,ha='center') # title
+    #fig.suptitle('Monthly Averaged '+str(species),y=0.94,fontsize=27,ha='center') # title
     fig.tight_layout() # spaces the plots out a bit
     
     for setting,i in zip(settings,[1,2,3]):    #list(set(da['Location Setting'])):
@@ -562,7 +562,7 @@ for species in pollutant:
         plt.grid(True)    # Add grid lines to make graph interpretation easier
         
         #text_height = 0.061
-        text_height = 0.05
+        text_height = 0.009 # 0.005 almost works
         x1 = 0.429
         x2 = 0.689
         x3 = 0.95
@@ -580,14 +580,14 @@ for species in pollutant:
             #ax.annotate('AP5',xy=(0.55,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.68,text_height),va='center',color='red',size='x-small') # Left Arrow AP5
             #ax.annotate('AP5',xy=(0.82,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.68,text_height),va='center',color='red',size='x-small') # Right Arrow AP5
         
-            ax.annotate('AP3',xy=(0.07,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Left Arrow AP3 # previous height of 0.061 for the xytext
-            ax.annotate('AP3',xy=(x1,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Right Arrow AP3
+            ax.annotate('AP3',xy=(0.07,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Left Arrow AP3 # previous height of 0.061 for the xytext
+            ax.annotate('AP3',xy=(x1,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Right Arrow AP3
             
-            ax.annotate('AP4',xy=(x1,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Left Arrow AP4
-            ax.annotate('AP4',xy=(x2,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Right Arrow AP4
+            ax.annotate('AP4',xy=(x1,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Left Arrow AP4
+            ax.annotate('AP4',xy=(x2,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Right Arrow AP4
     
-            ax.annotate('AP5',xy=(x2,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Left Arrow AP5
-            ax.annotate('AP5',xy=(x3,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Right Arrow AP5
+            ax.annotate('AP5',xy=(x2,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Left Arrow AP5
+            ax.annotate('AP5',xy=(x3,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Right Arrow AP5
         
 # =============================================================================
 #         # Add significant event annotations to plots
@@ -603,8 +603,16 @@ for species in pollutant:
 # =============================================================================
 
         #ax.text(1.01, 0.4,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes)  
-        ax.text(0.98, 0.92,'# of Observation sites '+str(temp1),fontsize = 20, ha='right', va='center', transform=ax.transAxes)  
-
+        ax.text(0.98, 0.92,'# of Observation sites '+str(temp1),fontsize = 20, ha='right', va='center', transform=ax.transAxes) 
+                
+        letter_horz = 0.99
+        if i == 1:
+            ax.text(letter_horz, 0.5,'A'+str(temp1),fontsize = 20, ha='right', va='center', transform=ax.transAxes)  
+        if i == 2:
+            ax.text(letter_horz, 0.5,'B'+str(temp1),fontsize = 20, ha='right', va='center', transform=ax.transAxes)          
+        if i == 3:
+            ax.text(letter_horz, 0.5,'C'+str(temp1),fontsize = 20, ha='right', va='center', transform=ax.transAxes)  
+        plt.subplots_adjust(bottom=0.01,top=0.95)
         #Calculate Statistics
         try:
             #Run stats functions

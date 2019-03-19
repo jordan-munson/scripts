@@ -10,7 +10,7 @@ Created on Thu Jul 5 16:11:19 2018
 ##########     IMPORT MODULES     ##########
 ############################################
 import matplotlib
-matplotlib.use('Agg')  # Uncomment this when using in Kamiak/Aeolus
+#matplotlib.use('Agg')  # Uncomment this when using in Kamiak/Aeolus
 import pandas as pd
 import numpy as np
 #import time
@@ -23,7 +23,7 @@ import Met_functions_for_Ben as met
 from convert_MW_date import MWdate_to_datetime
 #import wrf
 import matplotlib.pyplot as plt
-from MesoPy import Meso
+#from MesoPy import Meso
 from matplotlib import dates
 import time
 import matplotlib.dates as mdates
@@ -33,7 +33,7 @@ import matplotlib as mpl
  # Set a directory containing python scripts
 #base_dir = "/data/lar/users/jmunson/longterm_airpact/"
 base_dir = r'E:\Research\AIRPACT_eval\meteorology/'
-
+aqs_dir = r'E:/Research/AIRPACT_eval/AQS_data/'
 # set a directory to save output files
 outputdir = base_dir + 'AQS_plots/'
 
@@ -111,14 +111,14 @@ del([df1,df2,df3,df4,df5,df6,df7,df8,df9])
 # Read AQS data. csv's created from 'AQS_grabbing.py' script, and the model data from the previous lines of code
 ##############################################################################
 # Read AQS data
-df_wa = pd.read_csv(base_dir + 'AQS_data/Washington_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_or = pd.read_csv(base_dir + 'AQS_data/Oregon_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_id = pd.read_csv(base_dir + 'AQS_data/Idaho_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-#df_cc = pd.read_csv(inputDir + 'Canada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_mt = pd.read_csv(base_dir + 'AQS_data/Montana_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_ca = pd.read_csv(base_dir + 'AQS_data/California_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_nv = pd.read_csv(base_dir + 'AQS_data/Nevada_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_ut = pd.read_csv(base_dir + 'AQS_data/Utah_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_wa = pd.read_csv(aqs_dir + 'AQS_data/Washington_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_or = pd.read_csv(aqs_dir + 'AQS_data/Oregon_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_id = pd.read_csv(aqs_dir + 'AQS_data/Idaho_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+#df_cc = pd.read_csv(aqs_dir + 'Canada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_mt = pd.read_csv(aqs_dir + 'AQS_data/Montana_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_ca = pd.read_csv(aqs_dir + 'AQS_data/California_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_nv = pd.read_csv(aqs_dir + 'AQS_data/Nevada_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+df_ut = pd.read_csv(aqs_dir + 'AQS_data/Utah_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 
 #df_wa_winds = pd.read_csv(base_dir + 'AQS_data/Washington_met_aqs_winds.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
 #df_or_winds = pd.read_csv(base_dir + 'AQS_data/Oregon_met_aqs_winds.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
@@ -139,20 +139,22 @@ df_obs['AQS_ID'] = (df_obs['State Code']).astype(str) + (df_obs['County Code']).
 df_obs = df_obs.drop(['Unnamed: 0','Unnamed: 1','State Name','County Name','State Code','County Code','Site Num','Units of Measure','Latitude','Longitude'],axis=1)
 df_obs = df_obs.rename(columns={'Date Local_Time Local': 'datetime','Parameter Name':'Parameter_Name'})
 
-#Create AQSID Column form state code, county code, and site num
-aqsid = pd.read_csv(r'E:\Research\AIRPACT_eval/aqs_sites.csv')
-aqsid = aqsid.ix[:,['State Code','County Code','Site Number','Local Site Name','Location Setting']]
-
-aqsid['County Code'] = ["%03d" % n for n in aqsid['County Code'] ]
-aqsid['Site Number'] = ["%04d" % n for n in aqsid['Site Number'] ]
-
-aqsid['AQS_ID'] = (aqsid['State Code']).astype(str) + (aqsid['County Code']).astype(str)+(aqsid['Site Number']).astype(str)
-
-# Must force every cell in AQSID to be a string, otherwise lose most of data
-aqsid['AQS_ID'] = aqsid['AQS_ID'].astype(str)
+# =============================================================================
+# #Create AQSID Column form state code, county code, and site num
+# aqsid = pd.read_csv(r'E:\Research\AIRPACT_eval/aqs_sites.csv')
+# aqsid = aqsid.ix[:,['State Code','County Code','Site Number','Local Site Name','Location Setting']]
+# 
+# aqsid['County Code'] = ["%03d" % n for n in aqsid['County Code'] ]
+# aqsid['Site Number'] = ["%04d" % n for n in aqsid['Site Number'] ]
+# 
+# aqsid['AQS_ID'] = (aqsid['State Code']).astype(str) + (aqsid['County Code']).astype(str)+(aqsid['Site Number']).astype(str)
+# 
+# # Must force every cell in AQSID to be a string, otherwise lose most of data
+# aqsid['AQS_ID'] = aqsid['AQS_ID'].astype(str)
+# =============================================================================
 df_obs['AQS_ID'] = df_obs['AQS_ID'].astype(str)
 
-df_obs = pd.merge(df_obs,aqsid) # Merge df_mod and aqsid so as to add names and such to the datafram
+#df_obs = pd.merge(df_obs,aqsid) # Merge df_mod and aqsid so as to add names and such to the datafram
 df_obs = df_obs.drop(['State Code','County Code','Site Number'], axis=1)
 print('Observed data read and combined')
 
@@ -172,14 +174,16 @@ df_obs = pd.merge(df_obs,df_obs1,how='outer')
 #df_com = pd.merge(df_obs, df_airpact, how='outer')
 
 
-# Create list of AQS_ID to run the for loop
-aqsid['AQS_ID']=aqsid['AQS_ID'].astype(str)
-site_list1= aqsid.loc[(aqsid['State Code'] == '16')]
-site_list2= aqsid.loc[(aqsid['State Code'] == '53')]
-site_list3= aqsid.loc[(aqsid['State Code'] == '41')]
-site_list=pd.concat([site_list1,site_list2,site_list3])
-site_list = site_list['AQS_ID'].tolist()
-stations = site_list
+# =============================================================================
+# # Create list of AQS_ID to run the for loop
+# aqsid['AQS_ID']=aqsid['AQS_ID'].astype(str)
+# site_list1= aqsid.loc[(aqsid['State Code'] == '16')]
+# site_list2= aqsid.loc[(aqsid['State Code'] == '53')]
+# site_list3= aqsid.loc[(aqsid['State Code'] == '41')]
+# site_list=pd.concat([site_list1,site_list2,site_list3])
+# site_list = site_list['AQS_ID'].tolist()
+# stations = site_list
+# =============================================================================
 
 setting = ['URBAN AND CENTER CITY','SUBURBAN','RURAL']
 # Save the data so that this process does not have to be done over and over again
@@ -541,9 +545,11 @@ for i in stations:
 
 print('plots complete')    
 '''
-df_airpact = df_airpact.drop(['lat','lon'],axis=1)
-df_airpact = pd.merge(df_airpact,aqsid).drop(['State Code','County Code','Site Number','Local Site Name'],axis=1)
-del(aqsid)
+# =============================================================================
+# df_airpact = df_airpact.drop(['lat','lon'],axis=1)
+# df_airpact = pd.merge(df_airpact,aqsid).drop(['State Code','County Code','Site Number','Local Site Name'],axis=1)
+# =============================================================================
+#del(aqsid)
 #%%
 # =============================================================================
 # stats_all = pd.DataFrame() # statistics for each station

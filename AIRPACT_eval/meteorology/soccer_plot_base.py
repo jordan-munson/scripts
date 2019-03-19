@@ -11,8 +11,8 @@ import matplotlib.patches as patches
 import numpy as np
 
 # Set directories
-inputdir = r'E:/Research/AIRPACT_eval/meteorology/'
-outputdir = r'E:/Research/AIRPACT_eval/meteorology/AQS_plots/soccer_plots'
+inputdir = r'G:/Research/AIRPACT_eval/meteorology/'
+outputdir = r'G:/Research/AIRPACT_eval/meteorology/AQS_plots/soccer_plots'
 
 #Load data
 #df_airpact = pd.read_csv(inputdir+'df_airpact.csv').drop(['Unnamed: 0','lat','lon'],axis=1)

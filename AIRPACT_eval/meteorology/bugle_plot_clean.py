@@ -17,7 +17,7 @@ inputdir = r'G:/Research/AIRPACT_eval/stats/'
 outputdir = r'G:/Research/AIRPACT_eval/plots/bugle'
 
 #Load data
-df_stats = pd.read_csv(inputdir+'aqs_version_stats.csv').drop(['Unnamed: 0'],axis=1)
+df_stats = pd.read_csv(inputdir+'aqs_version_stats_20190206.csv')#.drop(['Unnamed: 0'],axis=1)
 
 # Seperate types
 df_o3 = df_stats.loc[df_stats['index']=='O3_mod']
@@ -50,7 +50,7 @@ plt.ylim((-100,100))
 plt.xlim((0,10))
 
 # Label plot
-ax.set(title='PM_2.5 per AIRPACT Version',xlabel='Mean',ylabel='FB [%]')
+ax.set(title='PM$_{2.5}$ per AIRPACT Version',xlabel='Mean',ylabel='FB [%]')
 
 # Add color to the plot, colors signifying which site type
 colors = ['r','g','b']
@@ -80,7 +80,7 @@ plt.grid(b=None, which='major', axis='y')
 def graph(func, x_range,color):
    x = np.arange(*x_range)
    y = func(x)
-   plt.plot(x, y,color = color,alpha =0.7)
+   plt.plot(x, y,color = color,alpha =0.7,ls='-.')
 
 # Criteria lines
 graph(lambda x: 70*(np.power(0.3, x))+60, (0,11),'red') # Top
@@ -98,10 +98,10 @@ fig, ax = plt.subplots(figsize=figsize)
 
 # Set axis so that the plot resembles a soccer plot
 plt.ylim((-100,100))
-plt.xlim((20,60))
+plt.xlim((0,60))
 
 # Label plot
-ax.set(title='8-Hour Max Ozone Bugle',xlabel='Mean',ylabel='FB (%)')
+ax.set(title='Ozone per AIRPACT Version',xlabel='Mean',ylabel='FB (%)')
 
 # Add color to the plot, colors signifying which site type
 colors = ['r','g','b']
@@ -133,7 +133,7 @@ plt.grid(b=None, which='major', axis='y')
 def graph(func, x_range,color):
    x = np.arange(*x_range)
    y = func(x)
-   plt.plot(x, y,color = color,alpha =0.7)
+   plt.plot(x, y,color = color,alpha =0.7,ls='-.')
 
 line_lim = 70
 # Criteria lines
