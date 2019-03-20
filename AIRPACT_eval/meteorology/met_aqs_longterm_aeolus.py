@@ -33,7 +33,7 @@ import matplotlib as mpl
  # Set a directory containing python scripts
 #base_dir = "/data/lar/users/jmunson/longterm_airpact/"
 base_dir = r'E:\Research\AIRPACT_eval\meteorology/'
-aqs_dir = r'E:/Research/AIRPACT_eval/AQS_data/'
+aqs_dir = r'E:/Research/AIRPACT_eval/'
 # set a directory to save output files
 outputdir = base_dir + 'AQS_plots/'
 
@@ -45,40 +45,7 @@ datadir = r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\AIRPACT\201
 exec(open(r'E:\Research\scripts/AIRPACT_eval\meteorology/' +"Met_functions_for_Ben.py").read())
 #print(base_dir +"Met_functions_for_Ben.py")
 
-#df1 = pd.read_csv('airpact_met_200951_2012102.csv').drop(['Unnamed: 0'],axis=1)
-#df2 = pd.read_csv('airpact_met_2012102_2016113.csv').drop(['Unnamed: 0'],axis=1)
-#df3 = pd.read_csv('airpact_met_2016114_20161210.csv').drop(['Unnamed: 0'],axis=1)
-#df4 = pd.read_csv('airpact_met_20161210_201871.csv').drop(['Unnamed: 0'],axis=1)
-
-# The old df2 uses a 95x95 grid so will not work when combined. The grid cells will be off.
-
-# Read the met data
-df1 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_200951_2010818.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
-df2 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_201091_20121020.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
-df3 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_20121021_2013326.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
-df4 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_2013326_201471.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
-df5 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_201511_2016112.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
-df6 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_2016113_201711.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
-df7 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_201712_2017531.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
-df8 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_201761_201811.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
-df9 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_201812_2018814.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
-
-print('Met data read')
-
-# Combine the met data
-df_airpact = pd.concat([df1,df2,df3,df4,df5,df6,df7,df8,df9])
-
-#df_airpact = pd.merge(df1,df2)
-
-#df_list = [df1,df2,df3,df4]
-
-#df_airpact = pd.concat(df_list)
-df_airpact['DateTime'] = pd.to_datetime(df_airpact['DateTime'])
-df_airpact['AQS_ID'] = df_airpact['AQS_ID'].astype(str)
-print('Data concatenated')
-
-#exec(open(base_dir + "/airpact_functions.py").read())
-
+# set time
 start_year = 2009    #2009
 start_month = 5    #5
 start_day = 1    #1
@@ -105,41 +72,73 @@ tot_hours = time_diff.days*24 #+ time_diff.seconds/3600
 #print(tot_hours)
 date_diff_final = date_diff
 print(date_diff)
-del([df1,df2,df3,df4,df5,df6,df7,df8,df9])
-
-##############################################################################
-# Read AQS data. csv's created from 'AQS_grabbing.py' script, and the model data from the previous lines of code
-##############################################################################
-# Read AQS data
-df_wa = pd.read_csv(aqs_dir + 'AQS_data/Washington_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_or = pd.read_csv(aqs_dir + 'AQS_data/Oregon_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_id = pd.read_csv(aqs_dir + 'AQS_data/Idaho_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-#df_cc = pd.read_csv(aqs_dir + 'Canada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_mt = pd.read_csv(aqs_dir + 'AQS_data/Montana_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_ca = pd.read_csv(aqs_dir + 'AQS_data/California_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_nv = pd.read_csv(aqs_dir + 'AQS_data/Nevada_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_ut = pd.read_csv(aqs_dir + 'AQS_data/Utah_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-
-#df_wa_winds = pd.read_csv(base_dir + 'AQS_data/Washington_met_aqs_winds.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-#df_or_winds = pd.read_csv(base_dir + 'AQS_data/Oregon_met_aqs_winds.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-#df_id_winds = pd.read_csv(base_dir + 'AQS_data/Idaho_met_aqs_winds.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-
-#  Combine AQS data
-df_list = [df_wa,df_or,df_id,df_mt,df_ca,df_nv,df_ut]
-df_obs = pd.concat(df_list)
-
-
-#Create AQSID Column form state code, county code, and site num
-df_obs['County Code'] = ["%03d" % n for n in df_obs['County Code'] ]
-df_obs['Site Num'] = ["%04d" % n for n in df_obs['Site Num'] ]
-
-df_obs['AQS_ID'] = (df_obs['State Code']).astype(str) + (df_obs['County Code']).astype(str)+(df_obs['Site Num']).astype(str)
-
-# Drop columns of data we are not looking at so as to increase the speed of the script
-df_obs = df_obs.drop(['Unnamed: 0','Unnamed: 1','State Name','County Name','State Code','County Code','Site Num','Units of Measure','Latitude','Longitude'],axis=1)
-df_obs = df_obs.rename(columns={'Date Local_Time Local': 'datetime','Parameter Name':'Parameter_Name'})
-
 # =============================================================================
+# 
+# #df1 = pd.read_csv('airpact_met_200951_2012102.csv').drop(['Unnamed: 0'],axis=1)
+# #df2 = pd.read_csv('airpact_met_2012102_2016113.csv').drop(['Unnamed: 0'],axis=1)
+# #df3 = pd.read_csv('airpact_met_2016114_20161210.csv').drop(['Unnamed: 0'],axis=1)
+# #df4 = pd.read_csv('airpact_met_20161210_201871.csv').drop(['Unnamed: 0'],axis=1)
+# 
+# # The old df2 uses a 95x95 grid so will not work when combined. The grid cells will be off.
+# 
+# # Read the met data
+# df1 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_200951_2010818.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
+# df2 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_201091_20121020.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
+# df3 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_20121021_2013326.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
+# df4 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_2013326_201471.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
+# df5 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_201511_2016112.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
+# df6 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_2016113_201711.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
+# df7 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_201712_2017531.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
+# df8 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_201761_201811.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
+# df9 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_201812_2018814.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
+# 
+# print('Met data read')
+# 
+# # Combine the met data
+# df_airpact = pd.concat([df1,df2,df3,df4,df5,df6,df7,df8,df9])
+# 
+# df_airpact['DateTime'] = pd.to_datetime(df_airpact['DateTime'])
+# df_airpact['AQS_ID'] = df_airpact['AQS_ID'].astype(str)
+# 
+# print('df_airpact data concatenated')
+# 
+# #exec(open(base_dir + "/airpact_functions.py").read())
+# 
+# 
+# del([df1,df2,df3,df4,df5,df6,df7,df8,df9])
+# 
+# ##############################################################################
+# # Read AQS data. csv's created from 'AQS_grabbing.py' script, and the model data from the previous lines of code
+# ##############################################################################
+# # Read AQS data
+# df_wa = pd.read_csv(aqs_dir + 'AQS_data/Washington_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# df_or = pd.read_csv(aqs_dir + 'AQS_data/Oregon_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# df_id = pd.read_csv(aqs_dir + 'AQS_data/Idaho_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# #df_cc = pd.read_csv(aqs_dir + 'Canada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# df_mt = pd.read_csv(aqs_dir + 'AQS_data/Montana_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# df_ca = pd.read_csv(aqs_dir + 'AQS_data/California_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# df_nv = pd.read_csv(aqs_dir + 'AQS_data/Nevada_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# df_ut = pd.read_csv(aqs_dir + 'AQS_data/Utah_aqs_met.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# 
+# #df_wa_winds = pd.read_csv(base_dir + 'AQS_data/Washington_met_aqs_winds.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# #df_or_winds = pd.read_csv(base_dir + 'AQS_data/Oregon_met_aqs_winds.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# #df_id_winds = pd.read_csv(base_dir + 'AQS_data/Idaho_met_aqs_winds.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# 
+# #  Combine AQS data
+# df_list = [df_wa,df_or,df_id,df_mt,df_ca,df_nv,df_ut]
+# df_obs = pd.concat(df_list)
+# 
+# 
+# #Create AQSID Column form state code, county code, and site num
+# df_obs['County Code'] = ["%03d" % n for n in df_obs['County Code'] ]
+# df_obs['Site Num'] = ["%04d" % n for n in df_obs['Site Num'] ]
+# 
+# df_obs['AQS_ID'] = (df_obs['State Code']).astype(str) + (df_obs['County Code']).astype(str)+(df_obs['Site Num']).astype(str)
+# 
+# # Drop columns of data we are not looking at so as to increase the speed of the script
+# df_obs = df_obs.drop(['Unnamed: 0','Unnamed: 1','State Name','County Name','State Code','County Code','Site Num','Units of Measure','Latitude','Longitude'],axis=1)
+# df_obs = df_obs.rename(columns={'Date Local_Time Local': 'datetime','Parameter Name':'Parameter_Name'})
+# 
 # #Create AQSID Column form state code, county code, and site num
 # aqsid = pd.read_csv(r'E:\Research\AIRPACT_eval/aqs_sites.csv')
 # aqsid = aqsid.ix[:,['State Code','County Code','Site Number','Local Site Name','Location Setting']]
@@ -151,44 +150,55 @@ df_obs = df_obs.rename(columns={'Date Local_Time Local': 'datetime','Parameter N
 # 
 # # Must force every cell in AQSID to be a string, otherwise lose most of data
 # aqsid['AQS_ID'] = aqsid['AQS_ID'].astype(str)
+# df_obs['AQS_ID'] = df_obs['AQS_ID'].astype(str)
+# 
+# df_obs = pd.merge(df_obs,aqsid) # Merge df_mod and aqsid so as to add names and such to the datafram
+# df_obs = df_obs.drop(['State Code','County Code','Site Number'], axis=1)
+# print('Observed data read and combined')
+# 
+# # The obs data must be formatted so that the species are columns
+# df_obs_pres = df_obs.loc[(df_obs['Parameter_Name'] == 'Barometric pressure')].rename(columns={'Sample Measurement':'aqs_pressure'}).drop(['Parameter_Name'],axis=1)
+# df_obs_temp = df_obs.loc[(df_obs['Parameter_Name'] == 'Outdoor Temperature')].rename(columns={'Sample Measurement':'aqs_temp'}).drop(['Parameter_Name'],axis=1)
+# df_obs_rh = df_obs.loc[(df_obs['Parameter_Name'] == 'Relative Humidity ')].rename(columns={'Sample Measurement':'aqs_rh'}).drop(['Parameter_Name'],axis=1)
+# df_obs_wspd = df_obs.loc[(df_obs['Parameter_Name'] == 'Wind Speed - Resultant')].rename(columns={'Sample Measurement':'aqs_wspd'}).drop(['Parameter_Name'],axis=1)
+# df_obs_wdir = df_obs.loc[(df_obs['Parameter_Name'] == 'Wind Direction - Resultant')].rename(columns={'Sample Measurement':'aqs_wdir'}).drop(['Parameter_Name'],axis=1)
+# 
+# df_obs1 = pd.merge(df_obs_pres,df_obs_temp,how='outer')
+# df_obs = pd.merge(df_obs_wspd,df_obs_wdir,how='outer')
+# df_obs = pd.merge(df_obs,df_obs_rh,how='outer')
+# df_obs = pd.merge(df_obs,df_obs1,how='outer')
+# 
+# # Add site types to df_airpact. They used to be there but something must have changed...
+# df_airpact = pd.merge(df_airpact,aqsid).drop(['State Code','County Code','Site Number'], axis=1)
+# df_airpact = df_airpact.drop(['State Code','County Code','Site Number'], axis=1)
+# #df_obs2 = pd.concat([df_obs_pres,df_obs_temp,df_obs_rh,df_obs_wspd,df_obs_wdir],axis=1)
+# #df_com = pd.merge(df_obs, df_airpact, how='outer')
+# 
+# 
+# # =============================================================================
+# # # Create list of AQS_ID to run the for loop
+# # aqsid['AQS_ID']=aqsid['AQS_ID'].astype(str)
+# # site_list1= aqsid.loc[(aqsid['State Code'] == '16')]
+# # site_list2= aqsid.loc[(aqsid['State Code'] == '53')]
+# # site_list3= aqsid.loc[(aqsid['State Code'] == '41')]
+# # site_list=pd.concat([site_list1,site_list2,site_list3])
+# # site_list = site_list['AQS_ID'].tolist()
+# # stations = site_list
+# # =============================================================================
+# # Save the data so that this process does not have to be done over and over again
+# df_airpact.to_csv(base_dir+'/df_airpact_met.csv')
+# df_obs.to_csv(base_dir+'/df_obs_met.csv')
+# 
 # =============================================================================
-df_obs['AQS_ID'] = df_obs['AQS_ID'].astype(str)
-
-#df_obs = pd.merge(df_obs,aqsid) # Merge df_mod and aqsid so as to add names and such to the datafram
-df_obs = df_obs.drop(['State Code','County Code','Site Number'], axis=1)
-print('Observed data read and combined')
-
-# The obs data must be formatted so that the species are columns
-df_obs_pres = df_obs.loc[(df_obs['Parameter_Name'] == 'Barometric pressure')].rename(columns={'Sample Measurement':'aqs_pressure'}).drop(['Parameter_Name'],axis=1)
-df_obs_temp = df_obs.loc[(df_obs['Parameter_Name'] == 'Outdoor Temperature')].rename(columns={'Sample Measurement':'aqs_temp'}).drop(['Parameter_Name'],axis=1)
-df_obs_rh = df_obs.loc[(df_obs['Parameter_Name'] == 'Relative Humidity ')].rename(columns={'Sample Measurement':'aqs_rh'}).drop(['Parameter_Name'],axis=1)
-df_obs_wspd = df_obs.loc[(df_obs['Parameter_Name'] == 'Wind Speed - Resultant')].rename(columns={'Sample Measurement':'aqs_wspd'}).drop(['Parameter_Name'],axis=1)
-df_obs_wdir = df_obs.loc[(df_obs['Parameter_Name'] == 'Wind Direction - Resultant')].rename(columns={'Sample Measurement':'aqs_wdir'}).drop(['Parameter_Name'],axis=1)
-
-df_obs1 = pd.merge(df_obs_pres,df_obs_temp,how='outer')
-df_obs = pd.merge(df_obs_wspd,df_obs_wdir,how='outer')
-df_obs = pd.merge(df_obs,df_obs_rh,how='outer')
-df_obs = pd.merge(df_obs,df_obs1,how='outer')
-
-#df_obs2 = pd.concat([df_obs_pres,df_obs_temp,df_obs_rh,df_obs_wspd,df_obs_wdir],axis=1)
-#df_com = pd.merge(df_obs, df_airpact, how='outer')
-
-
-# =============================================================================
-# # Create list of AQS_ID to run the for loop
-# aqsid['AQS_ID']=aqsid['AQS_ID'].astype(str)
-# site_list1= aqsid.loc[(aqsid['State Code'] == '16')]
-# site_list2= aqsid.loc[(aqsid['State Code'] == '53')]
-# site_list3= aqsid.loc[(aqsid['State Code'] == '41')]
-# site_list=pd.concat([site_list1,site_list2,site_list3])
-# site_list = site_list['AQS_ID'].tolist()
-# stations = site_list
-# =============================================================================
+# Read in dataframes made previously, for speed. Make sure to comment out the above
+df_obs = pd.read_csv(base_dir+'/df_obs_met.csv').drop(['Unnamed: 0'], axis=1)
+df_airpact = pd.read_csv(base_dir+'/df_airpact_met.csv').drop(['Unnamed: 0'], axis=1)
+# Conversions to datetime
+df_airpact['DateTime'] = pd.to_datetime(df_airpact['DateTime'])
+df_obs['datetime'] = pd.to_datetime(df_obs['datetime'])
 
 setting = ['URBAN AND CENTER CITY','SUBURBAN','RURAL']
-# Save the data so that this process does not have to be done over and over again
-#df_airpact.to_csv(base_dir+'/df_airpact.csv')
-#df_obs.to_csv(base_dir+'/df_obs.csv')
+
 #aqsid.to_csv(base_dir+'/aqsid_waorid.csv')
 print('Data combined')
 
@@ -205,7 +215,7 @@ mpl.rcParams['ytick.minor.size']  = 5
 mpl.rcParams['ytick.minor.width'] = 1
 mpl.rcParams['ytick.direction']   = 'in'
 mpl.rcParams['xtick.direction']   = 'in'
-#%%
+
 ####################################
 #########     AIRPACT     ##########
 ####################################
@@ -217,7 +227,7 @@ else:
 '''
 # Delete the unecessary dataframes to avoid a memory error
 #del([df_id,df_or,df_wa,df_obs_pres,df_obs_temp,df_obs_rh,df_obs1,df_obs_wspd,df_obs_wdir,df_id_winds,df_wa_winds,df_or_winds])
-del(df_list)
+#del(df_list)
 grid = base_dir+'/2009050200/MCIP/GRIDCRO2D'
 # open one of wrfout to read coordinate
 modeloutputs = []

@@ -605,13 +605,13 @@ for species in pollutant:
         #ax.text(1.01, 0.4,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes)  
         ax.text(0.98, 0.92,'# of Observation sites '+str(temp1),fontsize = 20, ha='right', va='center', transform=ax.transAxes) 
                 
-        letter_horz = 0.99
+        letter_horz = 1.05
         if i == 1:
-            ax.text(letter_horz, 0.5,'A'+str(temp1),fontsize = 20, ha='right', va='center', transform=ax.transAxes)  
+            ax.text(letter_horz, 0.5,'A',fontsize = 20, ha='right', va='center', transform=ax.transAxes)  
         if i == 2:
-            ax.text(letter_horz, 0.5,'B'+str(temp1),fontsize = 20, ha='right', va='center', transform=ax.transAxes)          
+            ax.text(letter_horz, 0.5,'B',fontsize = 20, ha='right', va='center', transform=ax.transAxes)          
         if i == 3:
-            ax.text(letter_horz, 0.5,'C'+str(temp1),fontsize = 20, ha='right', va='center', transform=ax.transAxes)  
+            ax.text(letter_horz, 0.5,'C',fontsize = 20, ha='right', va='center', transform=ax.transAxes)  
         plt.subplots_adjust(bottom=0.01,top=0.95)
         #Calculate Statistics
         try:
