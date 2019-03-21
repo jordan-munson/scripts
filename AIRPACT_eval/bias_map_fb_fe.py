@@ -140,7 +140,7 @@ exec(open(stat_path).read())
 
 # Set plot parameters
 mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 24.0
+mpl.rcParams['font.size'] = 36.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -174,7 +174,8 @@ m = Basemap(projection='merc',
 # Calculate stats for each site and add to list
 pollutant = ['O3','PM2.5']
 for species in pollutant:
-    plt.figure(figsize=(10,11))
+    #plt.figure(figsize=(10,11))
+    fig, ax = plt.subplots(figsize=(10,11))
 #    if species == 'O3':
     unit_list = 'FB (%)'
 #    else:
@@ -252,7 +253,8 @@ for species in pollutant:
     for size,label in zip(msizes,labels):
         markers.append(plt.scatter([],[], s=size, label=label,c='black',alpha = 0.7))
     plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left',handles=markers)    
-    
+    ax.text(-0.03, 0.5,'B',fontsize = 36, ha='right', va='center', transform=ax.transAxes)
+
     plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map.png',  pad_inches=0.1, bbox_inches='tight')
     plt.show()
     plt.close()

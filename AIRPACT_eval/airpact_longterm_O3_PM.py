@@ -605,7 +605,7 @@ for species in pollutant:
         #ax.text(1.01, 0.4,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes)  
         ax.text(0.98, 0.92,'# of Observation sites '+str(temp1),fontsize = 20, ha='right', va='center', transform=ax.transAxes) 
                 
-        letter_horz = 1.05
+        letter_horz = 1.048
         if i == 1:
             ax.text(letter_horz, 0.5,'A',fontsize = 20, ha='right', va='center', transform=ax.transAxes)  
         if i == 2:

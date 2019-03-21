@@ -62,11 +62,12 @@ props = dict(boxstyle='square', facecolor='white', alpha=0.0)
 props1 = dict(boxstyle='square', facecolor='white', alpha=0.3)
 
 # Draw legends
-ax.text(1.03,0.5,'AP3',transform=ax.transAxes,
+adj = 0.125
+ax.text(1.03,0.5+adj,'AP3',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='red')
-ax.text(1.03,0.41,'AP4',transform=ax.transAxes,
+ax.text(1.03,0.41+adj,'AP4',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='green')
-ax.text(1.03,0.32,'AP5',transform=ax.transAxes,
+ax.text(1.03,0.32+adj,'AP5',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='blue')
 
 #ax.legend()
@@ -90,8 +91,9 @@ graph(lambda x: -70*(np.power(0.3, x))-60, (0,11),'black','-.','') # Bottom
 # Goal lines
 graph(lambda x: 70*(np.power(0.3, x))+30, (0,11),'black','--','Goal') # Top
 graph(lambda x: -70*(np.power(0.3, x))-30, (0,11),'black','--','') # Bottom
+ax.text(-0.13, 1.08,'A',fontsize = 20, ha='right', va='center', transform=ax.transAxes)
 
-ax.legend()
+plt.legend(prop={'size': 16})
 fig.savefig(outputdir + '/airpact_bugle_version_pm.png' ,bbox_inches='tight')
 
 #%%
@@ -117,16 +119,16 @@ props = dict(boxstyle='square', facecolor='white', alpha=0.0)
 props1 = dict(boxstyle='square', facecolor='white', alpha=0.3)
 
 # Draw legends
-ax.text(1.03,0.5,'AP3',transform=ax.transAxes,
+ax.text(1.03,0.5+adj,'AP3',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='red')
-ax.text(1.03,0.41,'AP4',transform=ax.transAxes,
+ax.text(1.03,0.41+adj,'AP4',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='green')
-ax.text(1.03,0.32,'AP5',transform=ax.transAxes,
+ax.text(1.03,0.32+adj,'AP5',transform=ax.transAxes,
         verticalalignment='top', bbox=props, color='blue')
 
 #ax.legend()
-legend = plt.legend(loc=legend_loc)
-plt.setp(legend.get_texts(), color='black')
+#legend = plt.legend(loc=legend_loc)
+#plt.setp(legend.get_texts(), color='black')
 
 #Draw grid
 plt.grid(b=None, which='major', axis='y')
@@ -143,7 +145,9 @@ goal = 15
 graph(lambda x: 70*(np.power(0.3, x))+goal, (0,line_lim),'black','--','Goal') # Top
 graph(lambda x: -70*(np.power(0.3, x))-goal, (0,line_lim),'black','--','') # Bottom
 
-ax.legend()
+ax.text(-0.13, 1.08,'A',fontsize = 20, ha='right', va='center', transform=ax.transAxes)
+
+plt.legend(prop={'size': 16})
 fig.savefig(outputdir + '/airpact_bugle_version_o3.png' ,bbox_inches='tight')
 df_stats.to_csv(outputdir+'/aqs_bugle_stats.csv')
 

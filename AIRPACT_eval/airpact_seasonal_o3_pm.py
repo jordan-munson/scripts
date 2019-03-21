@@ -398,6 +398,7 @@ settings = ['RURAL', 'SUBURBAN', 'URBAN AND CENTER CITY']
 seasons = ['Summer','Winter'] 
 
 pollutant = ['PM2.5','O3']
+#pollutant = ['O3']
 versions = ['AP3','AP4','AP5']
 
 # Short version to make running on pc faster
@@ -426,9 +427,9 @@ for species in pollutant:
 #     fig.text(0.5, 0.66, 'AIRPACT 4', va='center',ha='center')
 #     fig.text(0.5, 0.33, 'AIRPACT 5', va='center',ha='center')
 # =============================================================================
-    fig.text(0.184, 0.99, 'AIRPACT 3', va='center',ha='center')
-    fig.text(0.51, 0.99, 'AIRPACT 4', va='center',ha='center')
-    fig.text(0.835, 0.99, 'AIRPACT 5', va='center',ha='center')
+    fig.text(0.179, .98, 'AP-3', va='center',ha='center')
+    fig.text(0.5051, 0.98, 'AP-4', va='center',ha='center')
+    fig.text(0.833, 0.98, 'AP-5', va='center',ha='center')
     for version,i in zip(versions,[0,1,2]):#[0,4,8]):
         print(version)
     # Set date range used based of versions
@@ -623,8 +624,26 @@ for species in pollutant:
             ax.set_xlabel('')        # Gets rid of the 'DateTime' x label and replaces with a space
             ax.set_title(str(season),fontsize=28) # sets the titles of individ plots as the season, and makes the font smaller
             plt.legend(prop={'size': 16})#,loc=3) # Places the legend in the lower left corner at a size of 10
-            sze = 10 #size of annotation text
+            sze = 10 #size of annotation text            
             
+            # Set letter denoting plot
+            if i ==0:
+                if season == 'Winter':
+                    abc = 'A'
+                else:
+                    abc = 'D'
+            if i ==1:
+                if season == 'Winter':
+                    abc = 'B'
+                else:
+                    abc = 'E'
+            if i ==2:
+                if season == 'Winter':
+                    abc = 'C'
+                else:
+                    abc = 'F'
+            ax.text(-0.02, 1.08,abc,fontsize = 20, ha='right', va='center', transform=ax.transAxes)
+    
             plt.grid(True)    # Add grid lines to make graph interpretation easier
             
             #Calculate Statistics

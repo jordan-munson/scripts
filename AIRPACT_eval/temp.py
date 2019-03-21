@@ -31,9 +31,9 @@ fig.suptitle('Seasonal Variations by AIRPACT Version',y=1.025) # title
 fig.tight_layout() # spaces the plots out a bit
 
 #Annotate versions in
-fig.text(0.184, .98, 'AIRPACT 3', va='center',ha='center')
-fig.text(0.51, 0.98, 'AIRPACT 4', va='center',ha='center')
-fig.text(0.835, 0.98, 'AIRPACT 5', va='center',ha='center')
+fig.text(0.179, .98, 'AP-3', va='center',ha='center')
+fig.text(0.5051, 0.98, 'AP-4', va='center',ha='center')
+fig.text(0.833, 0.98, 'AP-5', va='center',ha='center')
 
 # Make winter month 
 db = pd.DataFrame()
@@ -48,7 +48,7 @@ db['datetime'] = dates
 db = db.set_index('datetime')
 db['data'] = 5
 
-for i in [1,2,3,4,5,6]:
+for i,abc in zip([1,2,3,4,5,6],['A','B','C','D','E','F']):
     ax = fig.add_subplot(2,3,i)
     plt.rcParams["figure.figsize"] = (8,4)
     plt.tight_layout() # spaces the plots out a bit
@@ -57,6 +57,9 @@ for i in [1,2,3,4,5,6]:
     ax.set_title(str('Winter'),fontsize=12) # sets the titles of individ plots as the season, and makes the font smaller
     plt.legend(prop={'size': 10})#,loc=3) # Places the legend in the lower left corner at a size of 10
     sze = 10 #size of annotation text
+    
+    # Set letter denoting plot
+    ax.text(-0.02, 1.04,abc,fontsize = 20, ha='right', va='center', transform=ax.transAxes)
     
     db.plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
     
