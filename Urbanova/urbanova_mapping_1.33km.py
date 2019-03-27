@@ -17,8 +17,8 @@ import pickle
 #import simplekml
 
 # Set file paths
-b_dir=r'G:/Research/Urbanova_Jordan/'
-base_dir = r'G:/Research/scripts/Urbanova/'
+b_dir=r'E:/Research/Urbanova_Jordan/'
+base_dir = r'E:/Research/scripts/Urbanova/'
 data_dir= b_dir + '/Urbanova_ref_site_comparison/Urbanova/'
 grid_dir_4km=b_dir + '/Urbanova_ref_site_comparison/AIRPACT/2018/2018011100/MCIP37/'
 grid_dir_urb=b_dir + '/Urbanova_ref_site_comparison/Urbanova/2018/2018011100/MCIP37/'

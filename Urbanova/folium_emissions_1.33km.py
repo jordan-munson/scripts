@@ -23,8 +23,8 @@ from pytz import timezone
 from datetime import timedelta
 
 # Set file paths
-base_dir=r'G:/Research/Urbanova_Jordan/'
-output_dir = r'G:/Research/scripts/folium_files/'
+base_dir=r'E:/Research/Urbanova_Jordan/'
+output_dir = r'E:/Research/scripts/folium_files/'
 git_dir = 'https://github.com/jordan-munson/scripts/raw/master/folium_files/'
 
 # Set times
@@ -167,7 +167,7 @@ m = Basemap(projection='merc',
               resolution='h',
               area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
 x,y = m(lon,lat)
-os.chdir('G:/Research/Urbanova_Jordan') # needed for ffmpeg
+os.chdir(base_dir) # needed for ffmpeg
 ############################################
 # hourly domain basemaps, this takes lots of time if doing hourly. Switch to daily could be prudent over a long timespan
 ############################################

@@ -30,8 +30,8 @@ exec(open(stat_path).read())
 #aqsidd = pd.read_csv(r'G:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison/Aqsid.csv')
 #aqsidd = aqsidd.drop(['Unnamed: 4','Unnamed: 5','Unnamed: 6','Latitude','Longitude'], axis=1)
 #aqsidd = aqsidd.drop([0,0], axis=0)
-
 # =============================================================================
+# 
 # ##############################################################################
 # # Read AQS data. csv's created from 'AQS_grabbing.py' script, and the model data from the previous lines of code
 # ##############################################################################
@@ -132,8 +132,8 @@ exec(open(stat_path).read())
 # df_com = df_com.drop(['State Code','County Code','Site Number'],axis=1) # drop unecessary columns
 # print('Combined dataframe finished')
 # 
-# df_com.to_csv(inputDir+'AQS_data/df_com.csv')
 # =============================================================================
+#df_com.to_csv(inputDir+'AQS_data/df_com.csv')
 
 #Removes rows without any useful information to speed script up
 #df_com = df_com.dropna(thresh = 6) # setting threshold to 6 means that any site without ANY data is dropped
@@ -153,8 +153,15 @@ mpl.rcParams['ytick.direction']   = 'in'
 mpl.rcParams['xtick.direction']   = 'in'
 
 
+#df_com = pd.read_csv(inputDir+'AQS_data/df_com_aplong.csv').drop('Unnamed: 0', axis=1)
 df_com = pd.read_csv(inputDir+'AQS_data/df_com.csv').drop('Unnamed: 0', axis=1)
 
+df_com.loc[:,'O3_mod'] = pd.to_numeric(df_com.loc[:,'O3_mod'], errors='coerce')
+df_com.loc[:,'PM2.5_mod'] = pd.to_numeric(df_com.loc[:,'PM2.5_mod'], errors='coerce')
+df_com.loc[:,'O3_obs'] = pd.to_numeric(df_com.loc[:,'O3_obs'], errors='coerce')
+df_com.loc[:,'PM2.5_obs'] = pd.to_numeric(df_com.loc[:,'PM2.5_obs'], errors='coerce')
+df_com['datetime'] = pd.to_datetime(df_com['datetime'])
+print('Data loading section done')
 #%%
 # create lits to use in calcs of site ids
 used_AQSID = list(set(df_com['AQSID']))

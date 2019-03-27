@@ -15,7 +15,7 @@
     <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
     <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
     
-    <style>#map_1a5c088f42904628a918d64833e1daa9 {
+    <style>#map_bfaf6474f3424a86b8430a08a72d6d7d {
         position: relative;
         width: 100.0%;
         height: 100.0%;
@@ -36,7 +36,7 @@
 </head>
 <body>    
     
-    <div class="folium-map" id="map_1a5c088f42904628a918d64833e1daa9" ></div>
+    <div class="folium-map" id="map_bfaf6474f3424a86b8430a08a72d6d7d" ></div>
 </body>
 <script>    
     
@@ -44,8 +44,8 @@
         var bounds = null;
     
 
-    var map_1a5c088f42904628a918d64833e1daa9 = L.map(
-        'map_1a5c088f42904628a918d64833e1daa9', {
+    var map_bfaf6474f3424a86b8430a08a72d6d7d = L.map(
+        'map_bfaf6474f3424a86b8430a08a72d6d7d', {
         center: [47.6588, -117.426],
         zoom: 9.25,
         maxBounds: bounds,
@@ -57,7 +57,7 @@
 
     
     
-    var tile_layer_ab3a795101bd4a25a071b642da09a8e7 = L.tileLayer(
+    var tile_layer_ff527c591b114df9b8a82d5fe974462c = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
         "attribution": null,
@@ -67,20 +67,20 @@
         "minZoom": 0,
         "noWrap": false,
         "subdomains": "abc"
-}).addTo(map_1a5c088f42904628a918d64833e1daa9);
+}).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
     
-                var lat_lng_popup_d99bae31001b47379807e38e3bc2dcf0 = L.popup();
+                var lat_lng_popup_bc213918d0e14cbbabe2f5230d001f06 = L.popup();
                 function latLngPop(e) {
-                    lat_lng_popup_d99bae31001b47379807e38e3bc2dcf0
+                    lat_lng_popup_bc213918d0e14cbbabe2f5230d001f06
                         .setLatLng(e.latlng)
                         .setContent("Latitude: " + e.latlng.lat.toFixed(4) +
                                     "<br>Longitude: " + e.latlng.lng.toFixed(4))
-                        .openOn(map_1a5c088f42904628a918d64833e1daa9);
+                        .openOn(map_bfaf6474f3424a86b8430a08a72d6d7d);
                     }
-                map_1a5c088f42904628a918d64833e1daa9.on('click', latLngPop);
+                map_bfaf6474f3424a86b8430a08a72d6d7d.on('click', latLngPop);
             
     
-                var image_overlay_67783688f25545aa97211b27470fae33 = L.imageOverlay(
+                var image_overlay_561a8e5cc96b4389b6b78652d16d37cb = L.imageOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/urbanova_emissions_basemap_1_CO.png',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {
@@ -92,24 +92,24 @@
   "opacity": 0.5,
   "zIndex": 1
 }
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var video_overlay_be9bcef0d2904caba8032330765cf9db = L.videoOverlay(
+                var video_overlay_2c5df6eeb29948efbbfdeb971f08fd3f = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_CO_output.webm',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {"opacity": 0.5, "attribution": "CO_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var video_overlay_88325fa81fdf4f19bf8ff987c43f3497 = L.videoOverlay(
+                var video_overlay_d239c82b04a147cf977b587db189b7d0 = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_CO_tiled_output.webm',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {"opacity": 0.5, "attribution": "CO_tiled_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var image_overlay_21c9daab044341ed907303f46aeb1287 = L.imageOverlay(
+                var image_overlay_0eb680694fd04e6aa382bcce95619912 = L.imageOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/urbanova_emissions_basemap_1_PM10.png',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {
@@ -121,24 +121,24 @@
   "opacity": 0.5,
   "zIndex": 1
 }
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var video_overlay_5ee84d10dc08444f9e120a6ec822571a = L.videoOverlay(
+                var video_overlay_30937db38b1748f9bfaa22d3b4435d8e = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_PM10_output.webm',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {"opacity": 0.5, "attribution": "PM10_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var video_overlay_c5f046bffbfd419fb93c23c672a44097 = L.videoOverlay(
+                var video_overlay_900294002ed9437aa63ec5e60c8165ef = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_PM10_tiled_output.webm',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {"opacity": 0.5, "attribution": "PM10_tiled_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var image_overlay_669307a856a84cb59dcd2621cd634811 = L.imageOverlay(
+                var image_overlay_99e629f78e1f4785abd6021bfd701c8b = L.imageOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/urbanova_emissions_basemap_1_BENZENE.png',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {
@@ -150,24 +150,24 @@
   "opacity": 0.5,
   "zIndex": 1
 }
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var video_overlay_bfb849f30685408cb9e3f9cf2af8a290 = L.videoOverlay(
+                var video_overlay_d3f415893e1248469896a19a08aef52c = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_BENZENE_output.webm',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {"opacity": 0.5, "attribution": "BENZENE_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var video_overlay_af372067ffa64d0e85981fc6e9fe5faf = L.videoOverlay(
+                var video_overlay_b7e268fa982d4321938450b14cbaf7aa = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_BENZENE_tiled_output.webm',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {"opacity": 0.5, "attribution": "BENZENE_tiled_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var image_overlay_88d158d5fa284846960f5c1fcb5b5a54 = L.imageOverlay(
+                var image_overlay_d2ba602b81544d3ab99b61e0cfab6ea2 = L.imageOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/urbanova_emissions_basemap_1_PMFINE.png',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {
@@ -179,24 +179,24 @@
   "opacity": 0.5,
   "zIndex": 1
 }
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var video_overlay_b52375e7a52e4f58b12c8c8fc632dab3 = L.videoOverlay(
+                var video_overlay_c776a79e164a429f9654fbccee9b4bfd = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_PMFINE_output.webm',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {"opacity": 0.5, "attribution": "PMFINE_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var video_overlay_0f1102e2450849f5abd561e9beba1719 = L.videoOverlay(
+                var video_overlay_3c96460d26c64e96afcea8d5b6de173f = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_PMFINE_tiled_output.webm',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {"opacity": 0.5, "attribution": "PMFINE_tiled_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var image_overlay_faef0d468f074ab9953ea0984d742f56 = L.imageOverlay(
+                var image_overlay_63e7fc6942264183809d0e995840e194 = L.imageOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/urbanova_emissions_basemap_1_NOX.png',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {
@@ -208,49 +208,49 @@
   "opacity": 0.5,
   "zIndex": 1
 }
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var video_overlay_5ba70acf871f4b9cadecbad3908a72f2 = L.videoOverlay(
+                var video_overlay_2ff301ecfe8d4de08bcf88e848ca7892 = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_NOX_output.webm',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {"opacity": 0.5, "attribution": "NOX_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-                var video_overlay_89afa1003f2046a5a723e65ed3043632 = L.videoOverlay(
+                var video_overlay_f91fa2dedbb64520907ef3b0444ee7c8 = L.videoOverlay(
                     'https://github.com/jordan-munson/scripts/raw/master/folium_files/movie_NOX_tiled_output.webm',
                     [[47.08146286010742, -118.22552490234375], [48.234893798828125, -116.51278686523438]],
                     {"opacity": 0.5, "attribution": "NOX_tiled_video_map", "loop": true, "autoplay": true}
-                    ).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                    ).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
     
-            var layer_control_20c09c9cc2da430385bd68b13d69fada = {
-                base_layers : { "openstreetmap" : tile_layer_ab3a795101bd4a25a071b642da09a8e7, },
-                overlays : { "CO" : image_overlay_67783688f25545aa97211b27470fae33,"CO_video" : video_overlay_be9bcef0d2904caba8032330765cf9db,"CO_tiled_video" : video_overlay_88325fa81fdf4f19bf8ff987c43f3497,"PM10" : image_overlay_21c9daab044341ed907303f46aeb1287,"PM10_video" : video_overlay_5ee84d10dc08444f9e120a6ec822571a,"PM10_tiled_video" : video_overlay_c5f046bffbfd419fb93c23c672a44097,"BENZENE" : image_overlay_669307a856a84cb59dcd2621cd634811,"BENZENE_video" : video_overlay_bfb849f30685408cb9e3f9cf2af8a290,"BENZENE_tiled_video" : video_overlay_af372067ffa64d0e85981fc6e9fe5faf,"PMFINE" : image_overlay_88d158d5fa284846960f5c1fcb5b5a54,"PMFINE_video" : video_overlay_b52375e7a52e4f58b12c8c8fc632dab3,"PMFINE_tiled_video" : video_overlay_0f1102e2450849f5abd561e9beba1719,"NOX" : image_overlay_faef0d468f074ab9953ea0984d742f56,"NOX_video" : video_overlay_5ba70acf871f4b9cadecbad3908a72f2,"NOX_tiled_video" : video_overlay_89afa1003f2046a5a723e65ed3043632, }
+            var layer_control_fe55bb029eb6433ca133538db2b7118b = {
+                base_layers : { "openstreetmap" : tile_layer_ff527c591b114df9b8a82d5fe974462c, },
+                overlays : { "CO" : image_overlay_561a8e5cc96b4389b6b78652d16d37cb,"CO_video" : video_overlay_2c5df6eeb29948efbbfdeb971f08fd3f,"CO_tiled_video" : video_overlay_d239c82b04a147cf977b587db189b7d0,"PM10" : image_overlay_0eb680694fd04e6aa382bcce95619912,"PM10_video" : video_overlay_30937db38b1748f9bfaa22d3b4435d8e,"PM10_tiled_video" : video_overlay_900294002ed9437aa63ec5e60c8165ef,"BENZENE" : image_overlay_99e629f78e1f4785abd6021bfd701c8b,"BENZENE_video" : video_overlay_d3f415893e1248469896a19a08aef52c,"BENZENE_tiled_video" : video_overlay_b7e268fa982d4321938450b14cbaf7aa,"PMFINE" : image_overlay_d2ba602b81544d3ab99b61e0cfab6ea2,"PMFINE_video" : video_overlay_c776a79e164a429f9654fbccee9b4bfd,"PMFINE_tiled_video" : video_overlay_3c96460d26c64e96afcea8d5b6de173f,"NOX" : image_overlay_63e7fc6942264183809d0e995840e194,"NOX_video" : video_overlay_2ff301ecfe8d4de08bcf88e848ca7892,"NOX_tiled_video" : video_overlay_f91fa2dedbb64520907ef3b0444ee7c8, }
                 };
             L.control.layers(
-                layer_control_20c09c9cc2da430385bd68b13d69fada.base_layers,
-                layer_control_20c09c9cc2da430385bd68b13d69fada.overlays,
+                layer_control_fe55bb029eb6433ca133538db2b7118b.base_layers,
+                layer_control_fe55bb029eb6433ca133538db2b7118b.overlays,
                 {position: 'topright',
                  collapsed: true,
                  autoZIndex: true
-                }).addTo(map_1a5c088f42904628a918d64833e1daa9);
+                }).addTo(map_bfaf6474f3424a86b8430a08a72d6d7d);
             
-                image_overlay_67783688f25545aa97211b27470fae33.remove();
-                video_overlay_be9bcef0d2904caba8032330765cf9db.remove();
-                video_overlay_88325fa81fdf4f19bf8ff987c43f3497.remove();
-                image_overlay_21c9daab044341ed907303f46aeb1287.remove();
-                video_overlay_5ee84d10dc08444f9e120a6ec822571a.remove();
-                video_overlay_c5f046bffbfd419fb93c23c672a44097.remove();
-                image_overlay_669307a856a84cb59dcd2621cd634811.remove();
-                video_overlay_bfb849f30685408cb9e3f9cf2af8a290.remove();
-                video_overlay_af372067ffa64d0e85981fc6e9fe5faf.remove();
-                image_overlay_88d158d5fa284846960f5c1fcb5b5a54.remove();
-                video_overlay_b52375e7a52e4f58b12c8c8fc632dab3.remove();
-                video_overlay_0f1102e2450849f5abd561e9beba1719.remove();
-                image_overlay_faef0d468f074ab9953ea0984d742f56.remove();
-                video_overlay_5ba70acf871f4b9cadecbad3908a72f2.remove();
-                video_overlay_89afa1003f2046a5a723e65ed3043632.remove();
+                image_overlay_561a8e5cc96b4389b6b78652d16d37cb.remove();
+                video_overlay_2c5df6eeb29948efbbfdeb971f08fd3f.remove();
+                video_overlay_d239c82b04a147cf977b587db189b7d0.remove();
+                image_overlay_0eb680694fd04e6aa382bcce95619912.remove();
+                video_overlay_30937db38b1748f9bfaa22d3b4435d8e.remove();
+                video_overlay_900294002ed9437aa63ec5e60c8165ef.remove();
+                image_overlay_99e629f78e1f4785abd6021bfd701c8b.remove();
+                video_overlay_d3f415893e1248469896a19a08aef52c.remove();
+                video_overlay_b7e268fa982d4321938450b14cbaf7aa.remove();
+                image_overlay_d2ba602b81544d3ab99b61e0cfab6ea2.remove();
+                video_overlay_c776a79e164a429f9654fbccee9b4bfd.remove();
+                video_overlay_3c96460d26c64e96afcea8d5b6de173f.remove();
+                image_overlay_63e7fc6942264183809d0e995840e194.remove();
+                video_overlay_2ff301ecfe8d4de08bcf88e848ca7892.remove();
+                video_overlay_f91fa2dedbb64520907ef3b0444ee7c8.remove();
         
 </script>

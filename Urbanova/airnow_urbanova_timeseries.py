@@ -7,7 +7,7 @@
 ############################################################################################################################
 # import some libraries
 import matplotlib as mpl
-mpl.use('Agg')
+#mpl.use('Agg')
 import pandas as pd
 import numpy as np
 import time
@@ -35,9 +35,9 @@ endday = '31'
 endmonth='12'
 endyear='2018'
 
-#end_year=int(endyear)
-#end_month=int(endmonth) 
-#endday = str(monthrange(end_year, end_month)[1])
+end_year=int(endyear)
+end_month=int(endmonth) 
+endday = str(monthrange(end_year, end_month)[1])
 
 inputDir          = r'E:\Research\Urbanova_Jordan/'
 plotDir           =r'E:\Research\Urbanova_Jordan\output/'
@@ -67,6 +67,9 @@ end = dt.datetime(year=int(endyear), month=int(endmonth), day=int(endday), hour=
 timezone = pytz.timezone("utc") #("America/Los_Angeles")
 start = timezone.localize(start)
 end = timezone.localize(end)
+
+start_date = year+'-'+month+'-'+day
+end_date = endyear+'-'+endmonth+'-'+endday
 '''
 print("Start date is "+ start.strftime("%Y%m%d") )
 
@@ -124,7 +127,7 @@ g = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 g.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 g = g.drop(0,1)
 
-species = ['PM2.5', 'OZONE','CO','NO2']
+species = ['PM2.5']#,'OZONE','CO','NO2']
 for pollutant in species:
     if pollutant == 'PM2.5':
         abrv = 'PM2.5'
@@ -135,7 +138,7 @@ for pollutant in species:
     if pollutant == 'OZONE':
         abrv = 'O3'
         unit = '(ppb)'
-        y_max = 60
+        y_max = 70
         t_title = ' O3 Max Daily 8-Hour Average'
         s_title = t_title
     if pollutant == 'CO':
@@ -147,7 +150,7 @@ for pollutant in species:
     if pollutant == 'NO2':
         abrv = 'NO2'
         unit = '(ppb)'
-        y_max = 200
+        y_max = 100
         t_title = 'NO2 Max Daily Hour Average'
         s_title = t_title
         
@@ -198,7 +201,14 @@ for pollutant in species:
     df_base = df_base.drop('time',axis=1)
     # sites which are common between base and Observations
     sites_common = set(df_obs['site_id']).intersection(set(df_base['site_id']))
+    
+    df_base = pd.merge(df_base,df_sites,how='inner')
+    df_obs = pd.merge(df_obs,df_sites,how='inner')
 
+    aqsid_spokane = pd.DataFrame()
+    aqsid_spokane['long_name'] = df_base['long_name'].unique()
+
+    df_obs = pd.merge(df_obs,aqsid_spokane,how='inner')
 
     df_obs_mod = pd.merge(df_obs,df_base, how='outer')
     # get rid of rows if abrv base is not available
@@ -215,7 +225,7 @@ for pollutant in species:
     #df_tseries['datetime'] = df_tseries['datetime'].dt.tz_localize('UTC').dt.tz_convert('US/Pacific')
     #print(set(df_tseries['site_id']))
 
-    df_tseries = df_tseries.dropna(subset = ['pollutant'])
+    #df_tseries = df_tseries.dropna(subset = ['pollutant'])
 
     # Set plot parameters
     mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
@@ -233,8 +243,12 @@ for pollutant in species:
 
     #print(df_tseries)
     
+    # Locate correct site model data
+    mask = (df_tseries['datetime'] > start_date) & (df_tseries['datetime'] <= end_date) # Create a mask to determine the date range used
+    df_tseries = df_tseries.loc[mask]
+    
     if pollutant == 'OZONE' or pollutant == 'CO':
-        df_tseries = df_tseries.copy().set_index('datetime')
+        df_tseries = df_tseries.set_index('datetime')
         df_tseries = df_tseries.resample('H').mean()
         avg_8hr_o3 = df_tseries.rolling(8,min_periods=6).mean()
         times = avg_8hr_o3.index.values - pd.Timedelta('8h')
@@ -259,6 +273,7 @@ for pollutant in species:
 #Plot
 
     fig,ax=plt.subplots(1,1, figsize=(12,4))
+            
     d.ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'blue', 'red'], label=['OBS', 'sens', 'base'])
     ax.set_title(t_title)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
@@ -276,7 +291,7 @@ for pollutant in species:
         aq_stats_1p33km = stats(d, abrv+'_AP5_1.33km', abrv+'_obs')
         aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
         g = pd.merge(g, aq_stats, how = 'inner', left_index = True, right_index = True)
-        print(g)
+        
      
     #Drop some stats to put on plots
 #        aq_stats = aq_stats.drop('MB',0)        
@@ -292,7 +307,7 @@ for pollutant in species:
     
     plt.show()
     plt.savefig(inputDir +'/airnow/timeseries_plot/daily_'+abrv+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf', pad_inches=0.1, bbox_inches='tight')
-    g.to_csv(inputDir +'/airnow/airnow_'+abrv+'_stats.csv')
+    #g.to_csv(inputDir +'/airnow/airnow_'+abrv+'_stats.csv')
     plt.close()
     #print(df_tseries)
     
@@ -302,8 +317,8 @@ for pollutant in species:
     #d=d.set_index('datetime')
     #d = d.resample('D').mean()
     #d=d.groupby(d.index.hour).rolling('24H').mean().ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']]
-    ax.scatter(d[abrv+'_obs'], d[abrv+'_AP5_4km'], c='b', label = '4km',linewidths=None, alpha=0.8)
-    ax.scatter(d[abrv+'_obs'], d[abrv+'_AP5_1.33km'], c='r', marker='s', label = '1.33km',linewidths=None,alpha=0.8)        
+    ax.scatter(d[abrv+'_obs'], d[abrv+'_AP5_4km'], c='b', label = '4km',linewidths=None, alpha=0.7)
+    ax.scatter(d[abrv+'_obs'], d[abrv+'_AP5_1.33km'], c='r', marker='s', label = '1.33km',linewidths=None,alpha=0.7)        
     axismax = max(max(d[abrv+'_AP5_4km']),max(d[abrv+'_AP5_1.33km']))
     plt.plot([0,axismax], [0,axismax], color='black')
     ax.set_aspect('equal', 'box')
@@ -407,7 +422,9 @@ for pollutant in species:
 #airnow('CO','CO','($ppb$)')
 #airnow('NOX','NOX','($ppb$)')
 #airnow('SO2','SO2','($ppb$)')     No SO2 data in airnow v5
-
+g = g.T
+print(g)
+g.to_csv(inputDir +'/airnow/airnow_2018_stats.csv')
 
 end_time = time.time()
 print("Run time was %s seconds"%(end_time-begin_time))

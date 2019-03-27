@@ -17,11 +17,12 @@ inputdir = r'E:/Research/AIRPACT_eval/stats/'
 outputdir = r'E:/Research/AIRPACT_eval/plots/bugle'
 
 #Load data
-df_stats = pd.read_csv(inputdir+'aqs_version_stats_20190206.csv')#.drop(['Unnamed: 0'],axis=1)
+#df_stats = pd.read_csv(inputdir+'aqs_version_stats_20190206.csv')#.drop(['Unnamed: 0'],axis=1)
+df_stats = pd.read_csv(inputdir+'aqs_version_stats.csv')#.drop(['Unnamed: 0'],axis=1)
 
 # Seperate types
-df_o3 = df_stats.loc[df_stats['index']=='O3_mod']
-df_pm = df_stats.loc[df_stats['index']=='PM2.5_mod']
+df_o3 = df_stats.loc[df_stats['index']=='O3_mod_hourly']
+df_pm = df_stats.loc[df_stats['index']=='PM2.5_mod_hourly']
 
 # Set plot parameters
 mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text

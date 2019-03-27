@@ -23,8 +23,8 @@ from pytz import timezone
 from datetime import timedelta
 
 # Set file paths
-base_dir=r'G:/Research/Urbanova_Jordan/'
-output_dir = r'G:/Research/scripts/folium_files/'
+base_dir=r'E:/Research/Urbanova_Jordan/'
+output_dir = r'E:/Research/scripts/folium_files/'
 git_dir = 'https://github.com/jordan-munson/scripts/raw/master/folium_files/'
 
 # Set times
@@ -45,6 +45,7 @@ start = timezone.localize(start)
 end = timezone.localize(end)
 
 # Load data
+# Data from "urbanova_mapping_1.33km.py"
 name =base_dir+ '1p33_'+start.strftime("%Y%m%d")+'_'+end.strftime("%Y%m%d")
 
 def load_obj(name ):

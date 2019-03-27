@@ -74,119 +74,121 @@ exec(open(stat_path).read())
 # print('Model data combined')
 # =============================================================================
 
-##############################################################################
-# Read AQS data. csv's created from 'AQS_grabbing.py' script, and the model data from the previous lines of code
-##############################################################################
-# Read model data
-df_mod = pd.read_csv(inputDir + '/model_aqs.csv',sep=',')
-df_mod['datetime'] = pd.to_datetime(df_mod['datetime']) #Must convert to date time to merge later
-df_mod = df_mod.drop('Unnamed: 0',axis=1)
-
-#Create AQSID Column form state code, county code, and site num
-aqsid = pd.read_csv(inputDir+'aqs_sites.csv')
-aqsid = aqsid.ix[:,['State Code','County Code','Site Number','Local Site Name','Location Setting']]
-
-aqsid['County Code'] = ["%03d" % n for n in aqsid['County Code'] ]
-aqsid['Site Number'] = ["%04d" % n for n in aqsid['Site Number'] ]
-
-aqsid['AQSID'] = (aqsid['State Code']).astype(str) + (aqsid['County Code']).astype(str)+(aqsid['Site Number']).astype(str)
-
-# Must force every cell in AQSID to be a string, otherwise lose most of data
-aqsid['AQSID'] = aqsid['AQSID'].astype(str)
-df_mod['AQSID'] = df_mod['AQSID'].astype(str)
-
-df_mod = pd.merge(df_mod,aqsid) # Merge df_mod and aqsid so as to add names and such to the datafram
-
-print('Model data read')
-
-# Read AQS data
-df_wa = pd.read_csv(inputDir + 'AQS_data/Washington_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_or = pd.read_csv(inputDir + 'AQS_data/Oregon_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_id = pd.read_csv(inputDir + 'AQS_data/Idaho_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-#df_cc = pd.read_csv(inputDir + 'Canada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_mt = pd.read_csv(inputDir + 'AQS_data/Montana_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_ca = pd.read_csv(inputDir + 'AQS_data/California_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_nv = pd.read_csv(inputDir + 'AQS_data/Nevada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-df_ut = pd.read_csv(inputDir + 'AQS_data/Utah_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-
-#  Combine AQS data
-df_list = [df_wa,df_or,df_id,df_mt,df_ca,df_nv,df_ut]
-df_obs = pd.concat(df_list)
-
-
-#Create AQSID Column form state code, county code, and site num
-df_obs['County Code'] = ["%03d" % n for n in df_obs['County Code'] ]
-df_obs['Site Num'] = ["%04d" % n for n in df_obs['Site Num'] ]
-
-df_obs['AQSID'] = (df_obs['State Code']).astype(str) + (df_obs['County Code']).astype(str)+(df_obs['Site Num']).astype(str)
-
-# Drop columns of data we are not looking at so as to increase the speed of the script
-df_obs = df_obs.drop(['Unnamed: 0','Unnamed: 1','State Name','County Name','State Code','County Code','Site Num','Units of Measure','Latitude','Longitude'],axis=1)
-df_obs = df_obs.rename(columns={'Date Local_Time Local': 'datetime','Parameter Name':'Parameter_Name'})
-print('Observed data read and combined')
-
-# Only pulls ozone/pm data
-df_obs_o3 = df_obs.loc[df_obs['Parameter_Name']=='Ozone']
-df_obs_pm = df_obs.loc[df_obs['Parameter_Name']=='PM2.5 - Local Conditions']
-df_obs_pm2 = df_obs.loc[df_obs['Parameter_Name']=='Acceptable PM2.5 AQI & Speciation Mass']
-df_obs_pm = pd.concat([df_obs_pm,df_obs_pm2])
-
-df_obs_o3 = df_obs_o3.rename(columns={'Sample Measurement':'O3_obs'})
-df_obs_pm = df_obs_pm.rename(columns={'Sample Measurement':'PM2.5_obs'})
-
-df_obs_o3 = df_obs_o3.drop(['Parameter_Name'],axis=1)
-df_obs_pm = df_obs_pm.drop(['Parameter_Name'],axis=1)
-df_obs = pd.merge(df_obs_o3, df_obs_pm, on =['datetime','AQSID'], how='outer')
-
-df_obs = pd.merge(df_obs,aqsid, how='outer') 
-#df_obs = df_obs.drop(['Latitude_x','Latitude_y','Longitude_x','Longitude_y'], axis=1)
-  
-##############################################################################
-# Manipulate obs and mod dataframes to set them up to plot
-##############################################################################
-#df_com = pd.concat([df_obs,df_mod])
-'''
-# sites which are common between base and Observations
-sites_common = set(df_obs['AQSID']).intersection(set(df_mod['AQSID']))
-
-## take only the data which is for common sites
-df_obs_new = pd.DataFrame(columns=df_obs.columns)
-df_mod_new = pd.DataFrame(columns=df_mod.columns)
-for sites in sites_common:
-    #    print sites
-    dfa = df_obs.loc[df_obs['AQSID']==sites, df_obs.columns]
-    dfb = df_mod.loc[df_mod['AQSID']==sites, df_mod.columns]
-    df_obs_new = pd.concat([df_obs_new, dfa], join='outer', ignore_index=True)
-    df_mod_new = pd.concat([df_mod_new, dfb], join='outer', ignore_index=True)
-'''
-# merge now
-print('Merging large dataframes, this may take a while')
-#df_com = pd.merge(df_obs_new, df_mod_new, on=['datetime', 'AQSID','long_name'], how='outer')
-df_com = pd.merge(df_obs, df_mod, how='outer')
-
-#df_com = pd.concat([df_obs,df_mod])
-
-
-# Need to convert these to numeric
-df_com.loc[:,'O3_mod'] = pd.to_numeric(df_com.loc[:,'O3_mod'], errors='coerce')
-df_com.loc[:,'PM2.5_mod'] = pd.to_numeric(df_com.loc[:,'PM2.5_mod'], errors='coerce')
-#df_com.loc[:,'AQSID'] = pd.to_numeric(df_com.loc[:,'AQSID'], errors='coerce')
-
-#df_com = df_com.drop(['AQSID_x','AQSID_y'],axis=1)
-df_com['datetime'] = pd.to_datetime(df_com['datetime'], infer_datetime_format=True)
-
-#df_com = pd.merge(df_com,aqsid, on=['AQSID','long_name'], how='outer')   
-#df_com = df_com.set_index('datetime')
-
-df_com.loc[:,'O3_mod'] = pd.to_numeric(df_com.loc[:,'O3_mod'], errors='coerce')
-df_com.loc[:,'PM2.5_mod'] = pd.to_numeric(df_com.loc[:,'PM2.5_mod'], errors='coerce')
-df_com.loc[:,'O3_obs'] = pd.to_numeric(df_com.loc[:,'O3_obs'], errors='coerce')
-df_com['O3_obs'] = df_com['O3_obs']*1000 #convert to ppb
-df_obs['O3_obs'] = df_obs['O3_obs']*1000
-df_com.loc[:,'PM2.5_obs'] = pd.to_numeric(df_com.loc[:,'PM2.5_obs'], errors='coerce')
-df_com = df_com.drop(['State Code','County Code','Site Number'],axis=1) # drop unecessary columns
-print('Combined dataframe finished')
-
+# =============================================================================
+# ##############################################################################
+# # Read AQS data. csv's created from 'AQS_grabbing.py' script, and the model data from the previous lines of code
+# ##############################################################################
+# # Read model data
+# df_mod = pd.read_csv(inputDir + '/model_aqs.csv',sep=',')
+# df_mod['datetime'] = pd.to_datetime(df_mod['datetime']) #Must convert to date time to merge later
+# df_mod = df_mod.drop('Unnamed: 0',axis=1)
+# 
+# #Create AQSID Column form state code, county code, and site num
+# aqsid = pd.read_csv(inputDir+'aqs_sites.csv')
+# aqsid = aqsid.ix[:,['State Code','County Code','Site Number','Local Site Name','Location Setting']]
+# 
+# aqsid['County Code'] = ["%03d" % n for n in aqsid['County Code'] ]
+# aqsid['Site Number'] = ["%04d" % n for n in aqsid['Site Number'] ]
+# 
+# aqsid['AQSID'] = (aqsid['State Code']).astype(str) + (aqsid['County Code']).astype(str)+(aqsid['Site Number']).astype(str)
+# 
+# # Must force every cell in AQSID to be a string, otherwise lose most of data
+# aqsid['AQSID'] = aqsid['AQSID'].astype(str)
+# df_mod['AQSID'] = df_mod['AQSID'].astype(str)
+# 
+# df_mod = pd.merge(df_mod,aqsid) # Merge df_mod and aqsid so as to add names and such to the datafram
+# 
+# print('Model data read')
+# 
+# # Read AQS data
+# df_wa = pd.read_csv(inputDir + 'AQS_data/Washington_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# df_or = pd.read_csv(inputDir + 'AQS_data/Oregon_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# df_id = pd.read_csv(inputDir + 'AQS_data/Idaho_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# #df_cc = pd.read_csv(inputDir + 'Canada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# df_mt = pd.read_csv(inputDir + 'AQS_data/Montana_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# df_ca = pd.read_csv(inputDir + 'AQS_data/California_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# df_nv = pd.read_csv(inputDir + 'AQS_data/Nevada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# df_ut = pd.read_csv(inputDir + 'AQS_data/Utah_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+# 
+# #  Combine AQS data
+# df_list = [df_wa,df_or,df_id,df_mt,df_ca,df_nv,df_ut]
+# df_obs = pd.concat(df_list)
+# 
+# 
+# #Create AQSID Column form state code, county code, and site num
+# df_obs['County Code'] = ["%03d" % n for n in df_obs['County Code'] ]
+# df_obs['Site Num'] = ["%04d" % n for n in df_obs['Site Num'] ]
+# 
+# df_obs['AQSID'] = (df_obs['State Code']).astype(str) + (df_obs['County Code']).astype(str)+(df_obs['Site Num']).astype(str)
+# 
+# # Drop columns of data we are not looking at so as to increase the speed of the script
+# df_obs = df_obs.drop(['Unnamed: 0','Unnamed: 1','State Name','County Name','State Code','County Code','Site Num','Units of Measure','Latitude','Longitude'],axis=1)
+# df_obs = df_obs.rename(columns={'Date Local_Time Local': 'datetime','Parameter Name':'Parameter_Name'})
+# print('Observed data read and combined')
+# 
+# # Only pulls ozone/pm data
+# df_obs_o3 = df_obs.loc[df_obs['Parameter_Name']=='Ozone']
+# df_obs_pm = df_obs.loc[df_obs['Parameter_Name']=='PM2.5 - Local Conditions']
+# df_obs_pm2 = df_obs.loc[df_obs['Parameter_Name']=='Acceptable PM2.5 AQI & Speciation Mass']
+# df_obs_pm = pd.concat([df_obs_pm,df_obs_pm2])
+# 
+# df_obs_o3 = df_obs_o3.rename(columns={'Sample Measurement':'O3_obs'})
+# df_obs_pm = df_obs_pm.rename(columns={'Sample Measurement':'PM2.5_obs'})
+# 
+# df_obs_o3 = df_obs_o3.drop(['Parameter_Name'],axis=1)
+# df_obs_pm = df_obs_pm.drop(['Parameter_Name'],axis=1)
+# df_obs = pd.merge(df_obs_o3, df_obs_pm, on =['datetime','AQSID'], how='outer')
+# 
+# df_obs = pd.merge(df_obs,aqsid, how='outer') 
+# #df_obs = df_obs.drop(['Latitude_x','Latitude_y','Longitude_x','Longitude_y'], axis=1)
+#   
+# ##############################################################################
+# # Manipulate obs and mod dataframes to set them up to plot
+# ##############################################################################
+# #df_com = pd.concat([df_obs,df_mod])
+# '''
+# # sites which are common between base and Observations
+# sites_common = set(df_obs['AQSID']).intersection(set(df_mod['AQSID']))
+# 
+# ## take only the data which is for common sites
+# df_obs_new = pd.DataFrame(columns=df_obs.columns)
+# df_mod_new = pd.DataFrame(columns=df_mod.columns)
+# for sites in sites_common:
+#     #    print sites
+#     dfa = df_obs.loc[df_obs['AQSID']==sites, df_obs.columns]
+#     dfb = df_mod.loc[df_mod['AQSID']==sites, df_mod.columns]
+#     df_obs_new = pd.concat([df_obs_new, dfa], join='outer', ignore_index=True)
+#     df_mod_new = pd.concat([df_mod_new, dfb], join='outer', ignore_index=True)
+# '''
+# # merge now
+# print('Merging large dataframes, this may take a while')
+# #df_com = pd.merge(df_obs_new, df_mod_new, on=['datetime', 'AQSID','long_name'], how='outer')
+# df_com = pd.merge(df_obs, df_mod, how='outer')
+# 
+# #df_com = pd.concat([df_obs,df_mod])
+# 
+# 
+# # Need to convert these to numeric
+# df_com.loc[:,'O3_mod'] = pd.to_numeric(df_com.loc[:,'O3_mod'], errors='coerce')
+# df_com.loc[:,'PM2.5_mod'] = pd.to_numeric(df_com.loc[:,'PM2.5_mod'], errors='coerce')
+# #df_com.loc[:,'AQSID'] = pd.to_numeric(df_com.loc[:,'AQSID'], errors='coerce')
+# 
+# #df_com = df_com.drop(['AQSID_x','AQSID_y'],axis=1)
+# df_com['datetime'] = pd.to_datetime(df_com['datetime'], infer_datetime_format=True)
+# 
+# #df_com = pd.merge(df_com,aqsid, on=['AQSID','long_name'], how='outer')   
+# #df_com = df_com.set_index('datetime')
+# 
+# df_com.loc[:,'O3_mod'] = pd.to_numeric(df_com.loc[:,'O3_mod'], errors='coerce')
+# df_com.loc[:,'PM2.5_mod'] = pd.to_numeric(df_com.loc[:,'PM2.5_mod'], errors='coerce')
+# df_com.loc[:,'O3_obs'] = pd.to_numeric(df_com.loc[:,'O3_obs'], errors='coerce')
+# df_com['O3_obs'] = df_com['O3_obs']*1000 #convert to ppb
+# df_obs['O3_obs'] = df_obs['O3_obs']*1000
+# df_com.loc[:,'PM2.5_obs'] = pd.to_numeric(df_com.loc[:,'PM2.5_obs'], errors='coerce')
+# df_com = df_com.drop(['State Code','County Code','Site Number'],axis=1) # drop unecessary columns
+# print('Combined dataframe finished')
+# 
+# =============================================================================
 # Set plot parameters
 mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
 mpl.rcParams['font.size'] = 20.0
@@ -201,10 +203,14 @@ mpl.rcParams['ytick.minor.width'] = 1
 mpl.rcParams['ytick.direction']   = 'in'
 mpl.rcParams['xtick.direction']   = 'in'
 
-
-df_mod.loc[:,'O3_mod'] = pd.to_numeric(df_mod.loc[:,'O3_mod'], errors='coerce')
-df_mod.loc[:,'PM2.5_mod'] = pd.to_numeric(df_mod.loc[:,'PM2.5_mod'], errors='coerce')
-
+# load data
+df_com = pd.read_csv(inputDir+'AQS_data/df_com.csv').drop('Unnamed: 0', axis=1)
+df_com.loc[:,'O3_mod'] = pd.to_numeric(df_com.loc[:,'O3_mod'], errors='coerce')
+df_com.loc[:,'PM2.5_mod'] = pd.to_numeric(df_com.loc[:,'PM2.5_mod'], errors='coerce')
+df_com.loc[:,'O3_obs'] = pd.to_numeric(df_com.loc[:,'O3_obs'], errors='coerce')
+df_com.loc[:,'PM2.5_obs'] = pd.to_numeric(df_com.loc[:,'PM2.5_obs'], errors='coerce')
+df_com['datetime'] = pd.to_datetime(df_com['datetime'])
+print('Data loading section done')
 
 #%%
 pollutant = ['O3','PM2.5']
@@ -413,6 +419,9 @@ for species in pollutant:
     #ax.set_ylabel(species+' '+'('+unit_list+')') 
     plt.grid(True,alpha=0.7,axis='y')
     
+    # place letters 
+    ax.text(1.07, 1.72,'A', ha='right', va='center', transform=ax.transAxes)
+    ax.text(1.07, 0.5,'B', ha='right', va='center', transform=ax.transAxes)
     plt.show()
     plt.savefig(inputDir+'/plots/boxplot/'+species+'boxplot.png',  pad_inches=0.1, bbox_inches='tight')
     plt.close()
