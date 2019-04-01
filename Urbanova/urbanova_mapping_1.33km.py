@@ -42,33 +42,46 @@ start_day = 11
 end_year = 2018
 end_month = '01'
 #end_day = monthrange(end_year, end_month)[1]
-end_day = 13
+end_day = 15
+
+# Need this to specify which species will be pulled. Combined gets just ozone and PMIJ
+filetype = 'combined'
+
+# =============================================================================
+# # Alternate method to create list of days to pull
+# DATE_TIME_STRING_FORMAT = '%Y%m%d'
+# 
+# from_date_time = datetime.strptime(str(start_year)+str(start_month)+str(start_day),
+#                                    DATE_TIME_STRING_FORMAT)
+# to_date_time = datetime.strptime(str(end_year)+str(end_month)+str(end_day),
+#                                  DATE_TIME_STRING_FORMAT)
+# 
+# date_times = [from_date_time.strftime(DATE_TIME_STRING_FORMAT)]
+# date_time = from_date_time
+# while date_time < to_date_time:
+#     date_time += timedelta(days=1)
+#     date_times.append(date_time.strftime(DATE_TIME_STRING_FORMAT))
+#  
+# modeloutputs = []   
+# 
+# 
+# for days in date_times:
+#     modeloutputs.append(data_dir + days[:4]+'/'+ days+'00'+'/POST/CCTM/combined_' + days+'.ncf')
+# =============================================================================
 
 
-
-# Alternate method to create list of days to pull
-DATE_TIME_STRING_FORMAT = '%Y%m%d'
-
-from_date_time = datetime.strptime(str(start_year)+str(start_month)+str(start_day),
-                                   DATE_TIME_STRING_FORMAT)
-to_date_time = datetime.strptime(str(end_year)+str(end_month)+str(end_day),
-                                 DATE_TIME_STRING_FORMAT)
-
-date_times = [from_date_time.strftime(DATE_TIME_STRING_FORMAT)]
-date_time = from_date_time
-while date_time < to_date_time:
-    date_time += timedelta(days=1)
-    date_times.append(date_time.strftime(DATE_TIME_STRING_FORMAT))
- 
+date1 = str(start_year)+'-'+start_month+'-'+str(start_day)
+date2 = str(end_year)+'-'+end_month+'-'+str(end_day)
+mydates = pd.date_range(date1, date2, freq='D').tolist()
 modeloutputs = []   
-for days in date_times:
-    modeloutputs.append(data_dir + days[:4]+'/'+ days+'00'+'/POST/CCTM/combined_' + days+'.ncf')
-
+for date in mydates:
+    days = date.strftime('%Y%m%d')
+    modeloutputs.append(data_dir + str(end_year)+'/'+ days+'00'+'/POST/CCTM/combined_' + days+'.ncf')
     
 start_month = int(start_month)
 end_month = int(end_month)
     
-exec(open(base_dir + "/airpact_functions.py").read())
+exec(open(base_dir + "/airpact_functions_20190328.py").read())
 # set start and end date
 start = datetime.datetime(start_year, start_month, start_day, hour=0)
 end = datetime.datetime(end_year, end_month, end_day, hour=23)
@@ -81,7 +94,7 @@ layer=0
 #Set up date diff for time loop
 date_diff =end -start
 date_diff =  int(round( date_diff.total_seconds()/60/60/24)) # total hour duration
-print("start date is "+ start.strftime("%Y%m%d") + ' combining 1.33km files' )
+#print("start date is "+ start.strftime("%Y%m%d") + ' combining 1.33km files' )
 now = start
 
 # =============================================================================
@@ -116,7 +129,7 @@ now = start
 # =============================================================================
 
 
-print('1.33km file paths arrayed')
+#print('1.33km file paths arrayed')
 
 print(modeloutputs)
 
@@ -144,8 +157,9 @@ lat_0 = fin0.YCENT
 lon_0 = fin0.XCENT
 fin0.close()
 
-print('Starting AIRPACT Function')
+
 print(' ')
+print('Starting AIRPACT Function')
 airpact = get_airpact_DF(start, end, layer)
 
 # Save the dictionary to be used in Folium mapping script
@@ -154,5 +168,5 @@ def save_obj(obj, name ):
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
     
 name = '1p33_'+start.strftime("%Y%m%d")+'_'+end.strftime("%Y%m%d")
-#save_obj(airpact,name)    
+save_obj(airpact,name)    
 print(airpact['DateTime'][:,0,0])
