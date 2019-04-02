@@ -20,15 +20,15 @@ from matplotlib.dates import date2num, DayLocator, DateFormatter
 
 # Set file paths
 base_dir=r'E:\Research\Urbanova_Jordan/'
-data_dir=r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\Urbanova' +'/'
+data_dir=r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\Urbanova/'
 #grid_dir=r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\AIRPACT\2018\2018011100\MCIP37/'
-grid_dir=r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\Urbanova/2018\2018011100\MCIP37'+'/'
+grid_dir=r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\Urbanova/2018\2018011100\MCIP37/'
 
 #base_dir = '/data/lar/users/jmunson/'
 #ata_dir = '/data/lar/projects/Urbanova/'
 #grid_dir = '/data/lar/projects/Urbanova/2018/2018011100/MCIP37/'
 
-exec(open(base_dir + "/airpact_functions.py").read())
+exec(open(r"E:/Research/scripts/Urbanova/airpact_functions.py").read())
 # set start and end date
 start = datetime.datetime(year=2018, month=2, day=13, hour=0)
 end = datetime.datetime(year=2018, month=2, day=14, hour=23)
@@ -37,7 +37,7 @@ start = timezone.localize(start)
 end = timezone.localize(end)
 # set layer
 layer=0
-
+filetype = 'not_aconc'
 #Set up date diff for time loop
 date_diff =end -start
 date_diff =  int(round( date_diff.total_seconds()/60/60/24)) # total hour duration
@@ -114,52 +114,54 @@ unit_list = ["ppb", "ug m-3"]
 ############################################
 # hourly domain basemaps
 ############################################
-'''
-#save maps into the pdf file (two maps in single page)
-from subprocess import check_call
-for i, sp in enumerate(var_list):
-    
-    for t in range(0, len(airpact_3d[sp])): 
-            
-        outpng = base_dir +'outputs/airpact_hourly_basemap_' + sp + '_%05d.png' % t
-        print(outpng)
-        
-        fig = plt.figure(figsize=(14,10))
-        plt.title(sp +'_at_' + airpact_3d["DateTime"][t,0,0])
-        
-        # compute auto color-scale using maximum concentrations
-        down_scale = np.percentile(airpact_3d[sp], 5)
-        up_scale = np.percentile(airpact_3d[sp], 95)
-        clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10),3)
-        print("debug clevs", clevs, sp)
-        
-        cblabel = unit_list[i]
-        print(unit_list[i], sp, t)
-        cbticks = True
-        cs = m.contourf(x,y,airpact_3d[sp][t,:,:],clevs,cmap=plt.get_cmap('jet'), extend='both')
-        cs.cmap.set_under('cyan')
-        cs.cmap.set_over('black')
-        
-        m.drawcoastlines()
-        m.drawstates()
-        m.drawcountries()
-        
-        cbar = m.colorbar(location='bottom',pad="5%")
-        cbar.set_label(cblabel)
-        if cbticks:
-            cbar.set_ticks(clevs)
-        
-        # print the surface-layer mean on the map plot
-        plt.annotate("mean: " + str(airpact_3d[sp][t,:,:].mean()) + " "+ unit_list[i], xy=(0, 1.02), xycoords='axes fraction')
-        
-        plt.savefig(outpng) 
-        plt.show()
-# This requires ffmpeg program, which is not easy to install in aeolus/kamiak
-# To make a video, download all the pngs in your computer and execute the command below
-# "ffmpeg -framerate 3 -i WRFChem_hourly_basemap_T2_%05d.png T2_output.mp4" 
-#        
-#    check_call(["ffmpeg", "-framerate", "3", "-i", "outputs/WRFChem_hourly_basemap_"+sp+ "_%05d.png",  "outputs/"+sp + "_output.mp4"])
-'''
+
+# =============================================================================
+# #save maps into the pdf file (two maps in single page)
+# from subprocess import check_call
+# for i, sp in enumerate(var_list):
+#     
+#     for t in range(0, len(airpact_3d[sp])): 
+#             
+#         outpng = base_dir +'outputs/airpact_hourly_basemap_' + sp + '_%05d.png' % t
+#         print(outpng)
+#         
+#         fig = plt.figure(figsize=(14,10))
+#         plt.title(sp +'_at_' + airpact_3d["DateTime"][t,0,0])
+#         
+#         # compute auto color-scale using maximum concentrations
+#         down_scale = np.percentile(airpact_3d[sp], 5)
+#         up_scale = np.percentile(airpact_3d[sp], 95)
+#         clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10),3)
+#         print("debug clevs", clevs, sp)
+#         
+#         cblabel = unit_list[i]
+#         print(unit_list[i], sp, t)
+#         cbticks = True
+#         cs = m.contourf(x,y,airpact_3d[sp][t,:,:],clevs,cmap=plt.get_cmap('jet'), extend='both')
+#         cs.cmap.set_under('cyan')
+#         cs.cmap.set_over('black')
+#         
+#         m.drawcoastlines()
+#         m.drawstates()
+#         m.drawcountries()
+#         
+#         cbar = m.colorbar(location='bottom',pad="5%")
+#         cbar.set_label(cblabel)
+#         if cbticks:
+#             cbar.set_ticks(clevs)
+#         
+#         # print the surface-layer mean on the map plot
+#         plt.annotate("mean: " + str(airpact_3d[sp][t,:,:].mean()) + " "+ unit_list[i], xy=(0, 1.02), xycoords='axes fraction')
+#         
+#         plt.savefig(outpng) 
+#         plt.show()
+# # This requires ffmpeg program, which is not easy to install in aeolus/kamiak
+# # To make a video, download all the pngs in your computer and execute the command below
+# # "ffmpeg -framerate 3 -i WRFChem_hourly_basemap_T2_%05d.png T2_output.mp4" 
+# #        
+# #    check_call(["ffmpeg", "-framerate", "3", "-i", "outputs/WRFChem_hourly_basemap_"+sp+ "_%05d.png",  "outputs/"+sp + "_output.mp4"])
+# =============================================================================
+
 ############################################
 # averaged domain basemaps
 ############################################
@@ -198,6 +200,6 @@ with PdfPages(base_dir+'maps/airpactRegrid_avg_basemap_' + '_'+ start.strftime("
         # print the surface-layer mean on the map plot
         plt.annotate("mean: " + str(airpact_3d[sp].mean(axis=0).mean()) +" ppb", xy=(0, 1.02), xycoords='axes fraction')
         
-        pdf.savefig(fig) 
+        #pdf.savefig(fig) 
         plt.show()
 print('End of script')

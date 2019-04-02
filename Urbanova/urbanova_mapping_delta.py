@@ -28,7 +28,9 @@ grid_dir_urb=r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\Urbanova
 urb_path = data_dir
 airpact_path = r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\AIRPACT/'
 regrid_path = r'E:\Research\Urbanova_Jordan\Urbanova_regrid4km/'
+exec(open(r"E:/Research/scripts/Urbanova/airpact_functions.py").read())
 
+filetype = 'not_aconc' # needed for airpact_functions script. use 'aconc' for lots of species
 
 #base_dir = '/data/lar/users/jmunson/'
 #data_dir = '/data/lar/projects/Urbanova/'
@@ -47,7 +49,6 @@ end_month = 2
 #end_day = monthrange(end_year, end_month)[1]
 end_day = 14
 
-exec(open(base_dir + "/airpact_functions.py").read())
 # set start and end date
 start = datetime.datetime(start_year, start_month, start_day, hour=0)
 end = datetime.datetime(end_year, end_month, end_day, hour=23)
