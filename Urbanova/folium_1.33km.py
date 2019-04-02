@@ -80,23 +80,34 @@ with PdfPages(base_dir+'maps/urbanova_avg_basemap_' + '_'+ start.strftime("%Y%m%
         fig = plt.figure(figsize=(14,10))
         #plt.title(sp)
         o3_max = 75
-        pm_max = 40
+        pm_max = 35
         o3_bins = np.arange(0, o3_max, 5)
         pm_bins = np.arange(0, pm_max, 5)
+        vmin = 0
         # compute auto color-scale using maximum concentrations
         down_scale = np.percentile(airpact[sp], 5)
         up_scale = np.percentile(airpact[sp], 95)
         if sp == "O3":
             clevs = o3_bins
+            vmax = o3_max
         else:
             clevs = pm_bins
+            vmax = pm_max
         #clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10),3)
         print("debug clevs", clevs, sp)
         
 
-        cs = m.contourf(x,y,airpact[sp].mean(axis=0),clevs,cmap=plt.get_cmap('jet'), extend='both')
-        cs.cmap.set_under('cyan')
-        cs.cmap.set_over('black')
+# =============================================================================
+#           # countour method
+#         cs = m.contourf(x,y,airpact[sp].mean(axis=0),clevs,cmap=plt.get_cmap('jet'), extend='both')
+#         cs.cmap.set_under('cyan')
+#         cs.cmap.set_over('black')
+# =============================================================================
+        # colormesh method
+        cmap = plt.get_cmap('jet')
+        colormesh = m.pcolormesh(x, y, airpact[sp].mean(axis=0), vmin = vmin,vmax=vmax, cmap=cmap)
+        colormesh.cmap.set_over('black')
+
         
         #m.drawcoastlines()
         #m.drawstates()
@@ -505,8 +516,8 @@ png1 = git_dir+'urbanova_basemap_12_O3.png'
 png2 = git_dir+'urbanova_basemap_12_PMIJ.png'
 
 # Set paths to videos
-video1 = git_dir+'movie_O3_daily_output.webm'
-video2 = git_dir+'movie_PMIJ_daily_output.webm'
+#video1 = git_dir+'movie_O3_daily_output.webm'
+#video2 = git_dir+'movie_PMIJ_daily_output.webm'
 video3 = git_dir+'movie_O3_daily_tiled_output.webm'
 video4 = git_dir+'movie_PMIJ_daily_tiled_output.webm'
 
@@ -515,10 +526,10 @@ folium.raster_layers.ImageOverlay(png1,bounds = extents,name='Ozone',opacity = 0
 folium.raster_layers.ImageOverlay(png2,bounds = extents,name='PM',opacity = 0.5,show = False).add_to(m) #Unchecks the PM layer so that only ozone is seen
 
 # Add videos to Folium
-folium.raster_layers.VideoOverlay(video_url=video1,bounds = extents,name='O3_video',opacity = 0.5,attr = 'O3_video_map',show = True,autoplay=True).add_to(m)
-folium.raster_layers.VideoOverlay(video_url=video2,bounds = extents,name='PM_video',opacity = 0.5,attr = 'pm_video_map',show = False,autoplay=True).add_to(m)
-folium.raster_layers.VideoOverlay(video_url=video3,bounds = extents,name='O3_tiled_video',opacity = 0.5,attr = 'O3_tiled_video_map',show = False,autoplay=True).add_to(m)
-folium.raster_layers.VideoOverlay(video_url=video4,bounds = extents,name='PM_tiled_video',opacity = 0.5,attr = 'pm_tiled_video_map',show = False,autoplay=True).add_to(m)
+#folium.raster_layers.VideoOverlay(video_url=video1,bounds = extents,name='O3_video',opacity = 0.5,attr = 'O3_video_map',show = True,autoplay=True).add_to(m)
+#folium.raster_layers.VideoOverlay(video_url=video2,bounds = extents,name='PM_video',opacity = 0.5,attr = 'pm_video_map',show = False,autoplay=True).add_to(m)
+folium.raster_layers.VideoOverlay(video_url=video3,bounds = extents,name='O3_timelapse_video',opacity = 0.5,attr = 'O3_tiled_video_map',show = False,autoplay=True).add_to(m)
+folium.raster_layers.VideoOverlay(video_url=video4,bounds = extents,name='PM_timelapse_video',opacity = 0.5,attr = 'pm_tiled_video_map',show = False,autoplay=True).add_to(m)
 
 # Add ability to move between layers
 folium.LayerControl().add_to(m)

@@ -127,7 +127,7 @@ g = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 g.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 g = g.drop(0,1)
 
-species = ['PM2.5']#,'OZONE','CO','NO2']
+species = ['PM2.5','OZONE','CO','NO2']
 for pollutant in species:
     if pollutant == 'PM2.5':
         abrv = 'PM2.5'
@@ -269,12 +269,18 @@ for pollutant in species:
         d = df_tseries.copy().set_index('datetime')
         d = d.resample('D').max()
         
-    
+    t1 = '2018-05-11'
+    t2 = '2018-12-21'
+    t1 = pd.to_datetime(t1)
+    t2 = pd.to_datetime(t2)
 #Plot
 
     fig,ax=plt.subplots(1,1, figsize=(12,4))
             
     d.ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'blue', 'red'], label=['OBS', 'sens', 'base'])
+    plt.axvline(dt.datetime(2018, 5, 11),color = 'green')
+    plt.axvline(dt.datetime(2018, 12, 21),color = 'green')
+    
     ax.set_title(t_title)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
     ax.set_ylabel(abrv+' '+unit)
@@ -287,8 +293,10 @@ for pollutant in species:
 #Calculate Statistics
     try:
         #Run stats functions
-        aq_stats_4km = stats(d, abrv+'_AP5_4km', abrv+'_obs')
-        aq_stats_1p33km = stats(d, abrv+'_AP5_1.33km', abrv+'_obs')
+        mask = (d.index > start_date) & (d.index <= t1) # Create a mask to determine the date range used
+        d1 = d.loc[mask]
+        aq_stats_4km = stats(d1, abrv+'_AP5_4km', abrv+'_obs')
+        aq_stats_1p33km = stats(d1, abrv+'_AP5_1.33km', abrv+'_obs')
         aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
         g = pd.merge(g, aq_stats, how = 'inner', left_index = True, right_index = True)
         
