@@ -293,8 +293,12 @@ for pollutant in species:
 #Calculate Statistics
     try:
         #Run stats functions
-        mask = (d.index > start_date) & (d.index <= t1) # Create a mask to determine the date range used
-        d1 = d.loc[mask]
+# =============================================================================
+#         # Use this to calc stats for befor the BCON issue
+#         mask = (d.index > start_date) & (d.index <= t1) # Create a mask to determine the date range used
+#         d1 = d.loc[mask]
+# =============================================================================
+        d1 = d
         aq_stats_4km = stats(d1, abrv+'_AP5_4km', abrv+'_obs')
         aq_stats_1p33km = stats(d1, abrv+'_AP5_1.33km', abrv+'_obs')
         aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
