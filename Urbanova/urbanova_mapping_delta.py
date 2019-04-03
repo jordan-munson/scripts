@@ -18,6 +18,7 @@ import matplotlib.ticker as ticker
 from matplotlib import dates
 from matplotlib.dates import date2num, DayLocator, DateFormatter
 from calendar import monthrange
+import pickle
 #import simplekml
 
 # Set file paths
@@ -196,6 +197,12 @@ print(airpact_3d.keys())
 print(airpact_3d['PMIJ'].shape)
 print(airpact_3d['DateTime'].shape)
 print(airpact_3d['lat'].shape)
+
+name = base_dir+'1p33_regrid4km_'+start.strftime("%Y%m%d")+'_'+end.strftime("%Y%m%d")+'_PST'
+def load_obj(name ):
+    with open(name + '.pkl', 'rb') as f:
+        return pickle.load(f)
+airpact = load_obj(name)
 #base map
 m = Basemap(projection='lcc', width=w, height=h, lat_0=lat_0, lon_0=lon_0,
               llcrnrlon = lon[0,0], urcrnrlon = lon[30-1,30 -1], 
@@ -277,21 +284,33 @@ with PdfPages(base_dir+'maps/delta_avg_basemap_' + '_'+ start.strftime("%Y%m%d")
         up_scale = np.percentile(airpact[sp], 95)
         if sp == "O3":
             clevs = [-4,-3,-2,-1,0,1,2,3,4,5]
+            vmin = -4
+            vmax = 5
         else:
             clevs = [-1.2,-.8,-.4,0,.4,.8,1.2]
+            vmin = -1.2
+            vmax = 1.2
         #clevs = np.round(np.arange(down_scale, up_scale, (up_scale-down_scale)/10),3)
         print("debug clevs", clevs, sp)
         
         cblabel = unit_list[i]
         cbticks = True
-        cs = m.contourf(x,y,airpact[sp].mean(axis=0),clevs,cmap=plt.get_cmap('jet'), extend='both')
-        cs.cmap.set_under('cyan')
-        cs.cmap.set_over('black')
+# =============================================================================
+#         #Contour way
+#         cs = m.contourf(x,y,airpact[sp].mean(axis=0),clevs,cmap=plt.get_cmap('jet'), extend='both')
+#         cs.cmap.set_under('cyan')
+#         cs.cmap.set_over('black')
+# =============================================================================
+        
+        # Colormesh way
+        cmap = plt.get_cmap('jet')
+        colormesh = m.pcolormesh(x, y, airpact[sp].mean(axis=0), vmin = vmin,vmax=vmax, cmap=cmap)
+        colormesh.cmap.set_over('black')
         
         #m.drawcoastlines()
         #m.drawstates()
        # m.drawcountries()
-#        m.drawcounties()
+        m.drawcounties()
         cbar = m.colorbar(location='bottom',pad="5%")
         cbar.set_label(cblabel)
         if cbticks:

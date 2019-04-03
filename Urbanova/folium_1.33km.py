@@ -80,7 +80,7 @@ with PdfPages(base_dir+'maps/urbanova_avg_basemap_' + '_'+ start.strftime("%Y%m%
         fig = plt.figure(figsize=(14,10))
         #plt.title(sp)
         o3_max = 75
-        pm_max = 35
+        pm_max = 10
         o3_bins = np.arange(0, o3_max, 5)
         pm_bins = np.arange(0, pm_max, 5)
         vmin = 0
@@ -528,7 +528,7 @@ folium.raster_layers.ImageOverlay(png2,bounds = extents,name='PM',opacity = 0.5,
 # Add videos to Folium
 #folium.raster_layers.VideoOverlay(video_url=video1,bounds = extents,name='O3_video',opacity = 0.5,attr = 'O3_video_map',show = True,autoplay=True).add_to(m)
 #folium.raster_layers.VideoOverlay(video_url=video2,bounds = extents,name='PM_video',opacity = 0.5,attr = 'pm_video_map',show = False,autoplay=True).add_to(m)
-folium.raster_layers.VideoOverlay(video_url=video3,bounds = extents,name='O3_timelapse_video',opacity = 0.5,attr = 'O3_tiled_video_map',show = False,autoplay=True).add_to(m)
+folium.raster_layers.VideoOverlay(video_url=video3,bounds = extents,name='O3_timelapse_video',opacity = 0.5,attr = 'O3_tiled_video_map',show = True,autoplay=True).add_to(m)
 folium.raster_layers.VideoOverlay(video_url=video4,bounds = extents,name='PM_timelapse_video',opacity = 0.5,attr = 'pm_tiled_video_map',show = False,autoplay=True).add_to(m)
 
 # Add ability to move between layers

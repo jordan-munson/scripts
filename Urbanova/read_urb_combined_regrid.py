@@ -67,13 +67,15 @@ def datetime_range(start, end, delta):
         current += delta
       
 #Main program starts here
-# =============================================================================
-# inoutputDir    = '/data/lar/projects/Urbanova/'
-# outputDir = '/data/lar/users/jmunson/'
-# =============================================================================
+inoutputDir    = '/data/lar/users/jmunson/Urbanova_regrid4km/'
+outputDir = '/data/lar/users/jmunson/'
+grid_dir_urb = '/data/lar/projects/Urbanova/2018/2018011100/MCIP37/'
 
-inoutputDir = r'E:/Research/Urbanova_Jordan/Urbanova_regrid4km/'
-outputDir = r'E:/Research/Urbanova_Jordan/'
+# =============================================================================
+# inoutputDir = r'E:/Research/Urbanova_Jordan/Urbanova_regrid4km/'
+# outputDir = r'E:/Research/Urbanova_Jordan/'
+# grid_dir_urb=r'E:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison\Urbanova/2018\2018011100\MCIP37/'
+# =============================================================================
 
 start = datetime.datetime(year=2018, month=1, day=11, hour=0)
 end = datetime.datetime(year=2018, month=12, day=31, hour=23)
@@ -91,10 +93,13 @@ inputlon=-120
 
 
 # read grid information
-modelgrid = inoutputDir +start.strftime("%Y")+'/'+start.strftime("%Y%m%d")+"00/MCIP37/GRIDCRO2D"
+modelgrid = grid_dir_urb+"GRIDCRO2D"
 nc  = Dataset(modelgrid, 'r')
 lat = nc.variables['LAT'][0,0,:,:]
 lon = nc.variables['LON'][0,0,:,:]
+#Drop rows and columns to make lat/lon coordinates match
+lat = lat[1::3, 1::3]
+lon = lon[1::3, 1::3]
 nc.close()
         
 # sample lat/lon grid information 
@@ -212,5 +217,5 @@ def save_obj(obj, name ):
     with open(name + '.pkl', 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
     
-name = outputDir+'1p33_'+start.strftime("%Y%m%d")+'_'+end.strftime("%Y%m%d")+'_PST'
+name = outputDir+'1p33_regrid4km_'+start.strftime("%Y%m%d")+'_'+end.strftime("%Y%m%d")+'_PST'
 save_obj(modelarray,name)

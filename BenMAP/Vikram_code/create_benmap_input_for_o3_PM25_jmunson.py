@@ -29,24 +29,24 @@ time_begin = time.time()
 #################################################
 # USER INPUTS ETC.
 # PC
-inputDir   = r'E:/Research/Urbanova_Jordan/Urbanova_ref_site_comparison/Urbanova/2018/'
-outDir     = r'E:/Research/Benmap/output/pc/'
-grd_file   = r'E:/Research/Urbanova_Jordan/Urbanova_POST/GRIDCRO2D'    
+# =============================================================================
+# inputDir   = r'E:/Research/Urbanova_Jordan/Urbanova_ref_site_comparison/Urbanova/2018/'
+# outDir     = r'E:/Research/Benmap/output/pc/'
+# grd_file   = r'E:/Research/Urbanova_Jordan/Urbanova_POST/GRIDCRO2D'    
+# =============================================================================
 
 # Aeolus
-#inputDir   = '/data/lar/projects/Urbanova/2018/' #for Urbanova files
-#inputDir   = '/data/lar/users/jmunson/Urbanova_regrid4km/' #for Airpact files
-
-#outDir     = '/data/lar/users/jmunson/benmap/script_output/'
-#grd_file   = '/data/lar/projects/Urbanova/2018/2018011100/MCIP37/GRIDCRO2D'    # This file still exists so the path is valid for this
+inputDir   = '/data/lar/projects/Urbanova/2018/' #for Urbanova files
+outDir     = '/data/lar/users/jmunson/benmap/script_output/'
+grd_file   = '/data/lar/projects/Urbanova/2018/2018011100/MCIP37/GRIDCRO2D'    # This file still exists so the path is valid for this
 
 
-pollutant  = 'PMIJ'          # PM25 or O3
+pollutant  = 'O3'          # PM25 or O3
 case       = 'BASE'         # 2EMIS or NARA or BASE
 epi_to_qtr = True           # if getting quarterly mean / annual mean from an episode (we assume that quarterly/annual mean equals episodic mean in worst case, NOTE: not valid for fire silumations)
-metric     = 'D24HourMean'   # for Ozone - D8HourMax or D1HourMax; for PM2.5 - D24HourMean, QuarterlyMean, AnnualMean
+metric     = 'D8HourMax'   # for Ozone - D8HourMax or D1HourMax; for PM2.5 - D24HourMean, QuarterlyMean, AnnualMean
 beginDate  = '2018-01-11'    # begin date of simulations
-endDate    = '2018-01-13'    # end date of simulations
+endDate    = '2018-12-31'    # end date of simulations
 
 #################################################
 # based on user inputs, create some date variables
