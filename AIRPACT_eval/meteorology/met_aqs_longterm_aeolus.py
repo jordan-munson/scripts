@@ -250,41 +250,43 @@ print(date_diff_final)
 '''
 now=start
 
-if int(start.strftime('%Y%m%d')) < 20160425:  
-    #modeloutputs =  datadir + start.strftime('%Y%m%d')+'00/MCIP/METCRO2D'
-    modeloutputs = base_dir+'/2009050200/MCIP/METCRO2D'
-else:
-    modeloutputs =  datadir + start.strftime('%Y%m%d')+'00/MCIP37/METCRO2D'
-print(int(start.strftime('%Y%m%d')) < 20160425)
-print(modeloutputs)
-# open and read wrfout using netCDF function (Dataset)
-if os.path.isfile(modeloutputs):
-    nc  = Dataset(modeloutputs, 'r')
-    print('reading ', modeloutputs)
-else:
-    print("no file")
-    exit()
-
-# x_dim and y_dim are the x (lon) and y (lat) dimensions of the model
-x_dim = len(nc.dimensions['COL'])
-y_dim = len(nc.dimensions['ROW'])
-
-# Get a variable (T2) from netCDF file for Basemap
-#t_basemap = wrf.getvar(nc, "TEMP2")
-
-nc.close()
-
-# obtain model lat and lon - needed for AQS eval and basemap
-latlon = grid
-fin0 = Dataset(latlon, 'r')
-lat = fin0.variables['LAT'][0,0]
-lon = fin0.variables['LON'][0,0]
-w = (fin0.NCOLS)*(fin0.XCELL)
-h = (fin0.NROWS)*(fin0.YCELL)
-lat_0 = fin0.YCENT
-lon_0 = fin0.XCENT
-fin0.close()
-
+# =============================================================================
+# if int(start.strftime('%Y%m%d')) < 20160425:  
+#     #modeloutputs =  datadir + start.strftime('%Y%m%d')+'00/MCIP/METCRO2D'
+#     modeloutputs = base_dir+'/2009050200/MCIP/METCRO2D'
+# else:
+#     modeloutputs =  datadir + start.strftime('%Y%m%d')+'00/MCIP37/METCRO2D'
+# print(int(start.strftime('%Y%m%d')) < 20160425)
+# print(modeloutputs)
+# # open and read wrfout using netCDF function (Dataset)
+# if os.path.isfile(modeloutputs):
+#     nc  = Dataset(modeloutputs, 'r')
+#     print('reading ', modeloutputs)
+# else:
+#     print("no file")
+#     exit()
+# 
+# # x_dim and y_dim are the x (lon) and y (lat) dimensions of the model
+# x_dim = len(nc.dimensions['COL'])
+# y_dim = len(nc.dimensions['ROW'])
+# 
+# # Get a variable (T2) from netCDF file for Basemap
+# #t_basemap = wrf.getvar(nc, "TEMP2")
+# 
+# nc.close()
+# 
+# # obtain model lat and lon - needed for AQS eval and basemap
+# latlon = grid
+# fin0 = Dataset(latlon, 'r')
+# lat = fin0.variables['LAT'][0,0]
+# lon = fin0.variables['LON'][0,0]
+# w = (fin0.NCOLS)*(fin0.XCELL)
+# h = (fin0.NROWS)*(fin0.YCELL)
+# lat_0 = fin0.YCENT
+# lon_0 = fin0.XCENT
+# fin0.close()
+# 
+# =============================================================================
 layer=0
 
 

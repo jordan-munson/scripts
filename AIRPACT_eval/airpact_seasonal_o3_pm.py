@@ -157,8 +157,8 @@ df_com = df_com.drop(['State Code','County Code','Site Number'],axis=1) # drop u
 print('Combined dataframe finished')
 
 # Set plot parameters
-mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 28.0
+mpl.rcParams['font.family'] = 'times new roman'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 10.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -397,8 +397,9 @@ settings = ['RURAL', 'SUBURBAN', 'URBAN AND CENTER CITY']
 #seasons = ['Summer','Fall','Winter','Spring'] 
 seasons = ['Summer','Winter'] 
 
-pollutant = ['PM2.5','O3']
-#pollutant = ['O3']
+#pollutant = ['PM2.5','O3']
+pollutant = ['O3']
+pollutant = ['PM2.5']
 versions = ['AP3','AP4','AP5']
 
 # Short version to make running on pc faster
@@ -408,15 +409,19 @@ for species in pollutant:
     print(species)
     da = df_com.dropna(subset=['Location Setting'])
     # Create the overal plot and its settings
-    fig = plt.figure(figsize=(26,10))#10,18)) # seems to do nothing here really
+    fig = plt.figure(figsize=(6,3),dpi=300)#8,4)) # seems to do nothing here really
     if species == 'PM2.5':
         #fig.set_ylabel('$PM_{2.5} (ug/m^3)$')
-        fig.text(-0.01, 0.5, '$PM_{2.5} (ug/m^3)$', va='center', rotation='vertical')
-        fig.suptitle('Daily Averaged Seasonal Variations',y=1.06) # title
+        fig.text(-0.015, 0.5, '$PM_{2.5} (ug/m^3)$', va='center', rotation='vertical')
+# =============================================================================
+#         fig.suptitle('Daily Averaged Seasonal Variations',y=1.06) # title
+# =============================================================================
     else:
         #fig.set_ylabel('Ozone (ppb)') 
-        fig.text(-0.01, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
-        fig.suptitle('Daily Max 8-Hr Ozone Seasonal Variations',y=1.06) # title
+        fig.text(-0.015, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
+# =============================================================================
+#         fig.suptitle('Daily Max 8-Hr Ozone Seasonal Variations',y=1.06) # title
+# =============================================================================
         
     
     fig.tight_layout() # spaces the plots out a bit
@@ -427,9 +432,13 @@ for species in pollutant:
 #     fig.text(0.5, 0.66, 'AIRPACT 4', va='center',ha='center')
 #     fig.text(0.5, 0.33, 'AIRPACT 5', va='center',ha='center')
 # =============================================================================
-    fig.text(0.179, .98, 'AP-3', va='center',ha='center')
-    fig.text(0.5051, 0.98, 'AP-4', va='center',ha='center')
-    fig.text(0.833, 0.98, 'AP-5', va='center',ha='center')
+    fig.text(0.21, 0.98, 'AP-3', va='center',ha='center')
+    fig.text(0.527, 0.98, 'AP-4', va='center',ha='center')
+    fig.text(0.845, 0.98, 'AP-5', va='center',ha='center')
+    # seasons
+    fig.text(0.013,0.78,'Winter',va='center',ha='center', rotation='vertical')
+    fig.text(0.013,0.3,'Summer',va='center',ha='center', rotation='vertical')
+    
     for version,i in zip(versions,[0,1,2]):#[0,4,8]):
         print(version)
     # Set date range used based of versions
@@ -547,7 +556,7 @@ for species in pollutant:
                     ax = fig.add_subplot(6,2,2+i)
 
                     
-            plt.rcParams["figure.figsize"] = (8,4)
+            #plt.rcParams["figure.figsize"] = (8,4)
             plt.tight_layout() # spaces the plots out a bit
 
             # Change data to monthly averages
@@ -622,27 +631,33 @@ for species in pollutant:
             ax.xaxis.set_major_locator(months)
             ax.xaxis.set_minor_locator(days)
             ax.set_xlabel('')        # Gets rid of the 'DateTime' x label and replaces with a space
-            ax.set_title(str(season),fontsize=28) # sets the titles of individ plots as the season, and makes the font smaller
-            plt.legend(prop={'size': 16})#,loc=3) # Places the legend in the lower left corner at a size of 10
+# =============================================================================
+#             ax.set_title(str(season),fontsize=12) # sets the titles of individ plots as the season, and makes the font smaller
+# =============================================================================
+            #plt.legend(['Observation','Forecast'],prop={'size': 8})
             sze = 10 #size of annotation text            
             
             # Set letter denoting plot
             if i ==0:
                 if season == 'Winter':
                     abc = 'A'
+                    plt.legend(['Observation','Forecast'],prop={'size': 8})
                 else:
                     abc = 'D'
+                    ax.get_legend().remove()
             if i ==1:
+                ax.get_legend().remove()
                 if season == 'Winter':
                     abc = 'B'
                 else:
                     abc = 'E'
             if i ==2:
+                ax.get_legend().remove()
                 if season == 'Winter':
                     abc = 'C'
                 else:
                     abc = 'F'
-            ax.text(-0.02, 1.08,abc,fontsize = 20, ha='right', va='center', transform=ax.transAxes)
+            ax.text(1.07, 1.23,abc,fontsize = 20, ha='right', va='center', transform=ax.transAxes)
     
             plt.grid(True)    # Add grid lines to make graph interpretation easier
             

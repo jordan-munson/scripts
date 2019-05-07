@@ -486,3 +486,5 @@ make_kml(llcrnrlon=lon.min(),
          figs=figures,# colorbar=base_dir+'legend.png',
          kmzfile=base_dir+'6.kmz') 
 print('End of script')
+
+

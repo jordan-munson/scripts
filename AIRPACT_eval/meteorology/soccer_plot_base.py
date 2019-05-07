@@ -11,13 +11,13 @@ import matplotlib.patches as patches
 import numpy as np
 
 # Set directories
-inputdir = r'G:/Research/AIRPACT_eval/meteorology/'
-outputdir = r'G:/Research/AIRPACT_eval/meteorology/AQS_plots/soccer_plots'
+inputdir = r'E:/Research/AIRPACT_eval/meteorology/'
+outputdir = r'E:/Research/AIRPACT_eval/meteorology/AQS_plots/soccer_plots'
 
 #Load data
 #df_airpact = pd.read_csv(inputdir+'df_airpact.csv').drop(['Unnamed: 0','lat','lon'],axis=1)
 #df_obs = pd.read_csv(inputdir+'df_obs.csv').drop(['Unnamed: 0','Local Site Name'],axis=1).rename(columns={'datetime':'DateTime'})
-df_stats = pd.read_csv(inputdir + 'aqs_stats.csv').drop(['Unnamed: 0','model'],axis=1)
+df_stats = pd.read_csv(inputdir + 'AQS_stats/aqs_stats.csv').drop(['Unnamed: 0','model'],axis=1)
 
 #df_all = pd.merge(df_airpact,df_obs,how ='outer',left_index=True,right_index=True, on = ['DateTime','AQS_ID'])
 print('Dataframes read')

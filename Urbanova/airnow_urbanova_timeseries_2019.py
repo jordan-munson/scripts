@@ -22,18 +22,17 @@ import os
 from netCDF4 import Dataset
 from matplotlib.backends.backend_pdf import PdfPages
 from calendar import monthrange
-
 print('Start of airnow Analysis')
 
 
 starttime = time.time()
 day='01'
 month = '01' 
-year  = '2018' 
+year  = '2019' 
 
-endday = '21'#'31'
-endmonth='04'#'12'
-endyear='2018'
+endday = '21'
+endmonth='04'
+endyear='2019'
 
 end_year=int(endyear)
 end_month=int(endmonth) 
@@ -123,6 +122,23 @@ print('AIRNOW data concatenated')
 # Open statistics script
 exec(open(stats_dir +"statistical_functions.py").read()) 
 #%%
+# Need to load 2019 data from individual sites
+df_obs_orig = pd.DataFrame()
+folder = ['160090011', '160550003', '160550004', '530630001',
+       '530630021', '530630046', '530630047', '530639995', '530639997',
+       '530650002', '530750006', '530639999']
+apan_col_names = ['datetime','O3_AP5_4km','PM2.5_AP5_4km','CO_AP5_4km','NO_AP5_4km','NO2_AP5_4km','NOX_AP5_4km','WSPM2.5_AP5_4km','PM10_AP5_4km','SO2_AP5_4km',
+                  'O3_obs','PM2.5_obs','CO_obs','NO_obs','NO2_obs','NOX_obs','PM10_obs','SO2_obs']
+for file in folder:
+    try:
+        x = pd.read_csv('http://lar.wsu.edu/R_apps/2019ap5/data/byAQSID/'+file+'.apan',names=apan_col_names,header=None,skiprows=1)
+        x['site_id'] = file
+        df_obs_orig=df_obs_orig.append(x)
+    except:
+        print('http://lar.wsu.edu/R_apps/2019ap5/data/byAQSID/'+file+'.apan')
+        continue
+
+
 g = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 g.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 g = g.drop(0,1)
@@ -133,7 +149,7 @@ for pollutant in species:
         abrv = 'PM2.5'
         unit = '($ug/m^3$)'
         y_max = 30
-        t_title = str(end_year)+ ' Daily Mean '+pollutant
+        t_title = endyear+' Daily Mean '+pollutant
         s_title = t_title
     if pollutant == 'OZONE':
         abrv = 'O3'
@@ -162,7 +178,7 @@ for pollutant in species:
         col_names_observed= ['datetime', 'site_id', 'O3_AP5_4km', 'PM2.5_AP5_4km', 'O3_obs', 'PM2.5_obs']
         #df_base  = pd.read_csv(file_modelled_base, header=None, names=col_names_modeled, sep='|',dtype='unicode')   #AIRNOW data is seperated by |, thus it has to be specified here
         df_base  = pd.read_csv(file_modelled_base).drop('Unnamed: 0',axis=1) # new method
-        df_obs   = pd.read_csv('http://lar.wsu.edu/R_apps/'+str(end_year)+'ap5/data/hrly'+str(end_year)+'.csv', sep=',', names=col_names_observed, skiprows=[0],dtype='unicode')
+        df_obs   = df_obs_orig
         df_sites = pd.read_csv(file_airnowsites, skiprows=[1],dtype='unicode') # skip 2nd row which is blank
         df_sites.rename(columns={'AQSID':'site_id'}, inplace=True)
         print('O3/PM2.5 files read')
@@ -171,7 +187,7 @@ for pollutant in species:
         col_names_observed= ['datetime', 'site_id','CO_AP5_4km', 'NOX_AP5_4km','NO_AP5_4km', 'NO2_AP5_4km','CO_obs', 'NOX_obs','NO_obs','NO2_obs']
         #df_base   = pd.read_csv(file_modelled_base, header=None, names=col_names_modeled, sep='|',dtype='unicode')   #AIRNOW data is seperated by |, thus it has to be specified here
         df_base  = pd.read_csv(file_modelled_base).drop('Unnamed: 0',axis=1) # new method
-        df_obs   = pd.read_csv('http://lar.wsu.edu/R_apps/'+str(end_year)+'ap5/data/hrly'+str(end_year)+'_conoxnono2.csv', sep=',', names=col_names_observed, skiprows=[0],dtype='unicode')
+        df_obs   = df_obs_orig
         df_sites = pd.read_csv(file_airnowsites, skiprows=[1],dtype='unicode') # skip 2nd row which is blank
         df_sites.rename(columns={'AQSID':'site_id'}, inplace=True)
         print('CO/NOX files read')  
@@ -179,7 +195,7 @@ for pollutant in species:
         col_names_modeled = ['date', 'time', 'site_id', 'pollutant', 'concentration']
         col_names_observed= ['datetime', 'site_id', 'SO2_AP5_4km', 'SO2_obs']
         df_base   = pd.read_csv(file_modelled_base, header=None, names=col_names_modeled, sep='|',dtype='unicode')   #AIRNOW data is seperated by |, thus it has to be specified here
-        df_obs   = pd.read_csv('http://lar.wsu.edu/R_apps/'+str(end_year)+'ap5/data/hrly'+str(end_year)+'_so2.csv', sep=',', names=col_names_observed, skiprows=[0],dtype='unicode')
+        df_obs   = df_obs_orig
         df_sites = pd.read_csv(file_airnowsites, skiprows=[1],dtype='unicode') # skip 2nd row which is blank
         df_sites.rename(columns={'AQSID':'site_id'}, inplace=True)
         print('SO2 files read')        
@@ -278,8 +294,10 @@ for pollutant in species:
     fig,ax=plt.subplots(1,1, figsize=(12,4))
             
     d.ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'blue', 'red'], label=['OBS', 'sens', 'base'])
-    plt.axvline(dt.datetime(2018, 5, 11),color = 'green')
-    plt.axvline(dt.datetime(2018, 12, 21),color = 'green')
+# =============================================================================
+#     plt.axvline(dt.datetime(2018, 5, 11),color = 'green')
+#     plt.axvline(dt.datetime(2018, 12, 21),color = 'green')
+# =============================================================================
     
     ax.set_title(t_title)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))

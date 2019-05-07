@@ -11,8 +11,8 @@ from matplotlib.dates import DateFormatter
 import matplotlib.dates as mdates
 
 # Set plot parameters
-mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 20.0
+mpl.rcParams['font.family'] = 'time new roman'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 10.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -25,16 +25,18 @@ mpl.rcParams['ytick.direction']   = 'in'
 mpl.rcParams['xtick.direction']   = 'in'
 
 
-fig = plt.figure(figsize=(26,10))
+fig = plt.figure(figsize=(6,3))
 fig.text(-0.02, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
-fig.suptitle('Seasonal Variations by AIRPACT Version',y=1.025) # title
+#fig.suptitle('Seasonal Variations by AIRPACT Version',y=1.025) # title
 fig.tight_layout() # spaces the plots out a bit
 
 #Annotate versions in
-fig.text(0.179, .98, 'AP-3', va='center',ha='center')
-fig.text(0.5051, 0.98, 'AP-4', va='center',ha='center')
-fig.text(0.833, 0.98, 'AP-5', va='center',ha='center')
+fig.text(0.214, 0.92, 'AP-3', va='center',ha='center')
+fig.text(0.53, 0.92, 'AP-4', va='center',ha='center')
+fig.text(0.845, 0.92, 'AP-5', va='center',ha='center')
 
+fig.text(0.01,0.78,'Winter',va='center',ha='center', rotation='vertical')
+fig.text(0.01,0.3,'Summer',va='center',ha='center', rotation='vertical')
 # Make winter month 
 db = pd.DataFrame()
 s = '12/1/2009'
@@ -50,16 +52,23 @@ db['data'] = 5
 
 for i,abc in zip([1,2,3,4,5,6],['A','B','C','D','E','F']):
     ax = fig.add_subplot(2,3,i)
-    plt.rcParams["figure.figsize"] = (8,4)
+    plt.legend(prop={'size': 10})
+    if i == 4:
+        plt.legend(prop={'size': 10})
+        print('leg')
+    else:
+        ax.get_legend().remove()
+        print('no leg')
+    #plt.rcParams["figure.figsize"] = (8,4)
     plt.tight_layout() # spaces the plots out a bit
     
     ax.set_xlabel('')        # Gets rid of the 'DateTime' x label and replaces with a space
-    ax.set_title(str('Winter'),fontsize=12) # sets the titles of individ plots as the season, and makes the font smaller
-    plt.legend(prop={'size': 10})#,loc=3) # Places the legend in the lower left corner at a size of 10
+    #ax.set_title(str('Winter'),fontsize=12) # sets the titles of individ plots as the season, and makes the font smaller
+    #plt.legend(prop={'size': 10})#,loc=3) # Places the legend in the lower left corner at a size of 10
     sze = 10 #size of annotation text
     
     # Set letter denoting plot
-    ax.text(-0.02, 1.04,abc,fontsize = 20, ha='right', va='center', transform=ax.transAxes)
+    ax.text(1.07, 1.23,abc,fontsize = 20, ha='right', va='center', transform=ax.transAxes)
     
     db.plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
     

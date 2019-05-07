@@ -76,7 +76,7 @@ m = Basemap(projection='merc',
 x,y = m(lon,lat)
 
 ############################################
-# Averaged domain basemaps       
+# Averaged domain basemaps      - Tiled  
 ############################################
 
 # Set the colorbar values

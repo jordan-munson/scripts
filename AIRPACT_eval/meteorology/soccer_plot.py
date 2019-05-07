@@ -38,8 +38,8 @@ df_wd = df_stats.loc[df_stats['index']=='WD_1']
 sites = ['URBAN AND CENTER CITY','SUBURBAN','RURAL']
 
 # Set plot parameters
-mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 20.0
+mpl.rcParams['font.family'] = 'times new roman'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 10.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -288,7 +288,7 @@ fig.savefig(outputdir + '/airpact_versions_nmbnme.png' ,bbox_inches='tight')
 #%%
 # Create a soccer plot function to make them easier
 def soccer(x,y,axismax,size1,size2,temp,press,rh,ws,wd):    # x and y are stats looked at, then set plot axis, then squares, then determine which species
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(5, 3),dpi=200)
     
     # set axis limits
     plt.ylim((0,axismax))
@@ -331,22 +331,26 @@ def soccer(x,y,axismax,size1,size2,temp,press,rh,ws,wd):    # x and y are stats 
     if temp and ws and rh == 'yes':
         name = 'combined'
     # Label plot
-    ax.set(title='Hourly Meteorology',xlabel=x,ylabel=y)
+    ax.set(xlabel=x,ylabel=y)#,title='Hourly Meteorology')
     
     # Place textbox of color legend
     props = dict(boxstyle='square', facecolor='white', alpha=0.0)
     
     # Draw legends
-    ax.text(1.03,0.5,'AP3',transform=ax.transAxes,
+    vers_anno_x = .89
+    ax.text(vers_anno_x,0.57,'AP3',transform=ax.transAxes,
             verticalalignment='top', bbox=props, color='red')
-    ax.text(1.03,0.41,'AP4',transform=ax.transAxes,
+    ax.text(vers_anno_x,0.51,'AP4',transform=ax.transAxes,
             verticalalignment='top', bbox=props, color='green')
-    ax.text(1.03,0.32,'AP5',transform=ax.transAxes,
+    ax.text(vers_anno_x,0.45,'AP5',transform=ax.transAxes,
             verticalalignment='top', bbox=props, color='blue')
     
-    
+    #Draw rectangle to encompass versions
+    rect = patches.Rectangle((1.05,.57),.4,.3,facecolor='none',linewidth=1,edgecolor='black',linestyle='solid',clip_on=False,alpha=0.3)
+    ax.add_patch(rect)
+
     #ax.legend()
-    legend = plt.legend(loc=legend_loc,fontsize=12)
+    legend = plt.legend(loc='lower right',fontsize=8)
     plt.setp(legend.get_texts(), color='black')
     
     # Save the plot

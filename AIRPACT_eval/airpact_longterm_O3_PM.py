@@ -13,14 +13,16 @@ import time
 starttime = time.time()
 begin_time = time.time()
 
-day='01'
-month = '04' 
-year  = '2018' 
-
-endday = '31'
-#endmonth='05'
-endmonth='12'
-endyear='2018'
+# =============================================================================
+# day='01'
+# month = '04' 
+# year  = '2018' 
+# 
+# endday = '31'
+# #endmonth='05'
+# endmonth='12'
+# endyear='2018'
+# =============================================================================
 
 # =============================================================================
 # # Aeolus directories
@@ -192,8 +194,8 @@ exec(open(stat_path).read())
 # =============================================================================
 
 # Set plot parameters
-mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 24.0
+mpl.rcParams['font.family'] = 'times new roman'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 10.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -512,7 +514,7 @@ settings = ['RURAL', 'SUBURBAN', 'URBAN AND CENTER CITY']
 pollutant = ['O3','PM2.5']
 for species in pollutant:
     da = df_com.copy().dropna(subset=['Location Setting'])
-    fig = plt.figure(figsize=(14,16))
+    fig = plt.figure(dpi=200,figsize=(7,8)) # (7,8)
     #fig.suptitle('Monthly Averaged '+str(species),y=0.94,fontsize=27,ha='center') # title
     fig.tight_layout() # spaces the plots out a bit
     
@@ -554,16 +556,20 @@ for species in pollutant:
             ax.set_ylim(0,25)
             height = 20 # Height of annotations in graphs
             spc = 1.2 # Space the annotations are moved up and down
-            plt.legend(prop={'size': 20},loc=2)
+            plt.legend(['Observation','Forecast'],prop={'size': 8},loc=2)
         else:
             ax.set_ylabel('Ozone (ppb)')
             ax.set_ylim(0,50)
             height=10
             spc = 2
-            plt.legend(prop={'size': 20},loc=3)
+            plt.legend(['Observation','Forecast'],prop={'size': 8},loc=3)
         
         ax.set_xlim('2009-1-1','2018-12-31')
-        ax.set_xlabel(' ')        
+        ax.set_xlabel(' ')    
+        # remove zero on y axis to prevent overlap with year on x axis
+        yticks = ax.yaxis.get_major_ticks() 
+        yticks[0].label1.set_visible(False)
+
         ax.set_title(str(site_type))
        # plt.legend(prop={'size': 20},loc=2)
         sze = 10 #size of annotation text
@@ -571,7 +577,7 @@ for species in pollutant:
         plt.grid(True)    # Add grid lines to make graph interpretation easier
         
         #text_height = 0.061
-        text_height = 0.009 # 0.005 almost works
+        text_height = 0.02 # 0.005 almost works
         x1 = 0.429
         x2 = 0.689
         x3 = 0.95
@@ -612,7 +618,7 @@ for species in pollutant:
 # =============================================================================
 
         #ax.text(1.01, 0.4,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes)  
-        ax.text(0.98, 0.92,'# of Observation sites '+str(temp1),fontsize = 20, ha='right', va='center', transform=ax.transAxes) 
+        ax.text(0.98, 0.92,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes) 
                 
         letter_horz = 1.048
         if i == 1:

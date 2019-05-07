@@ -6,7 +6,7 @@ Created on Thu Dec 20 08:51:54 2018
 """
 
 import matplotlib as mpl
-#mpl.use('Agg')
+mpl.use('Agg')
 import pandas as pd
 import matplotlib.pyplot as plt
 import time
@@ -139,8 +139,8 @@ exec(open(stat_path).read())
 #df_com = df_com.dropna(thresh = 6) # setting threshold to 6 means that any site without ANY data is dropped
 
 # Set plot parameters
-mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 36.0
+mpl.rcParams['font.family'] = 'times new roman'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 10.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -182,7 +182,9 @@ m = Basemap(projection='merc',
 pollutant = ['O3','PM2.5']
 for species in pollutant:
     #plt.figure(figsize=(10,11))
-    fig, ax = plt.subplots(figsize=(10,11))
+    fig, ax = plt.subplots(figsize=(3,3.5),dpi=200)
+    sze_scale = .7
+
 #    if species == 'O3':
     unit_list = 'FB (%)'
 #    else:
@@ -219,14 +221,13 @@ for species in pollutant:
         try:
             #Run stats functions
             aq_stats = stats(d, species+'_mod', species+'_obs')
-            
                     #Mapping
             x, y = m(lon, lat)
             marker_shape = 'o'
             #marker_color = 'r'
             sp = 3 # Fractional Bias
             spp = 4 # FE # Change this if you want the size to correlate to a different statistic
-            size = abs(6*aq_stats[species+'_mod'][spp])
+            size = abs(sze_scale*aq_stats[species+'_mod'][spp])
             m.scatter(x, y, marker=marker_shape,c = aq_stats[species+'_mod'][sp], s = size, alpha = 0.7,cmap=cmap)
             print(AQSID,aq_stats[species+'_mod'][sp])
             plt.clim(-100,100)
@@ -248,19 +249,22 @@ for species in pollutant:
     cbticks = True
     cbar = m.colorbar(location='bottom')#,pad="-12%")    # Disable this for the moment
     cbar.set_label(unit_list)
-    if species == 'O3':
-        plt.title('Ozone Fractional Bias/Error Map')
-    else:
-        plt.title('PM$_{2.5}$ Fractional Bias/Error Map')        
+# =============================================================================
+#     if species == 'O3':
+#         plt.title('Ozone Fractional Bias/Error')
+#     else:
+#         plt.title('PM$_{2.5}$ Fractional Bias/Error')        
+# =============================================================================
     
     # Circle size chart
-    msizes = [0,30,150,300,450,600]
+    msizes = [0,5,25,50,75,100]
+    msizes=[i * sze_scale for i in msizes]
     labels = ['FE (%)',5,25,50,75,100]
     markers = []
     for size,label in zip(msizes,labels):
         markers.append(plt.scatter([],[], s=size, label=label,c='black',alpha = 0.7))
-    plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left',handles=markers)    
-    ax.text(-0.03, 0.5,'B',fontsize = 36, ha='right', va='center', transform=ax.transAxes)
+    plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left',handles=markers,labelspacing=1)    
+    #ax.text(-0.03, 0.5,'B',fontsize = 20, ha='right', va='center', transform=ax.transAxes)
 
     plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map.png',  pad_inches=0.1, bbox_inches='tight')
     plt.show()

@@ -36,15 +36,15 @@ time_begin = time.time()
 # =============================================================================
 
 # Aeolus
-inputDir   = '/data/lar/projects/Urbanova/2018/' #for Urbanova files
+inputDir   = '/data/lar/projects/airpact5/saved/2018/' #for Urbanova files
 outDir     = '/data/lar/users/jmunson/benmap/script_output/'
-grd_file   = '/data/lar/projects/Urbanova/2018/2018011100/MCIP37/GRIDCRO2D'    # This file still exists so the path is valid for this
+grd_file   = '/data/lar/projects/airpact5/AIRRUN/2018/2018011100/MCIP37/GRIDCRO2D'    # This file still exists so the path is valid for this
 
 
 pollutant  = 'PMIJ'          # PMIJ or O3
 case       = 'BASE'         # 2EMIS or NARA or BASE
 epi_to_qtr = True           # if getting quarterly mean / annual mean from an episode (we assume that quarterly/annual mean equals episodic mean in worst case, NOTE: not valid for fire silumations)
-metric     = 'D8HourMax'   # for Ozone - D8HourMax or D1HourMax; for PM2.5 - D24HourMean, QuarterlyMean, AnnualMean
+metric     = 'D24HourMean'   # for Ozone - D8HourMax or D1HourMax; for PM2.5 - D24HourMean, QuarterlyMean, AnnualMean
 beginDate  = '2018-01-11'    # begin date of simulations
 endDate    = '2018-12-31'    # end date of simulations
 
@@ -56,7 +56,7 @@ lastDay   = beginDate.split('-')[0]+'-12-31'            # last day of year
 yearDates = pd.date_range(firstDay, lastDay, freq='D')  # date range of year
 simYear   = beginDate.split('-')[0]                     # for labelling output files
 
-outFile   = outDir + simYear + "_" + case + '_NARA_benmap_' + pollutant + '_' + metric  + '.csv' # output file name
+outFile   = outDir + simYear + "_" + case + '_NARA_AIRPACT_benmap_' + pollutant + '_' + metric  + '.csv' # output file name
 ################################################
 # READ THE INPUT FILES IN NUMPY ARRAYS
 grd    = Dataset(grd_file,'r')
@@ -70,14 +70,12 @@ for i, date in enumerate(dateRange):
     strdy = '{:02d}'.format(date.day)
     YMD   = stryr + strmt + strdy
     doy   = date.strftime('%j')
+    month = date.strftime('%m')
     YJDay = stryr + doy
     
     # CMAQ output file for the date
-    if inputDir == '/data/lar/users/jmunson/Urbanova_regrid4km/':
-        nc_file = inputDir+"/combined_{YearJDay}.regrid4km.ncf".format(inDir=inputDir, YearJDay=YMD)
-    else:
-        nc_file = inputDir+YMD+'00'+"/POST/CCTM/combined_{YearJDay}.ncf".format(inDir=inputDir, YearJDay=YMD)
-    
+    nc_file = inputDir+month+"/aconc/combined_{YearJDay}.ncf".format(inDir=inputDir, YearJDay=YMD)
+    #print(nc_file)
     # read in the data
     if (os.path.isfile(nc_file)):
         concData   = Dataset(nc_file, 'r')
@@ -88,6 +86,7 @@ for i, date in enumerate(dateRange):
            hourlyConc = concData.variables[pollutant][:, 0, :, :]
         elif pollutant == 'PMIJ':
            hourlyConc = concData.variables[pollutant][:, 0, :, :]
+
 
         if i==0:
            concArray = hourlyConc

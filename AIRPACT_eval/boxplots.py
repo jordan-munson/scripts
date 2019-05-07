@@ -190,8 +190,8 @@ exec(open(stat_path).read())
 # 
 # =============================================================================
 # Set plot parameters
-mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 20.0
+mpl.rcParams['font.family'] = 'times new roman'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 10.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -213,7 +213,7 @@ df_com['datetime'] = pd.to_datetime(df_com['datetime'])
 print('Data loading section done')
 
 #%%
-pollutant = ['O3','PM2.5']
+pollutant = ['O3']#,'PM2.5']
 versions = ['AP3','AP4','AP5']
 seasons = ['Summer']#,'Winter'] 
 
@@ -338,7 +338,7 @@ for species in pollutant:
                     dates = pd.date_range(start='3/1/2009',end='5/31/2009')
 
                     
-            plt.rcParams["figure.figsize"] = (8,4)
+            plt.rcParams["figure.figsize"] = (6,3)
             plt.tight_layout() # spaces the plots out a bit
 
             # Change data to monthly averages
@@ -372,7 +372,8 @@ for species in pollutant:
 #                     x1 = avg_8hr_o3.resample('D').max().dropna()
 # =============================================================================
                     
-                    dbc = dbc.append(x1.groupby(x1.index.day).mean())
+                    dbc = dbc.append(x1.groupby(x1.index.day).mean()) # This bit unnecessary. Averages over the whole timeframe into a single month
+                    #dbc = x1
                 db = dbc.dropna()
                 
                 db['datetime'] = dates
@@ -392,9 +393,9 @@ for species in pollutant:
             names.append(version)
             
     # Plotting section
-    fig = plt.figure(figsize=(8,8))
+    fig = plt.figure(figsize=(4,3),dpi=200)
     fig.tight_layout()
-    label = 20
+    label = 10
     if species == 'O3':
         fig.suptitle('Summer 8-Hour Max Average Ozone ',ha='center') # title
         fig.text(0.03, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
@@ -404,7 +405,7 @@ for species in pollutant:
     sites = len(data)
     
     ax = fig.add_subplot(2,1,1)
-    ax.set_title('Modeled',fontsize = label)
+    #ax.set_title('Modeled',fontsize = label)
 
     ax.boxplot(data)
     plt.xticks([],[])
@@ -412,16 +413,25 @@ for species in pollutant:
     #ax.set_ylabel(species+' '+'('+unit_list+')') 
     
     ax = fig.add_subplot(2,1,2)
-    ax.set_title('Observed', fontsize = label)
+    #ax.set_title('Observed', fontsize = label)
 
     ax.boxplot(data1)
     plt.xticks([1,2,3],names)
+    
+    # Removex ticks
+    plt.tick_params(
+    axis='x',          # changes apply to the x-axis
+    which='both',      # both major and minor ticks are affected
+    bottom=False,      # ticks along the bottom edge are off
+    top=False,         # ticks along the top edge are off
+    labelbottom=True) # labels along the bottom edge are off
+    
     #ax.set_ylabel(species+' '+'('+unit_list+')') 
     plt.grid(True,alpha=0.7,axis='y')
     
     # place letters 
-    ax.text(1.07, 1.72,'A', ha='right', va='center', transform=ax.transAxes)
-    ax.text(1.07, 0.5,'B', ha='right', va='center', transform=ax.transAxes)
+    ax.text(1.09, 1.72,'A', ha='right', va='center', transform=ax.transAxes,fontsize=20)
+    ax.text(1.09, 0.5,'B', ha='right', va='center', transform=ax.transAxes,fontsize=20)
     plt.show()
     plt.savefig(inputDir+'/plots/boxplot/'+species+'boxplot.png',  pad_inches=0.1, bbox_inches='tight')
     plt.close()
