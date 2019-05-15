@@ -514,7 +514,7 @@ settings = ['RURAL', 'SUBURBAN', 'URBAN AND CENTER CITY']
 pollutant = ['O3','PM2.5']
 for species in pollutant:
     da = df_com.copy().dropna(subset=['Location Setting'])
-    fig = plt.figure(dpi=200,figsize=(7,8)) # (7,8)
+    fig = plt.figure(dpi=200,figsize=(6.125,7)) # (6.125,7) This is as small as can currently go without having some overlap of labels
     #fig.suptitle('Monthly Averaged '+str(species),y=0.94,fontsize=27,ha='center') # title
     fig.tight_layout() # spaces the plots out a bit
     

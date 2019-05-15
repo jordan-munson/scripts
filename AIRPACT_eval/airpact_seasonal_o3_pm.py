@@ -399,7 +399,7 @@ seasons = ['Summer','Winter']
 
 #pollutant = ['PM2.5','O3']
 pollutant = ['O3']
-pollutant = ['PM2.5']
+#pollutant = ['PM2.5']
 versions = ['AP3','AP4','AP5']
 
 # Short version to make running on pc faster
@@ -432,8 +432,8 @@ for species in pollutant:
 #     fig.text(0.5, 0.66, 'AIRPACT 4', va='center',ha='center')
 #     fig.text(0.5, 0.33, 'AIRPACT 5', va='center',ha='center')
 # =============================================================================
-    fig.text(0.21, 0.98, 'AP-3', va='center',ha='center')
-    fig.text(0.527, 0.98, 'AP-4', va='center',ha='center')
+    fig.text(0.207, 0.98, 'AP-3', va='center',ha='center')
+    fig.text(0.525, 0.98, 'AP-4', va='center',ha='center')
     fig.text(0.845, 0.98, 'AP-5', va='center',ha='center')
     # seasons
     fig.text(0.013,0.78,'Winter',va='center',ha='center', rotation='vertical')

@@ -396,25 +396,28 @@ for species in pollutant:
     fig = plt.figure(figsize=(4,3),dpi=200)
     fig.tight_layout()
     label = 10
-    if species == 'O3':
-        fig.suptitle('Summer 8-Hour Max Average Ozone ',ha='center') # title
-        fig.text(0.03, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
-    else:
-        fig.suptitle('Summer Daily Average PM2.5',ha='center') # title        
-        fig.text(0, 0.5, '$PM_{2.5} (ug/m^3)$', va='center', rotation='vertical')
+# =============================================================================
+#     if species == 'O3':
+#         fig.suptitle('Summer 8-Hour Max Average Ozone ',ha='center') # title
+#         fig.text(0.03, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
+#     else:
+#         fig.suptitle('Summer Daily Average PM2.5',ha='center') # title        
+#         fig.text(0, 0.5, '$PM_{2.5} (ug/m^3)$', va='center', rotation='vertical')
+# =============================================================================
     sites = len(data)
     
     ax = fig.add_subplot(2,1,1)
-    #ax.set_title('Modeled',fontsize = label)
+    ax.set_title('Modeled',fontsize = label)
 
     ax.boxplot(data)
     plt.xticks([],[])
     plt.grid(True,alpha=0.7,axis='y')
-    #ax.set_ylabel(species+' '+'('+unit_list+')') 
+    ax.set_ylabel(species+' '+'('+unit_list+')') 
     
     ax = fig.add_subplot(2,1,2)
-    #ax.set_title('Observed', fontsize = label)
-
+    ax.set_title('Observed', fontsize = label)
+    ax.set_ylabel(species+' '+'('+unit_list+')') 
+    
     ax.boxplot(data1)
     plt.xticks([1,2,3],names)
     
