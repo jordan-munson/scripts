@@ -6,7 +6,7 @@ Created on Thu Dec 20 08:51:54 2018
 """
 
 import matplotlib as mpl
-mpl.use('Agg')
+#mpl.use('Agg')
 import pandas as pd
 import matplotlib.pyplot as plt
 import time
@@ -24,7 +24,7 @@ begin_time = time.time()
 #Set directory
 inputDir = r'E:/Research/AIRPACT_eval/'
 stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
-ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
+#ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
 
 exec(open(stat_path).read())
 #aqsidd = pd.read_csv(r'G:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison/Aqsid.csv')
@@ -139,7 +139,7 @@ exec(open(stat_path).read())
 #df_com = df_com.dropna(thresh = 6) # setting threshold to 6 means that any site without ANY data is dropped
 
 # Set plot parameters
-mpl.rcParams['font.family'] = 'times new roman'  # the font used for all labelling/text
+mpl.rcParams['font.family'] = 'calibri'  # the font used for all labelling/text
 mpl.rcParams['font.size'] = 10.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
@@ -161,8 +161,132 @@ df_com.loc[:,'PM2.5_mod'] = pd.to_numeric(df_com.loc[:,'PM2.5_mod'], errors='coe
 df_com.loc[:,'O3_obs'] = pd.to_numeric(df_com.loc[:,'O3_obs'], errors='coerce')
 df_com.loc[:,'PM2.5_obs'] = pd.to_numeric(df_com.loc[:,'PM2.5_obs'], errors='coerce')
 df_com['datetime'] = pd.to_datetime(df_com['datetime'])
+df_com = df_com.drop(['Location Setting', 'Local Site Name'], axis=1)
 print('Data loading section done')
 #%%
+# Herein what lies below in the murky depths be ye old method of a single plot
+# =============================================================================
+# # create lits to use in calcs of site ids
+# used_AQSID = list(set(df_com['AQSID']))
+# 
+# stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
+# stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
+# stats_com = stats_com.drop(0,1)
+# lats = []
+# lons = []
+# 
+# m = Basemap(projection='merc',
+#               #lat_0=lat, lon_0=lon,
+#               llcrnrlat=40.5, urcrnrlat=49.5,
+#               llcrnrlon=-125, urcrnrlon=-109,
+#               area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
+# 
+# # Calculate stats for each site and add to list
+# pollutant = ['O3','PM2.5']
+# for species in pollutant:
+#     
+#     fig, ax = plt.subplots(figsize=(3,3.5),dpi=200) # Original mehtod
+#     sze_scale = .7
+# 
+# #    if species == 'O3':
+#     unit_list = 'FB (%)'
+# #    else:
+# #        unit_list = '$ug/m^3$'
+#     m.drawcounties()
+#     m.drawcoastlines()
+#     m.drawstates()
+#     m.drawcountries()
+#     cmap = plt.get_cmap('jet')
+#     
+#     #used_AQSID = ['410050004','530090013'] # to test map
+#     for AQSID in used_AQSID:
+#         
+#         #This section selects only data relevant to the aqs site
+#         d = df_com.loc[df_com['AQSID']==AQSID]
+#         d=d.reset_index()
+#         site_nameinfo = d.loc[0,'Local Site Name'] #Gets the longname of the site to title the plot
+#         
+#         lat = d.loc[0,'Latitude']
+#         lon = d.loc[0,'Longitude']
+#         #lats.append(lat)
+#         #lons.append(lon)
+#         
+#         #site_type = d.loc[0,'Location Setting']
+#         d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
+#         #d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
+#         d['date'] = d['datetime'] #format="%m/%d/%y %H:%M")
+#         
+#         
+#         #d = d.set_index('datetime') 
+#         
+#         #print(species+ ' ' + str(site_nameinfo))
+#         #Calculate Statistics
+#         try:
+#             #Run stats functions
+#             aq_stats = stats(d, species+'_mod', species+'_obs')
+#                     #Mapping
+#             x, y = m(lon, lat)
+#             marker_shape = 'o'
+#             #marker_color = 'r'
+#             sp = 3 # Fractional Bias
+#             spp = 4 # FE # Change this if you want the size to correlate to a different statistic
+#             size = abs(sze_scale*aq_stats[species+'_mod'][spp])
+#             m.scatter(x, y, marker=marker_shape,c = aq_stats[species+'_mod'][sp], s = size, alpha = 0.7,cmap=cmap)
+# # =============================================================================
+# #             print(AQSID,aq_stats[species+'_mod'][sp])
+# # =============================================================================
+#             plt.clim(-100,100)
+#             #print(aq_stats[species+'_mod'][sp])
+#         # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
+#    
+#             # Merge stats into single dataframe
+#             aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + str(site_nameinfo))    
+#             stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
+#             #print('Stats check okay')
+#             
+# 
+#             
+#         except (ZeroDivisionError):
+#             pass
+#     
+# 
+# 
+#     cbticks = True
+#     cbar = m.colorbar(location='bottom')#,pad="-12%")    # Disable this for the moment
+#     cbar.set_label(unit_list)
+# # =============================================================================
+# #     if species == 'O3':
+# #         plt.title('Ozone Fractional Bias/Error')
+# #     else:
+# #         plt.title('PM$_{2.5}$ Fractional Bias/Error')        
+# # =============================================================================
+#     
+#     # Circle size chart
+#     msizes = [0,5,25,50,75,100]
+#     msizes=[i * sze_scale for i in msizes]
+#     labels = ['FE (%)',5,25,50,75,100]
+#     markers = []
+#     for size,label in zip(msizes,labels):
+#         markers.append(plt.scatter([],[], s=size, label=label,c='black',alpha = 0.7))
+#     plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left',handles=markers,labelspacing=1)    
+#     #ax.text(-0.03, 0.5,'B',fontsize = 20, ha='right', va='center', transform=ax.transAxes)
+# 
+#     plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map.png',  pad_inches=0.1, bbox_inches='tight')
+#     plt.show()
+#     plt.close()
+# end_time = time.time()
+# print("Run time was %s minutes"%(round((end_time-begin_time)/60)))
+# print('done')
+# #stats_com.to_csv(inputDir + 'stats/bias_map_stats.csv')
+# =============================================================================
+
+#%%
+
+
+# =============================================================================
+# This method will make a plot of each AP version, and a difference plot
+# =============================================================================
+
 # create lits to use in calcs of site ids
 used_AQSID = list(set(df_com['AQSID']))
 
@@ -179,107 +303,280 @@ m = Basemap(projection='merc',
               area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
 
 # Calculate stats for each site and add to list
-pollutant = ['O3','PM2.5']
+pollutant = ['O3','PM2.5','O3_hourly','PM2.5_hourly']
+pollutant = ['O3_hourly','PM2.5_hourly']
+
+versions = ['ap3','ap4','ap5','difference'] #List versions
+
 for species in pollutant:
-    #plt.figure(figsize=(10,11))
-    fig, ax = plt.subplots(figsize=(3,3.5),dpi=200)
-    sze_scale = .7
+    fig = plt.figure(dpi=300,figsize=(5,5))
+    #fig.tight_layout() # spaces the plots out a bit
+    for version in versions:
+        print(version)
+        # Set date range used based of versions
+        if version == 'ap3':
+            start_date ='2009-05-01'
+            end_date = '2012-12-31'
+            i = 1
+            abc = '(a)'
+        elif version == 'ap4':
+            start_date ='2013-01-01'
+            end_date = '2015-12-31'
+            i = 2
+            abc = '(b)'
+        elif version == 'ap5':
+            start_date ='2016-01-01'
+            end_date = '2018-12-31'
+            i = 3
+            abc = '(c)'
+        elif version == 'difference':
+            start_date1 ='2009-05-01'
+            end_date1 = '2012-12-31'
+            start_date2 ='2016-01-01'
+            end_date2 = '2018-12-31'
+            i = 4
+            abc = '(d)'
+            
+        if version =='difference':
+            # Locate correct site model data
+            mask = (df_com['datetime'] > start_date1) & (df_com['datetime'] <= end_date1) # Create a mask to determine the date range used       
+            temp1 = df_com.copy().loc[mask]       
+            temp1 = temp1.reset_index(drop=True)
+            temp1['version'] = version
+            
+            mask = (df_com['datetime'] > start_date2) & (df_com['datetime'] <= end_date2) # Create a mask to determine the date range used        
+            temp2 = df_com.copy().loc[mask]       
+            temp2 = temp2.reset_index(drop=True)
+            temp2['version'] = version
+            
+            df_mod3 = temp1.rename(columns={'PM2.5_mod':'PM2.5_hourly_mod','PM2.5_obs':'PM2.5_hourly_obs','O3_mod':'O3_hourly_mod','O3_obs':'O3_hourly_obs'}) 
+            df_mod4 = temp2.rename(columns={'PM2.5_mod':'PM2.5_hourly_mod','PM2.5_obs':'PM2.5_hourly_obs','O3_mod':'O3_hourly_mod','O3_obs':'O3_hourly_obs'}) 
 
-#    if species == 'O3':
-    unit_list = 'FB (%)'
-#    else:
-#        unit_list = '$ug/m^3$'
-    m.drawcounties()
-    m.drawcoastlines()
-    m.drawstates()
-    m.drawcountries()
-    cmap = plt.get_cmap('jet')
-    
-    #used_AQSID = ['410050004','530090013'] # to test map
-    for AQSID in used_AQSID:
+            del [temp1,temp2]
+            
+        else:
+            # Locate correct site model data
+            mask = (df_com['datetime'] > start_date) & (df_com['datetime'] <= end_date) # Create a mask to determine the date range used
         
-        #This section selects only data relevant to the aqs site
-        d = df_com.loc[df_com['AQSID']==AQSID]
-        d=d.reset_index()
-        site_nameinfo = d.loc[0,'Local Site Name'] #Gets the longname of the site to title the plot
+            df_mod1 = df_com.copy().loc[mask]       
+            df_mod1 = df_mod1.reset_index(drop=True)
+            df_mod1['version'] = version
+            
+        print(species)
+        var_name = str(species+'_obs')
         
-        lat = d.loc[0,'Latitude']
-        lon = d.loc[0,'Longitude']
-        #lats.append(lat)
-        #lons.append(lon)
+        x=df_mod1.copy().ix[:,[species+'_obs',species+'_mod','datetime']]
+        x = x.set_index('datetime') # Set datetime column as index
         
-        #site_type = d.loc[0,'Location Setting']
-        d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
-        #d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
-        d['date'] = d['datetime'] #format="%m/%d/%y %H:%M")
-        
-        
-        #d = d.set_index('datetime') 
-        
-        #print(species+ ' ' + str(site_nameinfo))
-        #Calculate Statistics
-        try:
-            #Run stats functions
-            aq_stats = stats(d, species+'_mod', species+'_obs')
-                    #Mapping
-            x, y = m(lon, lat)
-            marker_shape = 'o'
-            #marker_color = 'r'
-            sp = 3 # Fractional Bias
-            spp = 4 # FE # Change this if you want the size to correlate to a different statistic
-            size = abs(sze_scale*aq_stats[species+'_mod'][spp])
-            m.scatter(x, y, marker=marker_shape,c = aq_stats[species+'_mod'][sp], s = size, alpha = 0.7,cmap=cmap)
-            print(AQSID,aq_stats[species+'_mod'][sp])
-            plt.clim(-100,100)
-            #print(aq_stats[species+'_mod'][sp])
-        # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
-   
-            # Merge stats into single dataframe
-            aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + str(site_nameinfo))    
-            stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
-            #print('Stats check okay')
+        #var_units = mw_data['UNITS'][var_name]
+        if var_name=='O3_obs':
+            var_name_mod1 = 'O3_mod'
+            var_units = 'ppb'
+            
+            
+            x = x.resample('H').mean()
+            avg_8hr_o3 = x.rolling(8,min_periods=6).mean()
+            times = avg_8hr_o3.index.values - pd.Timedelta('8h')
+            avg_8hr_o3.index.values[:] = times
+            df_mod2 = avg_8hr_o3.resample('D').max().dropna()
+
+        if species == 'O3_hourly':
+            var_name = 'O3_obs'
+            var_name_mod1 = 'O3_hourly_mod'
+            var_units = 'ppb'
+            df_mod2 = df_mod1.copy()
+            df_mod2 = df_mod2.rename(columns={'O3_mod':var_name_mod1,'O3_obs':'O3_hourly_obs'})
+            
+        if var_name=='PM2.5_obs':
+            var_name_mod1 = 'PM2.5_mod'            
+            var_units = 'ug/m3'
+            df_mod2 = x.resample('D').mean() # resample to 24 hour average
+            
+        if var_name == 'PM2.5_hourly_obs':
+            var_name = 'PM2.5_obs'
+            var_name_mod1 = 'PM2.5_hourly_mod'            
+            var_units = 'ug/m3'
+            df_mod2 = df_mod1.copy()
+            df_mod2 = df_mod2.rename(columns={'PM2.5_mod':var_name_mod1,'PM2.5_obs':'PM2.5_hourly_obs'})     
             
 
             
-        except (ZeroDivisionError):
-            pass
+        # =============================================================================
+        #     fig, ax = plt.subplots(figsize=(3,3.5),dpi=200) # Original mehtod
+        # =============================================================================
+        ax = fig.add_subplot(2,2,i)
+        ax.set_title(abc)
+        sze_scale = .7
     
+        unit_list = 'FB (%)'
 
+        m.drawcounties()
+        m.drawcoastlines()
+        m.drawstates()
+        m.drawcountries()
+        cmap = plt.get_cmap('jet')
+        if version == 'difference':
+            
+            used_AQSID = list(set(df_mod3['AQSID']))
+            #used_AQSID = ['410050004','530090013'] # to test map
+            for AQSID in used_AQSID:
+                try:
+                    #This section selects only data relevant to the aqs site
+                    d = df_mod3.loc[df_mod3['AQSID'].astype(str)==AQSID].drop(['datetime'],axis=1)
+                    d1 = df_mod4.loc[df_mod4['AQSID'].astype(str)==AQSID].drop(['datetime'],axis=1)
+                    d1 = d1.reset_index()
+                    d=d.reset_index()
+        #            site_nameinfo = d.loc[0,'Local Site Name'] #Gets the longname of the site to title the plot
+                    
+                    lat = d.loc[0,'Latitude']
+                    lon = d.loc[0,'Longitude']
+                except:
+                    continue
+                #lats.append(lat)
+                #lons.append(lon)
+                
+                #site_type = d.loc[0,'Location Setting']
+                d = d.ix[:,[species+'_obs',species+'_mod']]
+                d1 = d1.ix[:,[species+'_obs',species+'_mod']]
+             
+                #d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
+                #d['date'] = d['datetime'] #format="%m/%d/%y %H:%M")
+                
+                
+                #d = d.set_index('datetime') 
+                
+                #print(species+ ' ' + str(site_nameinfo))
+                #Calculate Statistics
+                try:
+                    #Run stats functions
+                    aq_stats = stats(d, species+'_mod', species+'_obs')
+                    aq_stats1 = stats(d1, species+'_mod', species+'_obs')
+                    aq_stats = aq_stats-aq_stats1
+                            #Mapping
+                    x, y = m(lon, lat)
+                    marker_shape = 'o'
+                    #marker_color = 'r'
+                    sp = 3 # Fractional Bias
+                    spp = 4 # FE # Change this if you want the size to correlate to a different statistic
+                    size = abs(sze_scale*aq_stats[species+'_mod'][spp])
+                    plotted_figure = m.scatter(x, y, marker=marker_shape,c = aq_stats[species+'_mod'][sp],ax=ax, s = size, alpha = 0.7,cmap=cmap)
+                    
+                    if species == 'O3_hourly':
+                        plotted_figure.set_clim(-50,50)
+                    else:
+                        plotted_figure.set_clim(-100,100)
+                    #print(aq_stats[species+'_mod'][sp])
+                # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
+           
+                    # Merge stats into single dataframe
+                    aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + str(AQSID))    
+                    stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
+                    #print('Stats check okay')
+                    
+        
+                    
+                except (ZeroDivisionError):
+                    pass
+        else:
+                    #used_AQSID = ['410050004','530090013'] # to test map
+            used_AQSID = list(set(df_mod2['AQSID']))
+            for AQSID in used_AQSID:
+                
+                #This section selects only data relevant to the aqs site
+                d = df_mod2.loc[df_mod2['AQSID']==AQSID]
+                d=d.reset_index()
+    #            site_nameinfo = d.loc[0,'Local Site Name'] #Gets the longname of the site to title the plot
+                
+                lat = d.loc[0,'Latitude']
+                lon = d.loc[0,'Longitude']
+                #lats.append(lat)
+                #lons.append(lon)
+                
+                #site_type = d.loc[0,'Location Setting']
+                d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
+                #d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
+                #d['date'] = d['datetime'] #format="%m/%d/%y %H:%M")
+                
+                
+                #d = d.set_index('datetime') 
+                
+                #print(species+ ' ' + str(site_nameinfo))
+                #Calculate Statistics
+                try:
+                    #Run stats functions
+                    aq_stats = stats(d, species+'_mod', species+'_obs')
+                            #Mapping
+                    x, y = m(lon, lat)
+                    marker_shape = 'o'
+                    #marker_color = 'r'
+                    sp = 3 # Fractional Bias
+                    spp = 4 # FE # Change this if you want the size to correlate to a different statistic
+                    size = abs(sze_scale*aq_stats[species+'_mod'][spp])
+                    plotted_figure = m.scatter(x, y, marker=marker_shape,c = aq_stats[species+'_mod'][sp],ax=ax, s = size, alpha = 0.7,cmap=cmap)
+                    
+                    if species == 'O3_hourly':
+                        plotted_figure.set_clim(-50,50)
+                    else:
+                        plotted_figure.set_clim(-100,100)
+                    #print(aq_stats[species+'_mod'][sp])
+                # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
+           
+                    # Merge stats into single dataframe
+                    aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + str(AQSID))    
+                    stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
+                    #print('Stats check okay')
+                    
+        
+                    
+                except (ZeroDivisionError):
+                    pass
+            
+# =============================================================================
+#         # generte colorbor
+#         cbticks = True
+#         cbar = ax.get_figure().colorbar(plotted_figure, ax=ax,orientation = 'horizontal') 
+#         cbar.set_label(unit_list)
+# =============================================================================
 
-    cbticks = True
-    cbar = m.colorbar(location='bottom')#,pad="-12%")    # Disable this for the moment
-    cbar.set_label(unit_list)
-# =============================================================================
-#     if species == 'O3':
-#         plt.title('Ozone Fractional Bias/Error')
-#     else:
-#         plt.title('PM$_{2.5}$ Fractional Bias/Error')        
-# =============================================================================
+        if abc == '(d)':
+            if species == 'O3_hourly':
+                msizes = [0,10,20,30,40,50]
+                msizes=[i * sze_scale for i in msizes]
+                labels = ['FE [%]',10,20,30,40,50]
+            else:   
+                # Circle size chart
+                msizes = [0,5,25,50,75,100]
+                msizes=[i * sze_scale for i in msizes]
+                labels = ['FE [%]',5,25,50,75,100]
+            markers = []
+            for size,label in zip(msizes,labels):
+                markers.append(plt.scatter([],[], s=size, label=label,c='black',alpha = 0.7))
+            plt.legend(bbox_to_anchor=(1.08, 1.8), loc='upper left',handles=markers,labelspacing=1) 
+            
+    # overall colorbar  
+    cb_ax = fig.add_axes([0.115, 0.1, 0.8, 0.02])
+    cbar = fig.colorbar(plotted_figure, cax=cb_ax,orientation = 'horizontal')
+    ax.text(0.04, -.4,'FB [%]' ,ha='right', va='center', transform=ax.transAxes)
     
-    # Circle size chart
-    msizes = [0,5,25,50,75,100]
-    msizes=[i * sze_scale for i in msizes]
-    labels = ['FE (%)',5,25,50,75,100]
-    markers = []
-    for size,label in zip(msizes,labels):
-        markers.append(plt.scatter([],[], s=size, label=label,c='black',alpha = 0.7))
-    plt.legend(bbox_to_anchor=(1.0, 1), loc='upper left',handles=markers,labelspacing=1)    
-    #ax.text(-0.03, 0.5,'B',fontsize = 20, ha='right', va='center', transform=ax.transAxes)
-
-    plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map.png',  pad_inches=0.1, bbox_inches='tight')
+# =============================================================================
+#             plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map.png',  pad_inches=0.1, bbox_inches='tight')
+# =============================================================================
     plt.show()
     plt.close()
+    
+
+        
+        
+        
+        
+        
+        
+        
+        
 end_time = time.time()
 print("Run time was %s minutes"%(round((end_time-begin_time)/60)))
 print('done')
 #stats_com.to_csv(inputDir + 'stats/bias_map_stats.csv')
-
-
-
-
-
-
-
 
 
 

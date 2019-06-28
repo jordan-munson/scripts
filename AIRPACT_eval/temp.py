@@ -50,7 +50,7 @@ db['datetime'] = dates
 db = db.set_index('datetime')
 db['data'] = 5
 
-for i,abc in zip([1,2,3,4,5,6],['A','B','C','D','E','F']):
+for i,abc in zip([1,2,3,4,5,6],['(a)','(b)','(c)','(d)','(e)','(f)']):
     ax = fig.add_subplot(2,3,i)
     plt.legend(prop={'size': 10})
     if i == 4:
@@ -68,7 +68,7 @@ for i,abc in zip([1,2,3,4,5,6],['A','B','C','D','E','F']):
     sze = 10 #size of annotation text
     
     # Set letter denoting plot
-    ax.text(1.07, 1.23,abc,fontsize = 20, ha='right', va='center', transform=ax.transAxes)
+    ax.text(.07, 1.23,abc,fontsize = 14, ha='right', va='center', transform=ax.transAxes)
     
     db.plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
     

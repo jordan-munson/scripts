@@ -38,7 +38,7 @@ df_wd = df_stats.loc[df_stats['index']=='WD_1']
 sites = ['URBAN AND CENTER CITY','SUBURBAN','RURAL']
 
 # Set plot parameters
-mpl.rcParams['font.family'] = 'times new roman'  # the font used for all labelling/text
+mpl.rcParams['font.family'] = 'arial'  # the font used for all labelling/text
 mpl.rcParams['font.size'] = 10.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
@@ -286,6 +286,13 @@ ax.add_patch(rect)
 fig.savefig(outputdir + '/airpact_versions_nmbnme.png' ,bbox_inches='tight')
 
 #%%
+# Seperate the measuremnet types
+df_temp = ap_total.loc[ap_total['index']=='TEMP2_1']
+df_pres = ap_total.loc[ap_total['index']=='PRSFC_1'] # While the pressure data is here, it has large error
+df_rh = ap_total.loc[ap_total['index']=='RH_1']
+df_ws = ap_total.loc[ap_total['index']=='WS_1']
+df_wd = ap_total.loc[ap_total['index']=='WD_1']
+
 # Create a soccer plot function to make them easier
 def soccer(x,y,axismax,size1,size2,temp,press,rh,ws,wd):    # x and y are stats looked at, then set plot axis, then squares, then determine which species
     fig, ax = plt.subplots(figsize=(5, 3),dpi=200)
@@ -312,21 +319,21 @@ def soccer(x,y,axismax,size1,size2,temp,press,rh,ws,wd):    # x and y are stats 
     #colors[df_stats["station ID"]=='SUBURBAN'] = 'g'
     #colors[df_stats["station ID"]=='RURAL'] = 'b'
     colors = ['r','g','b']
-    
+
     if temp == 'yes':
-        ax.scatter(df_temp[x],df_temp[y],c=colors, marker = 'o',label='Temp')
+        ax.scatter(df_temp[x],df_temp[y],edgecolors=colors, marker = 'o',label='Temp',facecolors='none')
         name='Temp'
     if press == 'yes':
-        ax.scatter(df_pres[x],df_pres[y],c=colors, marker = '*',label = 'Pressure')
+        ax.scatter(df_pres[x],df_pres[y],edgecolors=colors, marker = '*',label = 'Pressure',facecolors='none')
         name='Pressure'
     if rh == 'yes':
-        ax.scatter(df_rh[x],df_rh[y],c=colors, marker = '^', label = 'RH')
+        ax.scatter(df_rh[x],df_rh[y],edgecolors=colors, marker = '^', label = 'RH',facecolors='none')
         name = 'Relative_Humidity'
     if ws == 'yes':
-        ax.scatter(df_ws[x],df_ws[y],c=colors, marker = 'D', label = 'WS')
+        ax.scatter(df_ws[x],df_ws[y],edgecolors=colors, marker = 'D', label = 'WS',facecolors='none')
         name='Wind_Speed'
     if wd == 'yes':
-        ax.scatter(df_wd[x],df_wd[y],c=colors, marker = '+', label = 'WD')
+        ax.scatter(df_wd[x],df_wd[y],edgecolors=colors, marker = '+', label = 'WD',facecolors='none')
         name='Wind_Direction'
     if temp and ws and rh == 'yes':
         name = 'combined'
@@ -337,24 +344,32 @@ def soccer(x,y,axismax,size1,size2,temp,press,rh,ws,wd):    # x and y are stats 
     props = dict(boxstyle='square', facecolor='white', alpha=0.0)
     
     # Draw legends
-    vers_anno_x = .89
-    ax.text(vers_anno_x,0.57,'AP3',transform=ax.transAxes,
+    vers_anno_x = 1.07 # orig 0.89
+    ax.text(vers_anno_x,0.57,'AP-3',transform=ax.transAxes,
             verticalalignment='top', bbox=props, color='red')
-    ax.text(vers_anno_x,0.51,'AP4',transform=ax.transAxes,
+    ax.text(vers_anno_x,0.51,'AP-4',transform=ax.transAxes,
             verticalalignment='top', bbox=props, color='green')
-    ax.text(vers_anno_x,0.45,'AP5',transform=ax.transAxes,
+    ax.text(vers_anno_x,0.45,'AP-5',transform=ax.transAxes,
             verticalalignment='top', bbox=props, color='blue')
     
     #Draw rectangle to encompass versions
-    rect = patches.Rectangle((1.05,.57),.4,.3,facecolor='none',linewidth=1,edgecolor='black',linestyle='solid',clip_on=False,alpha=0.3)
+    rect = patches.Rectangle((1.55,.57),.535,.3,facecolor='none',linewidth=1,edgecolor='black',linestyle='solid',clip_on=False,alpha=0.2) # orig size posit values (1.05,.57),.4,.3,
     ax.add_patch(rect)
 
     #ax.legend()
-    legend = plt.legend(loc='lower right',fontsize=8)
+    legend = plt.legend(loc='lower right',fontsize=8,bbox_to_anchor=(1.21, 0.6))
     plt.setp(legend.get_texts(), color='black')
     
+    
+    #Draw rectangle and write noe about AP-5
+    rect = patches.Rectangle((1.55,.2),.535,.3,facecolor='none',linewidth=1,edgecolor='black',linestyle='solid',clip_on=False,alpha=0.2) # orig size posit values (1.05,.57),.4,.3,
+    ax.add_patch(rect)
+    
+    ax.text(1.02,0.32,'Note: AP-5 \n RH MB \n is 2.4%',transform=ax.transAxes,
+    verticalalignment='top', bbox=props, color='black')
+    
     # Save the plot
-    fig.savefig(outputdir+'/' +name+ 'airpact_versions.png' ,bbox_inches='tight')
+    fig.savefig(outputdir+'/' +name+ '_'+x+'_airpact_versions_for_paper.png' ,bbox_inches='tight')
     
 #soccer('NMB [%]','NME [%]',10,15)
 #soccer('MB','ME',1.5,0.5,0.5,'yes','no','no','no','no') # Temp
@@ -364,7 +379,7 @@ def soccer(x,y,axismax,size1,size2,temp,press,rh,ws,wd):    # x and y are stats 
 #soccer('MB','ME',12,10,10,'no','no','no','no','yes') # wd
 
 soccer('MB','ME',1.5,1,0.5,'yes','no','yes','yes','no') # temp,ws,rh
-    
+#soccer('NMB [%]','NME [%]',15,1,0.5,'yes','no','yes','yes','no') # temp,ws,rh
     
     
     

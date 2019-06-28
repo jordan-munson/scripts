@@ -194,8 +194,8 @@ exec(open(stat_path).read())
 # =============================================================================
 
 # Set plot parameters
-mpl.rcParams['font.family'] = 'times new roman'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 10.0
+mpl.rcParams['font.family'] = 'calibri'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 10 # 10 for paper. 28 for presentations
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -383,7 +383,7 @@ stats_com = stats_com.drop(0,1)
 #         fig,ax=plt.subplots(1,1, figsize=(10,8)) #Set figure dimensions
 # 
 #         #Plot
-#         d.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
+#         d.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'red'])
 #         
 #         if species == 'PM2.5':
 #             ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
@@ -447,7 +447,7 @@ stats_com = stats_com.drop(0,1)
 #         fig,ax=plt.subplots(1,1, figsize=(12,4))
 #         d=d.set_index('datetime')
 #         b=d.groupby(d.index.hour).std()
-#         d.groupby(d.index.hour).mean().ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'blue'], label=['Observation', 'Model'])
+#         d.groupby(d.index.hour).mean().ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'red'], label=['Observation', 'Model'])
 #         ax.set_title(str(site_nameinfo) +', Type: '+str(site_type))
 #         
 #         if species == 'PM2.5':
@@ -463,7 +463,7 @@ stats_com = stats_com.drop(0,1)
 #         x = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
 #         ax.set_ylim(bottom=0)
 #         #ax.text(0.95,1.03,'Site type: '+str(site_type),ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='white', edgecolor='black', boxstyle='round'))
-#         plt.fill_between(x, c[species+'_mod'], e[species+'_mod'], facecolor='blue', edgecolor='black',alpha = 0.1, label=['Std. Dev.']) 
+#         plt.fill_between(x, c[species+'_mod'], e[species+'_mod'], facecolor='red', edgecolor='black',alpha = 0.1, label=['Std. Dev.']) 
 #         ax.legend(['Observation', 'Model', 'Std. Dev.'], fontsize=12)
 #         print(species+  ' ' + site_nameinfo)
 #         
@@ -514,11 +514,11 @@ settings = ['RURAL', 'SUBURBAN', 'URBAN AND CENTER CITY']
 pollutant = ['O3','PM2.5']
 for species in pollutant:
     da = df_com.copy().dropna(subset=['Location Setting'])
-    fig = plt.figure(dpi=200,figsize=(6.125,7)) # (6.125,7) This is as small as can currently go without having some overlap of labels
+    fig = plt.figure(dpi=300,figsize=(6.125,7)) # (6.125,7) This is as small as can currently go without having some overlap of labels 14,16 for a presentation size plot
     #fig.suptitle('Monthly Averaged '+str(species),y=0.94,fontsize=27,ha='center') # title
     fig.tight_layout() # spaces the plots out a bit
     
-    for setting,i in zip(settings,[1,2,3]):    #list(set(da['Location Setting'])):
+    for setting,i,abcd in zip(settings,[1,2,3],['(a)','(b)','(c)']):    #list(set(da['Location Setting'])):
         #This section selects only data relevant to the aqs site
         print('Setting is ' + setting)
         d = da.loc[df_com['Location Setting']==setting]
@@ -549,16 +549,16 @@ for species in pollutant:
         
         #Plot
         ax = fig.add_subplot(3,1,i) # set subplots
-        d.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
+        d.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'red'])
         
         if species == 'PM2.5':
-            ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
+            ax.set_ylabel('PM$_{2.5}$ [ug/$m^3$]')
             ax.set_ylim(0,25)
             height = 20 # Height of annotations in graphs
             spc = 1.2 # Space the annotations are moved up and down
             plt.legend(['Observation','Forecast'],prop={'size': 8},loc=2)
         else:
-            ax.set_ylabel('Ozone (ppb)')
+            ax.set_ylabel('Ozone [ppb]')
             ax.set_ylim(0,50)
             height=10
             spc = 2
@@ -570,14 +570,14 @@ for species in pollutant:
         yticks = ax.yaxis.get_major_ticks() 
         yticks[0].label1.set_visible(False)
 
-        ax.set_title(str(site_type))
+        ax.set_title(abcd + ' ' + str(site_type))
        # plt.legend(prop={'size': 20},loc=2)
         sze = 10 #size of annotation text
         
         plt.grid(True)    # Add grid lines to make graph interpretation easier
         
         #text_height = 0.061
-        text_height = 0.02 # 0.005 almost works
+        text_height = 0.01 # 0.005 almost works
         x1 = 0.429
         x2 = 0.689
         x3 = 0.95
@@ -618,15 +618,19 @@ for species in pollutant:
 # =============================================================================
 
         #ax.text(1.01, 0.4,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes)  
-        ax.text(0.98, 0.92,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes) 
+# =============================================================================
+#         ax.text(0.95, 0.92,'# of Observation sites '+str(temp1), ha='right', va='center', transform=ax.transAxes) 
+# =============================================================================
                 
-        letter_horz = 1.048
-        if i == 1:
-            ax.text(letter_horz, 0.5,'A',fontsize = 20, ha='right', va='center', transform=ax.transAxes)  
-        if i == 2:
-            ax.text(letter_horz, 0.5,'B',fontsize = 20, ha='right', va='center', transform=ax.transAxes)          
-        if i == 3:
-            ax.text(letter_horz, 0.5,'C',fontsize = 20, ha='right', va='center', transform=ax.transAxes)  
+# =============================================================================
+#         letter_horz = 1.048
+#         if i == 1:
+#             ax.text(letter_horz, 0.5,'(a)', ha='right', va='center', transform=ax.transAxes)  
+#         if i == 2:
+#             ax.text(letter_horz, 0.5,'(b)', ha='right', va='center', transform=ax.transAxes)          
+#         if i == 3:
+#             ax.text(letter_horz, 0.5,'(c)', ha='right', va='center', transform=ax.transAxes)  
+# =============================================================================
         plt.subplots_adjust(bottom=0.01,top=0.95)
         #Calculate Statistics
         try:
@@ -694,7 +698,7 @@ stats_ozone_suburban.name = 'Ozone Suburban'
 # # Diurnal yearly plots
 # =============================================================================
     
-years = [2009,2010,2011,2012,2013,2014,2015,2016,2017]    
+years = [2009,2010,2011,2012,2013,2014,2015,2016,2017,2018]    
 pollutant = ['O3','PM2.5']
 
 for species in pollutant:
@@ -722,7 +726,7 @@ for species in pollutant:
                 ax.set_ylim(0,20)
                 
             b=d.groupby(d.index.hour).std()
-            d.groupby(d.index.hour).mean().ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['red', 'blue'], label=['Observation', 'Model'])
+            d.groupby(d.index.hour).mean().ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['red', 'red'], label=['Observation', 'Model'])
             ax.set_title(str(site_type) + ' '+year)
         
             if species == 'PM2.5':
@@ -739,9 +743,9 @@ for species in pollutant:
             e = d+b
             x = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
             #ax.text(0.95,1.03,'Site type: '+str(site_type),ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='white', edgecolor='black', boxstyle='round'))
-            plt.fill_between(x, c[species+'_mod'], e[species+'_mod'], facecolor='blue', edgecolor='black',alpha = 0.1, label=['Std. Dev.']) #Model
+            plt.fill_between(x, c[species+'_mod'], e[species+'_mod'], facecolor='red', edgecolor='black',alpha = 0.1, label=['Std. Dev.']) #Model
             plt.fill_between(x, c[species+'_obs'], e[species+'_obs'], facecolor='red', edgecolor='black',alpha = 0.1, label=['Std. Dev.']) #Obs
-            ax.legend(['Observation', 'Model', 'Std. Dev.'], fontsize=12)
+            ax.legend(['Observation', 'Model', 'Std. Dev.'], fontsize=10)
             
 
              #Calculate Statistics. Organized the way they are so as to make plotting easier
@@ -844,7 +848,7 @@ for dataframe in stat_list:
 
     #Set the location of the extra axis
     #par1.spines["right"].set_position(("axes", 1.1)) # red one
-    par2.spines["left"].set_position(("axes", -0.1)) # green one
+    par2.spines["left"].set_position(("axes", -0.1)) # red one
     par3.spines["right"].set_position(('axes',1))
 
     #make_patch_spines_invisible(par1)
@@ -918,8 +922,12 @@ versions = ['ap3','ap4','ap5'] #List versions
 stats_all = pd.DataFrame() # statistics for each station
 pollutant = ['O3','PM2.5','O3_hourly','PM_hourly']
 
-exec(open(ben_path).read())
-#import Met_functions_for_Ben as met
+# =============================================================================
+# stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
+# stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
+# stats_com = stats_com.drop(0,1)
+# =============================================================================
+
 for version in versions:
     print(version)
     # Set date range used based of versions
@@ -994,8 +1002,12 @@ for version in versions:
         
         var_units = 'var units' # eliminates a double column
         #print(df_mod2.tail)
-        stats1 = stats(df_mod2, var_name_mod1, var_name, var_units)
-
+# =============================================================================
+#         stats1 = stats_version(df_mod2, var_name_mod1, var_name) # this way for porting directly to the paper
+# 
+# =============================================================================
+        stats1 = stats(df_mod2, var_name_mod1, var_name) # run this so other scripts dont hit errors
+        
         stats_combined = pd.concat([stats1],axis=1,join_axes=[stats1.index])
         
         stats_T = stats_combined.T # transpose index and columns
@@ -1115,7 +1127,7 @@ for species in pollutant:
 # Save stats           
 stats_pm_rural.to_csv(inputDir+'/stats/PM_rural_monthly.csv')   
 stats_pm_urban.to_csv(inputDir+'/stats/PM_urban_monthly.csv')   
-stats_pm_suburban.to_csv(inputDir+'/stats/PM_suburban.csv')   
+stats_pm_suburban.to_csv(inputDir+'/stats/PM_suburban_monthly.csv')   
 
 stats_ozone_rural.to_csv(inputDir+'/stats/O3_rural_monthly.csv')   
 stats_ozone_urban.to_csv(inputDir+'/stats/O3_urban_monthly.csv')   
@@ -1167,7 +1179,7 @@ for dataframe in stat_list:
 
     #Set the location of the extra axis
     #par1.spines["right"].set_position(("axes", 1.1)) # red one
-    #par2.spines["left"].set_position(("axes", -0.1)) # green one
+    #par2.spines["left"].set_position(("axes", -0.1)) # red one
     par3.spines["right"].set_position(('axes',1))
 
     #make_patch_spines_invisible(par1)

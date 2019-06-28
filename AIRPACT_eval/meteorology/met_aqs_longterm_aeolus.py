@@ -203,8 +203,8 @@ setting = ['URBAN AND CENTER CITY','SUBURBAN','RURAL']
 print('Data combined')
 
 # Set plot parameters
-mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 24.0
+mpl.rcParams['font.family'] = 'lucida sans'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 10.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -523,14 +523,14 @@ for i in stations:
         if var_name == 'aqs_wdir':
             ax.plot(df_all.index,np.cos(df_all[var_name]*np.pi/180),c='k',label='Observations')
             # UW WRF model output        
-            ax.plot(df_all.index,np.cos(df_all[var_name_mod1]*np.pi/180),c='b',label='Model')
+            ax.plot(df_all.index,np.cos(df_all[var_name_mod1]*np.pi/180),c='r',label='Model')
             # WRF-Chem model output
             
             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
         else:
             ax.plot(df_all.index,df_all[var_name],c='k',label='Observations')
             # UW WRF model output        
-            ax.plot(df_all.index,df_all[var_name_mod1],c='b',label='Model')
+            ax.plot(df_all.index,df_all[var_name_mod1],c='r',label='Model')
             # WRF-Chem model output
             
             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
@@ -782,14 +782,14 @@ print('plots complete')
 #         if var_name == 'wind_direction':
 #             ax.plot(df_h['date_time'],np.cos(df_h[var_name]*np.pi/180),c='k',label='Observations')
 #             # UW WRF model output        
-#             ax.plot(df_h['date_time'],np.cos(mod_var1*np.pi/180),c='b',label='Model')
+#             ax.plot(df_h['date_time'],np.cos(mod_var1*np.pi/180),c='r',label='Model')
 #             # WRF-Chem model output
 #             
 #             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
 #         else:
 #             ax.plot(df_h['date_time'],df_h[var_name],c='k',label='Observations')
 #             # UW WRF model output        
-#             ax.plot(df_h['date_time'],mod_var1,c='b',label='Model')
+#             ax.plot(df_h['date_time'],mod_var1,c='r',label='Model')
 #             # WRF-Chem model output
 #             
 #             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
@@ -801,14 +801,14 @@ print('plots complete')
 #         if var_name == 'aqs_wdir':
 #             ax.plot(df_all.index,np.cos(df_all[var_name]*np.pi/180),c='k',label='Observations')
 #             # UW WRF model output        
-#             ax.plot(df_all.index,np.cos(df_all[var_name_mod1]*np.pi/180),c='b',label='Model')
+#             ax.plot(df_all.index,np.cos(df_all[var_name_mod1]*np.pi/180),c='r',label='Model')
 #             # WRF-Chem model output
 #             
 #             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
 #         else:
 #             ax.plot(df_all.index,df_all[var_name],c='k',label='Observations')
 #             # UW WRF model output        
-#             ax.plot(df_all.index,df_all[var_name_mod1],c='b',label='Model')
+#             ax.plot(df_all.index,df_all[var_name_mod1],c='r',label='Model')
 #             # WRF-Chem model output
 #             
 #             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
@@ -864,7 +864,7 @@ print('plots complete')
 #         # correlation coefficients "r" (models vs. obs)
 #         fig2, ax = plt.subplots(figsize=(6, 4.5))
 #         
-#         ax.scatter(df_h[var_name], mod_var1, s=50, c='b', label='UW WRF')
+#         ax.scatter(df_h[var_name], mod_var1, s=50, c='r', label='UW WRF')
 #         ax.scatter(df_h[var_name], mod_var2, s=50, c='r', label='WSU WRF')
 #         ax.scatter(df_h[var_name], mod_var3, s=50, c='g', label='HRRR') 
 #         
@@ -873,7 +873,7 @@ print('plots complete')
 #         m2, b2 = np.polyfit(df_h[var_name], mod_var2, deg=1)
 #         m3, b3 = np.polyfit(df_h[var_name], mod_var3, deg=1)
 #         
-#         #ax.plot(df_h[var_name], m1*df_h[var_name] + b1, '--b', label='UW_WRF')
+#         #ax.plot(df_h[var_name], m1*df_h[var_name] + b1, '--r', label='UW_WRF')
 #         #ax.plot(df_h[var_name], m2*df_h[var_name] + b2, ':r', label='WRF-Chem')
 #         #ax.plot(df_h[var_name], m3*df_h[var_name] + b3, '-.g', label='HRRR')
 #         
@@ -1157,14 +1157,14 @@ for version in versions:
             if var_name == 'wind_direction':
                 ax.plot(df_h['date_time'],np.cos(df_h[var_name]*np.pi/180),c='k',label='Observations')
                 # UW WRF model output        
-                ax.plot(df_h['date_time'],np.cos(mod_var1*np.pi/180),c='b',label='Model')
+                ax.plot(df_h['date_time'],np.cos(mod_var1*np.pi/180),c='r',label='Model')
                 # WRF-Chem model output
                 
                 ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
             else:
                 ax.plot(df_h['date_time'],df_h[var_name],c='k',label='Observations')
                 # UW WRF model output        
-                ax.plot(df_h['date_time'],mod_var1,c='b',label='Model')
+                ax.plot(df_h['date_time'],mod_var1,c='r',label='Model')
                 # WRF-Chem model output
                 
                 ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
@@ -1176,14 +1176,14 @@ for version in versions:
             if var_name == 'aqs_wdir':
                 ax.plot(df_all.index,np.cos(df_all[var_name]*np.pi/180),c='k',label='Observations')
                 # UW WRF model output        
-                ax.plot(df_all.index,np.cos(df_all[var_name_mod1]*np.pi/180),c='b',label='Model')
+                ax.plot(df_all.index,np.cos(df_all[var_name_mod1]*np.pi/180),c='r',label='Model')
                 # WRF-Chem model output
                 
                 ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
             else:
                 ax.plot(df_all.index,df_all[var_name],c='k',label='Observations')
                 # UW WRF model output        
-                ax.plot(df_all.index,df_all[var_name_mod1],c='b',label='Model')
+                ax.plot(df_all.index,df_all[var_name_mod1],c='r',label='Model')
                 # WRF-Chem model output
                 
                 ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
@@ -1211,7 +1211,7 @@ for version in versions:
             # correlation coefficients "r" (models vs. obs)
             fig2, ax = plt.subplots(figsize=(6, 4.5))
             
-            ax.scatter(df_h[var_name], mod_var1, s=50, c='b', label='UW WRF')
+            ax.scatter(df_h[var_name], mod_var1, s=50, c='r', label='UW WRF')
             ax.scatter(df_h[var_name], mod_var2, s=50, c='r', label='WSU WRF')
             ax.scatter(df_h[var_name], mod_var3, s=50, c='g', label='HRRR') 
             
@@ -1220,7 +1220,7 @@ for version in versions:
             m2, b2 = np.polyfit(df_h[var_name], mod_var2, deg=1)
             m3, b3 = np.polyfit(df_h[var_name], mod_var3, deg=1)
             
-            #ax.plot(df_h[var_name], m1*df_h[var_name] + b1, '--b', label='UW_WRF')
+            #ax.plot(df_h[var_name], m1*df_h[var_name] + b1, '--r', label='UW_WRF')
             #ax.plot(df_h[var_name], m2*df_h[var_name] + b2, ':r', label='WRF-Chem')
             #ax.plot(df_h[var_name], m3*df_h[var_name] + b3, '-.g', label='HRRR')
             
@@ -1511,14 +1511,14 @@ for version in versions:
         if var_name == 'wind_direction':
             ax.plot(df_h['date_time'],np.cos(df_h[var_name]*np.pi/180),c='k',label='Observations')
             # UW WRF model output        
-            ax.plot(df_h['date_time'],np.cos(mod_var1*np.pi/180),c='b',label='Model')
+            ax.plot(df_h['date_time'],np.cos(mod_var1*np.pi/180),c='r',label='Model')
             # WRF-Chem model output
             
             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
         else:
             ax.plot(df_h['date_time'],df_h[var_name],c='k',label='Observations')
             # UW WRF model output        
-            ax.plot(df_h['date_time'],mod_var1,c='b',label='Model')
+            ax.plot(df_h['date_time'],mod_var1,c='r',label='Model')
             # WRF-Chem model output
             
             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
@@ -1530,14 +1530,14 @@ for version in versions:
         if var_name == 'aqs_wdir':
             ax.plot(df_all.index,np.cos(df_all[var_name]*np.pi/180),c='k',label='Observations')
             # UW WRF model output        
-            ax.plot(df_all.index,np.cos(df_all[var_name_mod1]*np.pi/180),c='b',label='Model')
+            ax.plot(df_all.index,np.cos(df_all[var_name_mod1]*np.pi/180),c='r',label='Model')
             # WRF-Chem model output
             
             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
         else:
             ax.plot(df_all.index,df_all[var_name],c='k',label='Observations')
             # UW WRF model output        
-            ax.plot(df_all.index,df_all[var_name_mod1],c='b',label='Model')
+            ax.plot(df_all.index,df_all[var_name_mod1],c='r',label='Model')
             # WRF-Chem model output
             
             ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
@@ -1566,7 +1566,7 @@ for version in versions:
         # correlation coefficients "r" (models vs. obs)
         fig2, ax = plt.subplots(figsize=(6, 4.5))
         
-        ax.scatter(df_h[var_name], mod_var1, s=50, c='b', label='UW WRF')
+        ax.scatter(df_h[var_name], mod_var1, s=50, c='r', label='UW WRF')
         ax.scatter(df_h[var_name], mod_var2, s=50, c='r', label='WSU WRF')
         ax.scatter(df_h[var_name], mod_var3, s=50, c='g', label='HRRR') 
         
@@ -1575,7 +1575,7 @@ for version in versions:
         m2, b2 = np.polyfit(df_h[var_name], mod_var2, deg=1)
         m3, b3 = np.polyfit(df_h[var_name], mod_var3, deg=1)
         
-        #ax.plot(df_h[var_name], m1*df_h[var_name] + b1, '--b', label='UW_WRF')
+        #ax.plot(df_h[var_name], m1*df_h[var_name] + b1, '--r', label='UW_WRF')
         #ax.plot(df_h[var_name], m2*df_h[var_name] + b2, ':r', label='WRF-Chem')
         #ax.plot(df_h[var_name], m3*df_h[var_name] + b3, '-.g', label='HRRR')
         
@@ -1958,7 +1958,7 @@ for w in new_list:
         
         var_label = 'Wind Speed (m/s)'
         var_units = 'm/s'
-        ymin = 0
+        ymin = 1
         ymax = 6
         
     if var_name=='aqs_wdir':  
@@ -2029,21 +2029,21 @@ for w in new_list:
     #dfmt = dates.DateFormatter('%m-%d')
     
     # Create a time series plot of a meteorological parameter
-    fig1, ax = plt.subplots(figsize=(8, 5))
+    fig1, ax = plt.subplots(figsize=(6, 3),dpi=150)#(8,5)
 
     '''
     # MesoWest observations
     if var_name == 'wind_direction':
         ax.plot(df_h['date_time'],np.cos(df_h[var_name]*np.pi/180),c='k',label='Observations')
         # UW WRF model output        
-        ax.plot(df_h['date_time'],np.cos(mod_var1*np.pi/180),c='b',label='Model')
+        ax.plot(df_h['date_time'],np.cos(mod_var1*np.pi/180),c='r',label='Model')
         # WRF-Chem model output
         
         ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
     else:
         ax.plot(df_h['date_time'],df_h[var_name],c='k',label='Observations')
         # UW WRF model output        
-        ax.plot(df_h['date_time'],mod_var1,c='b',label='Model')
+        ax.plot(df_h['date_time'],mod_var1,c='r',label='Model')
         # WRF-Chem model output
         
         ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
@@ -2055,14 +2055,14 @@ for w in new_list:
     if var_name == 'aqs_wdir':
         ax.plot(df_all.index,np.cos(df_all[var_name]*np.pi/180),c='k',label='Observations')
         # UW WRF model output        
-        ax.plot(df_all.index,np.cos(df_all[var_name_mod1]*np.pi/180),c='b',label='Model')
+        ax.plot(df_all.index,np.cos(df_all[var_name_mod1]*np.pi/180),c='r',label='Model')
         # WRF-Chem model output
         
         ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel='Cosine of Wind Direction',ylim=(ymin,ymax))
     else:
         ax.plot(df_all.index,df_all[var_name],c='k',label='Observations')
         # UW WRF model output        
-        ax.plot(df_all.index,df_all[var_name_mod1],c='b',label='Model')
+        ax.plot(df_all.index,df_all[var_name_mod1],c='r',label='Model')
         # WRF-Chem model output
         
         ax.set(title=st_name,xlabel='Date / Time (UTC)',ylabel=var_label,ylim=(ymin,ymax))
@@ -2073,13 +2073,20 @@ for w in new_list:
     fig1.autofmt_xdate(rotation=25)
     #df_all.plot(xticks=df_all.index)
     # Display r^2 on plot
-    ax.text(1.17, 0.44,'$r^2$ = %s' %stats_T['R^2 [-]'][0], 
-             ha='center', va='center', transform=ax.transAxes)
-    ax.text(1.17, 0.32,'RMSE= %s' %stats_T['RMSE [var units]'][0], 
-             ha='center', va='center', transform=ax.transAxes)
-    ax.text(1.17, 0.2,'# of sites '+str(temp1), 
-             ha='center', va='center', transform=ax.transAxes)        # Plot number of sites
-    ax.legend(loc='upper right',fontsize=16, bbox_to_anchor=(1.4, 0.9))
+# =============================================================================
+#     ax.text(1.17, 0.44,'$r^2$ = %s' %stats_T['R^2 [-]'][0], 
+#              ha='center', va='center', transform=ax.transAxes)
+#     ax.text(1.17, 0.32,'RMSE= %s' %stats_T['RMSE [var units]'][0], 
+#              ha='center', va='center', transform=ax.transAxes)
+#     ax.text(1.17, 0.2,'# of sites '+str(temp1), 
+#              ha='center', va='center', transform=ax.transAxes)        # Plot number of sites
+# =============================================================================
+    ax.text(0.98, 0.92,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes)
+    
+    if var_name == 'aqs_temp':
+        ax.legend(loc='upper left')
+    else:
+        ax.legend(loc='lower right')#loc='upper right',fontsize=16, bbox_to_anchor=(1.4, 0.9))
     ax.fmt_xdata = mdates.DateFormatter('%Y-%m')
     
     yax = 0.015
@@ -2098,24 +2105,35 @@ for w in new_list:
     
     
     # Create Airpact version change annotation
-    ax.annotate('AP3',xy=(0.09,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax1,yax2),color='red',size=size) # Left Arrow AP3
-    ax.annotate('AP3',xy=(xax4,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax1,yax2),color='red',size=size) # Right Arrow AP3
- 
-    ax.annotate('AP4',xy=(xax4,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax2,yax2),color='red',size=size) # Left Arrow AP4       
-    ax.annotate('AP4',xy=(xax5,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax2,yax2),color='red',size=size) # Right Arrow AP4
+# =============================================================================
+#     ax.annotate('AP3',xy=(0.09,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax1,yax2),color='red',size=size) # Left Arrow AP3
+#     ax.annotate('AP3',xy=(xax4,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax1,yax2),color='red',size=size) # Right Arrow AP3
+#  
+#     ax.annotate('AP4',xy=(xax4,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax2,yax2),color='red',size=size) # Left Arrow AP4       
+#     ax.annotate('AP4',xy=(xax5,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax2,yax2),color='red',size=size) # Right Arrow AP4
+#     
+#     ax.annotate('AP5',xy=(xax5,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax3,yax2),color='red',size=size) # Left Arrow AP5
+#     ax.annotate('AP5',xy=(xax6,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax3,yax2),color='red',size=size) # Right Arrow AP5
+# =============================================================================
+    # set version annotations settiungs
+    text_height = 0.07 # 0.005 almost works
+    x1 = 0.429
+    x2 = 0.70 # 0.689
+    x3 = 0.95
     
-    ax.annotate('AP5',xy=(xax5,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax3,yax2),color='red',size=size) # Left Arrow AP5
-    ax.annotate('AP5',xy=(xax6,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax3,yax2),color='red',size=size) # Right Arrow AP5
-    '''
-    ax.annotate('AP3',xy=(0.09,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.235,yax2),color='red',size=size) # Left Arrow AP3
-    ax.annotate('AP3',xy=(0.405,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.235,yax2),color='red',size=size) # Right Arrow AP3
+    t1 = (x1-0.07)/2+0.07
+    t2 = (x2-x1)/2+x1
+    t3 = (x3-x2)/2+x2
     
-    ax.annotate('AP4',xy=(0.632,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.512,yax2),color='red',size=size) # Right Arrow AP4
-    ax.annotate('AP4',xy=(0.405,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.512,yax2),color='red',size=size) # Left Arrow AP4
+    ax.annotate('AP3',xy=(0.07,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Left Arrow AP3 # previous height of 0.061 for the xytext
+    ax.annotate('AP3',xy=(x1,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Right Arrow AP3
     
-    ax.annotate('AP5',xy=(0.632,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.78,yax2),color='red',size=size) # Left Arrow AP5
-    ax.annotate('AP5',xy=(0.94,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.78,yax2),color='red',size=size) # Right Arrow AP5
-    '''
+    ax.annotate('AP4',xy=(x1,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Left Arrow AP4
+    ax.annotate('AP4',xy=(x2,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Right Arrow AP4
+
+    ax.annotate('AP5',xy=(x2,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Left Arrow AP5
+    ax.annotate('AP5',xy=(x3,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Right Arrow AP5
+
     # Add significant event annotations to plots
     #ax.annotate('12km to 4km',xy=(0.405,0.75),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(0.405,.8),color='red',size='x-small') # Right Arrow AP3
     ax.set_xlabel('')
@@ -2130,7 +2148,7 @@ for w in new_list:
     # correlation coefficients "r" (models vs. obs)
     fig2, ax = plt.subplots(figsize=(6, 4.5))
     
-    ax.scatter(df_h[var_name], mod_var1, s=50, c='b', label='UW WRF')
+    ax.scatter(df_h[var_name], mod_var1, s=50, c='r', label='UW WRF')
     ax.scatter(df_h[var_name], mod_var2, s=50, c='r', label='WSU WRF')
     ax.scatter(df_h[var_name], mod_var3, s=50, c='g', label='HRRR') 
     
@@ -2139,7 +2157,7 @@ for w in new_list:
     m2, b2 = np.polyfit(df_h[var_name], mod_var2, deg=1)
     m3, b3 = np.polyfit(df_h[var_name], mod_var3, deg=1)
     
-    #ax.plot(df_h[var_name], m1*df_h[var_name] + b1, '--b', label='UW_WRF')
+    #ax.plot(df_h[var_name], m1*df_h[var_name] + b1, '--r', label='UW_WRF')
     #ax.plot(df_h[var_name], m2*df_h[var_name] + b2, ':r', label='WRF-Chem')
     #ax.plot(df_h[var_name], m3*df_h[var_name] + b3, '-.g', label='HRRR')
     

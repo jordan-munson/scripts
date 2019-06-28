@@ -190,7 +190,7 @@ exec(open(stat_path).read())
 # 
 # =============================================================================
 # Set plot parameters
-mpl.rcParams['font.family'] = 'times new roman'  # the font used for all labelling/text
+mpl.rcParams['font.family'] = 'Calibri'  # the font used for all labelling/text
 mpl.rcParams['font.size'] = 10.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
@@ -231,25 +231,24 @@ for species in pollutant:
     
     for version in versions:
         if version == 'AP3':
-            start_date ='2009-05-01'
-            #end_date = '2014-07-01'
-            end_date = '2014-06-30'
+            xlabel = 'AP-3'
+
             years = [2009,2010,2011,2012]
         elif version == 'AP4':
-            start_date ='2014-07-01'
-            #end_date = '2015-12-01'
-            end_date = '2015-11-30'
+            xlabel = 'AP-4'
+
             years = [2013,2014,2015]
         elif version == 'AP5':
-            start_date ='2015-12-01'
-            #end_date = '2018-07-01'
-            end_date = '2018-06-30'
-            years = [2016,2017]
+            xlabel = 'AP-5'
+
+            years = [2016,2017,2018]
         
         
-        # Locate correct site model data
-        mask = (df_com['datetime'] > start_date) & (df_com['datetime'] <= end_date) # Create a mask to determine the date range used
-        d = da.loc[mask]
+# =============================================================================
+#         # Locate correct site model data
+#         mask = (df_com['datetime'] > start_date) & (df_com['datetime'] <= end_date) # Create a mask to determine the date range used
+#         d = da.loc[mask]
+# =============================================================================
         for season in seasons:
             print(season)
             db=pd.DataFrame()       #reset empty
@@ -393,9 +392,12 @@ for species in pollutant:
             names.append(version)
             
     # Plotting section
-    fig = plt.figure(figsize=(4,3),dpi=200)
+    fig = plt.figure(figsize=(4,3),dpi=300)
     fig.tight_layout()
     label = 10
+    ylim = (20,60)
+    print(names)
+    names = ['AP-3','AP-4','AP-5']
 # =============================================================================
 #     if species == 'O3':
 #         fig.suptitle('Summer 8-Hour Max Average Ozone ',ha='center') # title
@@ -407,19 +409,22 @@ for species in pollutant:
     sites = len(data)
     
     ax = fig.add_subplot(2,1,1)
-    ax.set_title('Modeled',fontsize = label)
-
+    ax.set_title('(a) Forecasted',fontsize = label)
+    
     ax.boxplot(data)
     plt.xticks([],[])
     plt.grid(True,alpha=0.7,axis='y')
-    ax.set_ylabel(species+' '+'('+unit_list+')') 
+    ax.set_ylabel(species+' '+'['+unit_list+']') 
+    ax.set_ylim(ylim)
     
     ax = fig.add_subplot(2,1,2)
-    ax.set_title('Observed', fontsize = label)
-    ax.set_ylabel(species+' '+'('+unit_list+')') 
+    ax.set_title('(b) Observed', fontsize = label)
+    ax.set_ylabel(species+' '+'['+unit_list+']') 
+    ax.set_ylim(ylim)
     
     ax.boxplot(data1)
     plt.xticks([1,2,3],names)
+    
     
     # Removex ticks
     plt.tick_params(
@@ -432,9 +437,11 @@ for species in pollutant:
     #ax.set_ylabel(species+' '+'('+unit_list+')') 
     plt.grid(True,alpha=0.7,axis='y')
     
-    # place letters 
-    ax.text(1.09, 1.72,'A', ha='right', va='center', transform=ax.transAxes,fontsize=20)
-    ax.text(1.09, 0.5,'B', ha='right', va='center', transform=ax.transAxes,fontsize=20)
+# =============================================================================
+#     # place letters 
+#     ax.text(1.09, 1.72,'A', ha='right', va='center', transform=ax.transAxes,fontsize=20)
+#     ax.text(1.09, 0.5,'B', ha='right', va='center', transform=ax.transAxes,fontsize=20)
+# =============================================================================
     plt.show()
     plt.savefig(inputDir+'/plots/boxplot/'+species+'boxplot.png',  pad_inches=0.1, bbox_inches='tight')
     plt.close()

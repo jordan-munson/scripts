@@ -161,7 +161,7 @@ def percentile(df,name_var1,name_var2):
     return percentile_98
     
 #Calculates and combines into a labeled dataframe
-def stats(df,name_var1,name_var2,var_units):
+def stats_version(df,name_var1,name_var2,var_units):
     MB = mb(df,name_var1,name_var2)
     ME = me(df,name_var1,name_var2)
     FB = fb(df,name_var1,name_var2)

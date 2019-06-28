@@ -92,6 +92,25 @@ def me(df,name_var1,name_var2):  #var1 is model var2 is observed
     ME=round(abs(df_new['dif_var']).sum()/len(df_new.index),2)
     return ME
 
+def percentile(df,name_var1,name_var2):
+    df_new=pd.DataFrame()
+    percentile_98=pd.DataFrame()
+    name1 = name_var1+' 98th'
+    name2 = name_var2+' 98th'
+    df_new[name_var1]=df[name_var1]
+    df_new[name_var2]=df[name_var2]
+    percentile_98[name1] = [df_new[name_var1].quantile(0.98)]
+    percentile_98[name2] = [df_new[name_var2].quantile(0.98)]
+    return round(percentile_98,2)
+
+# The Mean - Mean model concentration
+def mean(df,name_var1,name_var2):  #var1 is model var2 is observed)
+    df_new=pd.DataFrame()
+    df_new[name_var1]=df[name_var1]
+    df_new[name_var2]=df[name_var2]
+    MEAN = df_new[name_var1].mean()
+    return round(MEAN,2)
+
 #Calculates and combines into a labeled dataframe    
 def stats(df,name_var1,name_var2):
     NMB = nmb(df,name_var1,name_var2)
@@ -106,6 +125,29 @@ def stats(df,name_var1,name_var2):
     g.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
     g.columns = [name_var1]
     return g
+
+#Calculates and combines into a labeled dataframe    
+def stats_version(df,name_var1,name_var2):
+    NMB = nmb(df,name_var1,name_var2)
+    NME = nme(df,name_var1,name_var2)
+    RMSE = rmse(df,name_var1,name_var2)
+    r_squared = r2(df,name_var1,name_var2)
+    MB = mb(df,name_var1,name_var2)
+    ME = me(df,name_var1,name_var2)
+    FB = fb(df,name_var1,name_var2)
+    FE = fe(df,name_var1,name_var2)
+    MEAN_MOD = mean(df,name_var1,name_var1)
+    MEAN_OBS = mean(df,name_var2,name_var2)
+    percentile_98 = percentile(df,name_var1,name_var2)
+    name1 = name_var1+' 98th'
+    name2 = name_var2+' 98th'
+    
+    g = pd.DataFrame([MEAN_MOD,MEAN_OBS,MB,ME,FB,FE,RMSE,r_squared, percentile_98[name1][0],percentile_98[name2][0]])
+    g.index = ['Forecast Mean', 'Observation Mean', 'MB','ME','FB [%]','FE [%]', "RMSE", "R^2 [-]",'Forecast 98th','Observation 98th']
+    g.columns = [name_var1]
+    return g
+
+
 ########### Below is an example of how these functions can be used
 '''
 #Run the stats function for the desired data

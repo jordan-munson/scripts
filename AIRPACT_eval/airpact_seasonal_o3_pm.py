@@ -157,7 +157,7 @@ df_com = df_com.drop(['State Code','County Code','Site Number'],axis=1) # drop u
 print('Combined dataframe finished')
 
 # Set plot parameters
-mpl.rcParams['font.family'] = 'times new roman'  # the font used for all labelling/text
+mpl.rcParams['font.family'] = 'calibri'  # the font used for all labelling/text
 mpl.rcParams['font.size'] = 10.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
@@ -398,8 +398,10 @@ settings = ['RURAL', 'SUBURBAN', 'URBAN AND CENTER CITY']
 seasons = ['Summer','Winter'] 
 
 #pollutant = ['PM2.5','O3']
+
 pollutant = ['O3']
-#pollutant = ['PM2.5']
+pollutant = ['PM2.5']
+
 versions = ['AP3','AP4','AP5']
 
 # Short version to make running on pc faster
@@ -412,13 +414,13 @@ for species in pollutant:
     fig = plt.figure(figsize=(6,3),dpi=300)#8,4)) # seems to do nothing here really
     if species == 'PM2.5':
         #fig.set_ylabel('$PM_{2.5} (ug/m^3)$')
-        fig.text(-0.015, 0.5, '$PM_{2.5} (ug/m^3)$', va='center', rotation='vertical')
+        fig.text(-0.015, 0.5, '$PM_{2.5} [ug/m^3]$', va='center', rotation='vertical')
 # =============================================================================
 #         fig.suptitle('Daily Averaged Seasonal Variations',y=1.06) # title
 # =============================================================================
     else:
         #fig.set_ylabel('Ozone (ppb)') 
-        fig.text(-0.015, 0.5, 'Ozone (ppb)', va='center', rotation='vertical')
+        fig.text(-0.015, 0.5, 'Ozone [ppb]', va='center', rotation='vertical')
 # =============================================================================
 #         fig.suptitle('Daily Max 8-Hr Ozone Seasonal Variations',y=1.06) # title
 # =============================================================================
@@ -432,35 +434,45 @@ for species in pollutant:
 #     fig.text(0.5, 0.66, 'AIRPACT 4', va='center',ha='center')
 #     fig.text(0.5, 0.33, 'AIRPACT 5', va='center',ha='center')
 # =============================================================================
-    fig.text(0.207, 0.98, 'AP-3', va='center',ha='center')
-    fig.text(0.525, 0.98, 'AP-4', va='center',ha='center')
-    fig.text(0.845, 0.98, 'AP-5', va='center',ha='center')
+    fig.text(0.202, 1, 'AP-3', va='center',ha='center') # 0.98
+    fig.text(0.520, 1, 'AP-4', va='center',ha='center')
+    fig.text(0.842, 1, 'AP-5', va='center',ha='center')
     # seasons
-    fig.text(0.013,0.78,'Winter',va='center',ha='center', rotation='vertical')
-    fig.text(0.013,0.3,'Summer',va='center',ha='center', rotation='vertical')
+# =============================================================================
+#     fig.text(0.013,0.78,'Winter',va='center',ha='center', rotation='vertical')
+#     fig.text(0.013,0.3,'Summer',va='center',ha='center', rotation='vertical')
+# =============================================================================
     
     for version,i in zip(versions,[0,1,2]):#[0,4,8]):
         print(version)
     # Set date range used based of versions
         if version == 'AP3':
-            start_date ='2009-05-01'
-            #end_date = '2014-07-01'
-            end_date = '2014-06-30'
+# =============================================================================
+#             start_date ='2009-05-01'
+#             #end_date = '2014-07-01'
+#             end_date = '2014-06-30'
+# =============================================================================
             years = [2009,2010,2011,2012]
         elif version == 'AP4':
-            start_date ='2014-07-01'
-            #end_date = '2015-12-01'
-            end_date = '2015-11-30'
+# =============================================================================
+#             start_date ='2014-07-01'
+#             #end_date = '2015-12-01'
+#             end_date = '2015-11-30'
+# =============================================================================
             years = [2013,2014,2015]
         elif version == 'AP5':
-            start_date ='2015-12-01'
-            #end_date = '2018-07-01'
-            end_date = '2018-06-30'
-            years = [2016,2017]
+# =============================================================================
+#             start_date ='2015-12-01'
+#             #end_date = '2018-07-01'
+#             end_date = '2018-06-30'
+# =============================================================================
+            years = [2016,2017,2018]
         
-        # Locate correct site model data
-        mask = (df_com['datetime'] > start_date) & (df_com['datetime'] <= end_date) # Create a mask to determine the date range used
-        dc = da.loc[mask]
+# =============================================================================
+#         # Locate correct site model data
+#         mask = (df_com['datetime'] > start_date) & (df_com['datetime'] <= end_date) # Create a mask to determine the date range used
+#         dc = da.loc[mask]
+# =============================================================================
         
 
         
@@ -475,7 +487,6 @@ for species in pollutant:
             #print('starting datetime conversion')
             d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
             #print('datetime conversion finished')
-            
             d = d.set_index('datetime') # Set datetime column as index
             d1=pd.DataFrame()
             d2=pd.DataFrame()
@@ -608,9 +619,9 @@ for species in pollutant:
             # Plotting section
             #ax = fig.add_subplot(1,i,1)
             #Plot
-            db.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'blue'])
+            db.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'red'])
             ax.set_xlim(s,e) # set limits in the hopes of removing doubled last label
-            plt.setp(ax.get_xticklabels(), rotation=30)#, horizontalalignment='right') # angle x axis labels
+            plt.setp(ax.get_xticklabels())#, horizontalalignment='right') # angle x axis labels
             if species == 'PM2.5':
                 #ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
                 ax.set_ylim(0,30)
@@ -640,24 +651,25 @@ for species in pollutant:
             # Set letter denoting plot
             if i ==0:
                 if season == 'Winter':
-                    abc = 'A'
+                    abc = '(a)'
                     plt.legend(['Observation','Forecast'],prop={'size': 8})
                 else:
-                    abc = 'D'
+                    abc = '(d)'
                     ax.get_legend().remove()
             if i ==1:
                 ax.get_legend().remove()
                 if season == 'Winter':
-                    abc = 'B'
+                    abc = '(b)'
                 else:
-                    abc = 'E'
+                    abc = '(e)'
             if i ==2:
                 ax.get_legend().remove()
                 if season == 'Winter':
-                    abc = 'C'
+                    abc = '(c)'
                 else:
-                    abc = 'F'
-            ax.text(1.07, 1.23,abc,fontsize = 20, ha='right', va='center', transform=ax.transAxes)
+                    abc = '(f)'
+            #ax.text(0.5, 1.1,abc, ha='right', va='center', transform=ax.transAxes)
+            ax.set_title(abc)
     
             plt.grid(True)    # Add grid lines to make graph interpretation easier
             

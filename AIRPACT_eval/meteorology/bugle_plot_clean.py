@@ -22,8 +22,10 @@ df_stats = pd.read_csv(inputdir+'aqs_version_stats.csv')#.drop(['Unnamed: 0'],ax
 
 # Seperate types
 df_o3 = df_stats.loc[df_stats['index']=='O3_mod_hourly']
+df_o3_dm8a = df_stats.loc[df_stats['index']=='O3_mod']
+df_o3_tot = df_o3.append(df_o3_dm8a)
 df_pm = df_stats.loc[df_stats['index']=='PM2.5_mod_hourly']
-
+df_pm_daily = df_stats.loc[df_stats['index']=='PM2.5_mod']
 # Set plot parameters
 mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
 mpl.rcParams['font.size'] = 20.0
@@ -44,19 +46,21 @@ legend_loc = 'upper right'
 # Plot
 
 # PM
-fig, ax = plt.subplots(figsize=figsize)
+fig, ax = plt.subplots(figsize=figsize,dpi = 150)
 
 # Set axis so that the plot resembles a soccer plot
 plt.ylim((-100,100))
 plt.xlim((0,10))
 
 # Label plot
-ax.set(title='PM$_{2.5}$ per AIRPACT Version',xlabel='Mean',ylabel='FB [%]')
+ax.set(title='PM$_{2.5}$',xlabel='Mean',ylabel='FB (%)')
 
 # Add color to the plot, colors signifying which site type
 colors = ['r','g','b']
 
-ax.scatter(df_pm['Mean'],df_pm['FB'],c=colors, marker = 'D', label = '')
+ax.scatter(df_pm['Mean'],df_pm['FB'],c=colors, marker = 'o', label = 'Hourly')
+ax.scatter(df_pm_daily['Mean'],df_pm_daily['FB'],c=colors, marker = 'D',label='Daily')
+
 
 # Define props
 props = dict(boxstyle='square', facecolor='white', alpha=0.0)
@@ -94,24 +98,27 @@ graph(lambda x: 70*(np.power(0.3, x))+30, (0,11),'black','--','Goal') # Top
 graph(lambda x: -70*(np.power(0.3, x))-30, (0,11),'black','--','') # Bottom
 ax.text(-0.13, 1.08,'A',fontsize = 20, ha='right', va='center', transform=ax.transAxes)
 
-plt.legend(prop={'size': 16})
+plt.legend(prop={'size': 14},loc = 'upper left')
 fig.savefig(outputdir + '/airpact_bugle_version_pm.png' ,bbox_inches='tight')
 
 #%%
 # 03
-fig, ax = plt.subplots(figsize=figsize)
+fig, ax = plt.subplots(figsize=figsize, dpi=150)
 
 # Set axis so that the plot resembles a soccer plot
 plt.ylim((-100,100))
 plt.xlim((0,60))
 
 # Label plot
-ax.set(title='Ozone per AIRPACT Version',xlabel='Mean',ylabel='FB (%)')
+ax.set(title='Ozone',xlabel='Mean',ylabel='FB (%)')
 
 # Add color to the plot, colors signifying which site type
 colors = ['r','g','b']
 
-ax.scatter(df_o3['Mean'],df_o3['FB'],c=colors, marker = 'o',label='')
+ax.scatter(df_o3['Mean'],df_o3['FB'],c=colors, marker = 'o',label='Hourly')
+ax.scatter(df_o3_dm8a['Mean'],df_o3_dm8a['FB'],c=colors, marker = 'D',label='DM8HA')
+ax.legend()
+#ax.scatter(df_o3_tot['Mean'],df_o3_tot['FB'],c=colors, marker = 'o',label='')
 
 #ax.scatter(df_pm['Mean'],df_pm['NMB [%]'],c=colors, marker = 'D', label = 'PM_2.5')
 
@@ -134,7 +141,6 @@ ax.text(1.03,0.32+adj,'AP5',transform=ax.transAxes,
 #Draw grid
 plt.grid(b=None, which='major', axis='y')
 
-
 line_lim = 70
 # Criteria lines
 criteria = 30
@@ -148,7 +154,7 @@ graph(lambda x: -70*(np.power(0.3, x))-goal, (0,line_lim),'black','--','') # Bot
 
 ax.text(-0.13, 1.08,'A',fontsize = 20, ha='right', va='center', transform=ax.transAxes)
 
-plt.legend(prop={'size': 16})
+legend  = plt.legend(prop={'size': 14},loc = 'upper left')
 fig.savefig(outputdir + '/airpact_bugle_version_o3.png' ,bbox_inches='tight')
 df_stats.to_csv(outputdir+'/aqs_bugle_stats.csv')
 

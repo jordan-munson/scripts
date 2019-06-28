@@ -24,6 +24,7 @@ from functions_for_benmap import *
 
 # for timing
 time_begin = time.time()
+year = '2016'
 
 #%%
 #################################################
@@ -36,17 +37,17 @@ time_begin = time.time()
 # =============================================================================
 
 # Aeolus
-inputDir   = '/data/lar/projects/airpact5/saved/2018/' #for Urbanova files
+inputDir   = '/data/lar/projects/airpact5/saved/'+year+'/' #for Urbanova files
 outDir     = '/data/lar/users/jmunson/benmap/script_output/'
-grd_file   = '/data/lar/projects/airpact5/AIRRUN/2018/2018011100/MCIP37/GRIDCRO2D'    # This file still exists so the path is valid for this
+grd_file   = '/data/lar/users/jmunson/benmap/GRIDCRO2D'    # This file still exists so the path is valid for this
 
 
 pollutant  = 'PMIJ'          # PMIJ or O3
 case       = 'BASE'         # 2EMIS or NARA or BASE
 epi_to_qtr = True           # if getting quarterly mean / annual mean from an episode (we assume that quarterly/annual mean equals episodic mean in worst case, NOTE: not valid for fire silumations)
-metric     = 'D24HourMean'   # for Ozone - D8HourMax or D1HourMax; for PM2.5 - D24HourMean, QuarterlyMean, AnnualMean
-beginDate  = '2018-01-11'    # begin date of simulations
-endDate    = '2018-12-31'    # end date of simulations
+metric     = 'QuarterlyMean'   # for Ozone - D8HourMax or D1HourMax; for PM2.5 - D24HourMean, QuarterlyMean, AnnualMean
+beginDate  = year+'-01-01'    # begin date of simulations
+endDate    = year+'-12-31'    # end date of simulations
 
 #################################################
 # based on user inputs, create some date variables

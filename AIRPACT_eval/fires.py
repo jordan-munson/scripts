@@ -11,8 +11,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 #Set directory
-inputDir = r'G:/Research/AIRPACT_eval/'
-stat_path = r'G:/Research/scripts/Urbanova/statistical_functions.py'
+inputDir = r'E:/Research/AIRPACT_eval/'
+stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
 
 # =============================================================================
 # Setup
@@ -33,13 +33,15 @@ mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/te
 # mpl.rcParams['xtick.direction']   = 'in'
 # =============================================================================
 
-states = ['WA','OR','ID','MT']
+states = ['WA','OR','ID','MT']#,'CA']
+#states = ['NATION']
+
 # =============================================================================
 # Plot fire data
 # =============================================================================
 df_fire = pd.read_csv(inputDir+'fire_data.csv')
 
-years = [2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018]
+years = [2010,2011,2012,2013,2014,2015,2016,2017,2018]
 df_com = pd.DataFrame(index = years, columns=['Fires', 'Acres', 'State']).fillna(0)
 
 fig = plt.figure()
@@ -60,50 +62,33 @@ ax.set_ylabel('Acres Burned / 1000')
 
 plt.show()
 plt.close()
-
+df_com.to_csv(inputDir+'fires.csv')
 #%%
 
-
-import matplotlib.pyplot as plt
-import numpy as np
-
-# Fixing random state for reproducibility
-np.random.seed(19680801)
-
-
-plt.subplot(211)
-plt.imshow(np.random.random((100, 100)), cmap=plt.cm.BuPu_r)
-plt.subplot(212)
-plt.imshow(np.random.random((100, 100)), cmap=plt.cm.BuPu_r)
-
-plt.subplots_adjust(bottom=0.1, right=.5, top=0.9)
-cax = plt.axes([0.85, 0.1, 0.075, 0.8])
-plt.colorbar(cax=cax)
-plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# =============================================================================
+# 
+# import matplotlib.pyplot as plt
+# import numpy as np
+# 
+# # Fixing random state for reproducibility
+# np.random.seed(19680801)
+# 
+# 
+# plt.subplot(211)
+# plt.imshow(np.random.random((100, 100)), cmap=plt.cm.BuPu_r)
+# plt.subplot(212)
+# plt.imshow(np.random.random((100, 100)), cmap=plt.cm.BuPu_r)
+# 
+# plt.subplots_adjust(bottom=0.1, right=.5, top=0.9)
+# cax = plt.axes([0.85, 0.1, 0.075, 0.8])
+# plt.colorbar(cax=cax)
+# plt.show()
+# 
+# 
+# 
+# 
+# 
+# =============================================================================
 
 
 
