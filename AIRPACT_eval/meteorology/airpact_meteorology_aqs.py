@@ -44,7 +44,12 @@ base_dir = "/data/lar/users/jmunson/longterm_airpact/"
 outputdir = base_dir + 'outputs/'
 
 # set a directory containing wrfout files
-datadir = base_dir + 'linked_days/'
+# =============================================================================
+# datadir = base_dir + 'linked_days/'
+# =============================================================================
+datadir = '/data/lar/projects/airpact5/AIRRUN/'
+
+
 #datadir = r'E:/Research/AIRPACT_eval/meteorology/example_met_days/'    # Actual data for plotting
 #datadir = r'E:/Research/Urbanova_Jordan/Urbanova_ref_site_comparison/AIRPACT/2018/'    # test days
 # all the functions are saved in Met_functions_for_Ben.py
@@ -152,7 +157,9 @@ print(base_dir +"Met_functions_for_Ben.py")
 start_year = 2018    #2009
 start_month = 8    #5
 start_day = 15    #1
- 
+
+datadir = datadir+ str(start_year)+'/' 
+
 end_year = 2018
 end_month = 12    #8
 #end_day = monthrange(end_year, end_month)[1]

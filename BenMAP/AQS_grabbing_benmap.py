@@ -44,7 +44,7 @@ def aqs(begining,ending):
             dict_AQS = AQS       
  
     AQS_df = pd.concat(dict_AQS)
-    AQS_df = AQS_df.drop(['Parameter Code','POC','Datum','Date GMT','Time GMT','MDL','Uncertainty',
+    AQS_df = AQS_df.drop(['Parameter Code','POC','Datum','Time Local','Date Local','MDL','Uncertainty',
                           'Qualifier','Method Type','Method Code','Method Name','Date of Last Change'], axis=1)
    
     AQS_df.to_csv(base_dir+'AQS_data/aqs_o3_benmap'+'_'+str(begining)+'.csv')
@@ -84,9 +84,10 @@ aqs(start_year,end_year)
 # =============================================================================
 # Hourly
 # =============================================================================
-df = pd.read_csv(base_dir+'AQS_data/aqs_o3_benmap_'+str(start_year)+'.csv',parse_dates=[['Date Local', 'Time Local']]).drop(['Parameter Name','Units of Measure','State Name','County Name','Unnamed: 0','Unnamed: 1'],axis=1)
-df = df.rename(columns={'Date Local_Time Local': 'Date Local'})
-df['Date Local'] = pd.to_datetime(df['Date Local'])
+df = pd.read_csv(base_dir+'AQS_data/aqs_o3_benmap_'+str(start_year)+'.csv',parse_dates=[['Date GMT', 'Time GMT']]).drop(['Parameter Name','Units of Measure','State Name','County Name','Unnamed: 0','Unnamed: 1'],axis=1)
+df = df.rename(columns={'Date GMT_Time GMT': 'Date GMT'})
+df['Date GMT'] = pd.to_datetime(df['Date GMT'])
+df["Date GMT"] = df["Date GMT"].apply(lambda x: x - dt.timedelta(hours=8)) #Adjust to PST
 
 
 #df = pd.read_csv(base_dir+'aqs_daily_pm25_benmap.csv',low_memory=False).drop(['Parameter Name','Pollutant Standard','Units of Measure','Event Type','Observation Count','Observation Percent','1st Max Value','1st Max Hour','AQI','State Name','County Name','City Name','CBSA Name','Address'],axis=1)
@@ -114,7 +115,7 @@ df['Statistic'] = ''
 df['Monitor Description'] = "'MethodCode=.','LandUse=.','LocationSetting=.','ProbeLocation=.','MonitorObjective=.','POC=1','PollutantID=44201'"
 
 # reorginize df
-df = df[['Monitor Name', 'Monitor Description','Latitude', 'Longitude','Metric','Seasonal Metric','Statistic', 'Date Local', 'Values']]
+df = df[['Monitor Name', 'Monitor Description','Latitude', 'Longitude','Metric','Seasonal Metric','Statistic', 'Date GMT', 'Values']]
 
 # Create date range
 date1 = str(start_year)+'-01-01'
@@ -122,15 +123,15 @@ date2 = str(start_year)+'-12-31'
 mydates = pd.date_range(date1, date2, freq='D').tolist()
 
 # Convert date in df to datetime
-df['Date Local'] = pd.to_datetime(df['Date Local'])
+df['Date GMT'] = pd.to_datetime(df['Date GMT'])
 
-df_b = pd.DataFrame(data=mydates,columns=['Date Local'])
-df_c = pd.DataFrame(columns=['Monitor Name','Monitor Description','Latitude','Longitude','Metric','Seasonal Metric','Statistic','Date Local','Values'])
+df_b = pd.DataFrame(data=mydates,columns=['Date GMT'])
+df_c = pd.DataFrame(columns=['Monitor Name','Monitor Description','Latitude','Longitude','Metric','Seasonal Metric','Statistic','Date GMT','Values'])
 for sites in mysites:
     df_a = df.loc[df['Monitor Name']==sites, df.columns] # Locate a single site
     
     df_a = pd.merge(df_a,df_b, how = 'outer') # merge to create dataframe with all days of the year
-    df_d = df_a.set_index('Date Local').drop(['Latitude','Longitude'],axis=1)
+    df_d = df_a.set_index('Date GMT').drop(['Latitude','Longitude'],axis=1)
     df_d = round(df_d.resample('D').mean(),2)
     df_d = df_d.reset_index()
     
@@ -147,7 +148,7 @@ for sites in mysites:
     df_d = df_d.fillna('.')
     
     # Sorts by datetime so that everything is in order
-    df_d = df_d.sort_values('Date Local')
+    df_d = df_d.sort_values('Date GMT')
     
     # create list of all conc values
     values = df_d['Values'].astype(str).tolist()
@@ -169,7 +170,7 @@ for sites in mysites:
     
     df_c = df_c.append(df_a)
 
-df_c = df_c.drop(['Date Local'],axis=1)
+df_c = df_c.drop(['Date GMT'],axis=1)
 df_c.to_csv(base_dir + 'AQS_data/daily_o3_aqs_formatted'+'_'+str(start_year)+'.csv',index=False, encoding='utf-8-sig')
 
 
@@ -179,9 +180,9 @@ df_c.to_csv(base_dir + 'AQS_data/daily_o3_aqs_formatted'+'_'+str(start_year)+'.c
 # # Use this with the benmap tool to convert mon data
 # # =============================================================================
 # # =============================================================================
-# # df = pd.read_csv(base_dir+'aqs_pm25_benmap.csv',low_memory=False,parse_dates=[['Date Local', 'Time Local']]).drop(['Parameter Name','Units of Measure','State Name','County Name','Unnamed: 0','Unnamed: 1'],axis=1)
-# # df = df.rename(columns={'Date Local_Time Local': 'Date Local'})
-# # df['Date Local'] = pd.to_datetime(df['Date Local'])
+# # df = pd.read_csv(base_dir+'aqs_pm25_benmap.csv',low_memory=False,parse_dates=[['Date GMT', 'Time GMT']]).drop(['Parameter Name','Units of Measure','State Name','County Name','Unnamed: 0','Unnamed: 1'],axis=1)
+# # df = df.rename(columns={'Date GMT_Time GMT': 'Date GMT'})
+# # df['Date GMT'] = pd.to_datetime(df['Date GMT'])
 # # =============================================================================
 # 
 # 
@@ -199,7 +200,7 @@ df_c.to_csv(base_dir + 'AQS_data/daily_o3_aqs_formatted'+'_'+str(start_year)+'.c
 # df = df.drop(['State Code','County Code','Site Num'],axis = 1)
 # 
 # # Change format to that BenMAP wants
-# df = df.rename(columns={"AQSID": "Monitor Name",'Arithmetic Mean':'Value','Date Local':'Date'})
+# df = df.rename(columns={"AQSID": "Monitor Name",'Arithmetic Mean':'Value','Date GMT':'Date'})
 # df['Metric'] = ''
 # df['Seasonal Metric'] = ''
 # df['Statistic'] = ''
@@ -247,7 +248,7 @@ df_c.to_csv(base_dir + 'AQS_data/daily_o3_aqs_formatted'+'_'+str(start_year)+'.c
 #     
 #     # add montior to total list
 #     df_c = df_c.append(df_a)
-# #df_c = df_c.drop(['Date Local'],axis=1)
+# #df_c = df_c.drop(['Date GMT'],axis=1)
 # 
 # df_c.to_csv(base_dir + 'aqs_for_ben_funct.csv',index=False)
 # =============================================================================

@@ -15,8 +15,8 @@ inputDir = r'C:/Users/riptu/Documents/My BenMAP-CE Files/Result/APVR/AIRPACT/'
 
 
 # Set plot parameters
-mpl.rcParams['font.family'] = 'arial'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 16 # 10 for paper. 28 for presentations
+mpl.rcParams['font.family'] = 'calibri'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 10 # 10 for paper. 28 for presentations
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -814,5 +814,62 @@ for endpoint in endpoints:
     d['Model'] = d['Model']/d['Population']*100
     im = d.plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
     states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+plt.show()
+plt.close()
+#%%
+# =============================================================================
+# DEQ analysis section
+# =============================================================================
+
+df_deq = pd.merge(pd.read_csv(inputDir + 'deq_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
+df_deq = pd.read_csv(inputDir + 'deq_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index().rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
+
+# =============================================================================
+# print(df_deq.drop(['Endpoint Group','State Name','Delta_Model'],axis=1).loc[df_mod['Endpoint Group'] == endpoint].sort_values(by=['Model'], ascending=False).loc[df_mod['County Name'] == 'Sherman'].head())
+# a = df_deq.drop(['Endpoint Group','State Name','Delta_Model'],axis=1).loc[df_mod['Endpoint Group'] == endpoint].sort_values(by=['Model'], ascending=False).loc[df_mod['County Name'] == 'Sherman'].head()
+# =============================================================================
+
+counties = counties
+df_mod = pd.merge(df_deq,counties) # Merging eliminates the rest of the country
+df_mod = gpd.GeoDataFrame(df_mod) # needs to be a GeoDataframe
+df_mod['Pollutant'] = df_mod['Pollutant'].replace('PM2.5 ','PM2.5') # Asthma Exacerbation for some reason had a tailing space at the end... this removes that
+df_mod['Endpoint Group'] = df_mod['Endpoint Group'].replace('Emergency Room Visits  Respiratory','Emergency Room Visits') # Asthma Exacerbation for some reason had a tailing space at the end... this removes that
+
+# Plotting section
+fig = plt.figure(figsize=(6,4),dpi=150)
+#fig.suptitle('2018 PNW PM$_{2.5}$ Health Impacts',y=0.93,fontsize=20,ha='center') # title
+fig.tight_layout() # spaces the plots out a bit
+#fig.text(0.06, 0.5, 'Latitude', va='center', rotation='vertical')
+#fig.text(0.5, 0.09, 'Longitude', va='center', ha = 'center')
+#fig.text(0.265, 0.82, 'Incidence', va='center', ha = 'center',fontsize=18)
+#fig.text(0.685, 0.82, '% Incidence', va='center', ha = 'center',fontsize=18)
+
+# Colorbar
+divider = make_axes_locatable(ax)
+cax = divider.append_axes("right", size="5%", pad=0.2) # depends on the user needs
+alpha = 0.7
+linewidth = 1
+endpoints = ['Mortality'] # sets the endpoints we are looking at
+
+
+# Add subplots
+for endpoint in endpoints:
+
+    vmax = 250
+    vmin = 0
+         
+    ax = fig.add_subplot(2,2,1)
+    plt.title('Mortality')
+    im = df_mod.loc[df_mod['Endpoint Group'] == endpoint].loc[df_mod['Pollutant'] == 'PM2.5'].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
+    states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,linewidth=linewidth,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+
+    vmax = .1
+    
+    ax = fig.add_subplot(2,2,2)
+    plt.title('% Mortality')
+    d = df_mod.loc[df_mod['Endpoint Group'] == endpoint].loc[df_mod['Pollutant'] == 'PM2.5']
+    d['Model'] = d['Model']/d['Population']*100
+    im = d.plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
+    states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,linewidth=linewidth,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 plt.show()
 plt.close()

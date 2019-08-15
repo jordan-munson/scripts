@@ -26,6 +26,9 @@ inputDir = r'E:/Research/AIRPACT_eval/'
 stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
 #ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
 
+df_aqsid_o3 = pd.read_csv(inputDir+'/o3_aqsid.csv',dtype=str).drop('Unnamed: 0', axis=1) # load in AQSID that are present for all versions of AIRPACT. This is created later in the script.
+df_aqsid_pm = pd.read_csv(inputDir+'/pm_aqsid.csv',dtype=str).drop('Unnamed: 0', axis=1) # load in AQSID that are present for all versions of AIRPACT. This is created later in the script.
+
 exec(open(stat_path).read())
 #aqsidd = pd.read_csv(r'G:\Research\Urbanova_Jordan\Urbanova_ref_site_comparison/Aqsid.csv')
 #aqsidd = aqsidd.drop(['Unnamed: 4','Unnamed: 5','Unnamed: 6','Latitude','Longitude'], axis=1)
@@ -352,6 +355,13 @@ for species in pollutant:
             temp2 = temp2.reset_index(drop=True)
             temp2['version'] = version
             
+            if species == 'O3_hourly' or species == 'O3':
+                temp1 = pd.merge(temp1,df_aqsid_o3,on='AQSID')
+                temp2 = pd.merge(temp2,df_aqsid_o3,on='AQSID')
+                #sze_scale = 2 # 0.7
+            else:
+                temp1 = pd.merge(temp1,df_aqsid_pm,on='AQSID')
+                temp2 = pd.merge(temp2,df_aqsid_pm,on='AQSID')
                 #sze_scale = 1 # 0.7
                 
             
@@ -370,6 +380,10 @@ for species in pollutant:
             df_mod1 = df_mod1.reset_index(drop=True)
             df_mod1['version'] = version
             
+            if species == 'O3_hourly' or species == 'O3':
+                df_mod1 = pd.merge(df_mod1,df_aqsid_o3,on='AQSID')
+            else:
+                df_mod1 = pd.merge(df_mod1,df_aqsid_pm,on='AQSID')
                 
         print(species)
         var_name = str(species+'_obs')
@@ -609,7 +623,7 @@ for species in pollutant:
         
                     
                 except (ZeroDivisionError):
-                    #print('ZeroDivisionError')
+                    print('ZeroDivisionError')
                     pass
             
 # =============================================================================
@@ -639,13 +653,13 @@ for species in pollutant:
     cbar = fig.colorbar(plotted_figure, cax=cb_ax,orientation = 'horizontal')
     ax.text(-.568, -.5,'FB [%]' ,ha='right', va='center', transform=ax.transAxes)
     
-    plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map.png',  pad_inches=0.1, bbox_inches='tight')
+    plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map_common.png',  pad_inches=0.1, bbox_inches='tight')
     plt.show()
     plt.close()
     
 #stats_com = stats_com.T
 stats_all = stats_all.reset_index()        
-stats_all.to_csv(inputDir+'/stats/aqs_location_stats.csv')
+stats_all.to_csv(inputDir+'/stats/aqs_location_stats_common.csv')
         
         
         
@@ -700,11 +714,13 @@ for species in pollutant:
             temp2['version'] = version
             
             if species == 'O3_hourly' or species == 'O3':
-
+                temp1 = pd.merge(temp1,df_aqsid_o3,on='AQSID')
+                temp2 = pd.merge(temp2,df_aqsid_o3,on='AQSID')
                 abc = '(a)'
                 #sze_scale = 2 # 0.7
             else:
-
+                temp1 = pd.merge(temp1,df_aqsid_pm,on='AQSID')
+                temp2 = pd.merge(temp2,df_aqsid_pm,on='AQSID')
                 abc = '(b)'
                 #sze_scale = 1 # 0.7
                 
@@ -724,7 +740,10 @@ for species in pollutant:
             df_mod1 = df_mod1.reset_index(drop=True)
             df_mod1['version'] = version
             
-
+            if species == 'O3_hourly' or species == 'O3':
+                df_mod1 = pd.merge(df_mod1,df_aqsid_o3,on='AQSID')
+            else:
+                df_mod1 = pd.merge(df_mod1,df_aqsid_pm,on='AQSID')
                 
         print(species)
         var_name = str(species+'_obs')
@@ -876,7 +895,7 @@ for species in pollutant:
         
                     
                 except (ZeroDivisionError):
-                    #print('zero division')
+                    print('zero division')
                     pass
 
 # =============================================================================
@@ -903,7 +922,7 @@ for species in pollutant:
     cbar = fig.colorbar(plotted_figure, cax=cb_ax,orientation = 'horizontal')
     ax.text(0.60, -.3,'FE [%]' ,ha='right', va='center', transform=ax.transAxes)
     
-    plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map_difference.png',  pad_inches=0.1, bbox_inches='tight')
+    plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map_difference_common.png',  pad_inches=0.1, bbox_inches='tight')
     plt.show()
     plt.close()
     

@@ -61,7 +61,6 @@ def DateTime_range(start, end, delta):
         yield current
         current += delta
 
-#Normalized Mean Bias - NMB
 def nmb(df,name_var1,name_var2):  #var1 is model var2 is observed
     df_new=pd.DataFrame()
     df_new[name_var1]=df[name_var1]
@@ -77,7 +76,7 @@ def nme(df,name_var1,name_var2):  #var1 is model var2 is observed
     df_new['dif_var']= abs(df_new[name_var1]-df_new[name_var2])
     NME=round((df_new['dif_var'].sum()/df_new[name_var2].sum())*100,2)
     return NME
-
+    
 #Root Mean Squared Error - RMSE
 def rmse(df,name_var1,name_var2):  #var1 is model var2 is observed
     df_new=pd.DataFrame()
@@ -86,14 +85,14 @@ def rmse(df,name_var1,name_var2):  #var1 is model var2 is observed
     df_new['dif_var']= (df_new[name_var1]-df_new[name_var2])**(2)
     RMSE=round((df_new['dif_var'].sum()/len(df_new.index))**(0.5),2)
     return RMSE
-
+    
 #Coefficient of Determination - r^2
 def r2(df,name_var1,name_var2):
     df_new=pd.DataFrame()
     df_new[name_var1]=df[name_var1]
     df_new[name_var2]=df[name_var2]
     top_var= ((df_new[name_var1]-np.mean(df_new[name_var1])) * (df_new[name_var2]-np.mean(df_new[name_var2]))).sum()
-    bot_var= (((df_new[name_var1]-np.mean(df_new[name_var1]))**2).sum() * ((df_new[name_var2]-np.mean(df_new[name_var2]))**2).sum())**(.5)
+    bot_var= (((df_new[name_var1]-np.mean(df_new[name_var1]))**2).sum() * ((df_new[name_var2]-np.mean(df_new[name_var2]))**2).sum())**(.5)    
     r_squared=round(((top_var/bot_var)**2),2)
     return r_squared
 
@@ -132,7 +131,7 @@ def mb(df,name_var1,name_var2):  #var1 is model var2 is observed
     MB=round((df_new['dif_var'].sum())/len(df_new.index),2)
     return MB
 
-#Mean error - ME
+#Mean bias - ME
 def me(df,name_var1,name_var2):  #var1 is model var2 is observed
     df_new=pd.DataFrame()
     df_new[name_var1]=df[name_var1]
@@ -140,14 +139,6 @@ def me(df,name_var1,name_var2):  #var1 is model var2 is observed
     df_new['dif_var']=df_new[name_var1]-df_new[name_var2]
     ME=round(abs(df_new['dif_var']).sum()/len(df_new.index),2)
     return ME
-
-# The Mean - Mean model concentration
-def mean(df,name_var1,name_var2):  #var1 is model var2 is observed)
-    df_new=pd.DataFrame()
-    df_new[name_var1]=df[name_var1]
-    df_new[name_var2]=df[name_var2]
-    MEAN = df_new[name_var1].mean()
-    return MEAN
 
 def percentile(df,name_var1,name_var2):
     df_new=pd.DataFrame()
@@ -158,10 +149,18 @@ def percentile(df,name_var1,name_var2):
     df_new[name_var2]=df[name_var2]
     percentile_98[name1] = [df_new[name_var1].quantile(0.98)]
     percentile_98[name2] = [df_new[name_var2].quantile(0.98)]
-    return percentile_98
+    return round(percentile_98,2)
+
+# The Mean - Mean model concentration
+def mean(df,name_var1,name_var2):  #var1 is model var2 is observed)
+    df_new=pd.DataFrame()
+    df_new[name_var1]=df[name_var1]
+    df_new[name_var2]=df[name_var2]
+    MEAN = df_new[name_var1].mean()
+    return round(MEAN,2)
     
 #Calculates and combines into a labeled dataframe
-def stats_version(df,name_var1,name_var2,var_units):
+def stats(df,name_var1,name_var2,var_units):
     MB = mb(df,name_var1,name_var2)
     ME = me(df,name_var1,name_var2)
     FB = fb(df,name_var1,name_var2)
@@ -180,6 +179,26 @@ def stats_version(df,name_var1,name_var2,var_units):
     g.columns = [name_var1]
     return g
 
+#Calculates and combines into a labeled dataframe    
+def stats_version(df,name_var1,name_var2):
+    NMB = nmb(df,name_var1,name_var2)
+    NME = nme(df,name_var1,name_var2)
+    RMSE = rmse(df,name_var1,name_var2)
+    r_squared = r2(df,name_var1,name_var2)
+    MB = mb(df,name_var1,name_var2)
+    ME = me(df,name_var1,name_var2)
+    FB = fb(df,name_var1,name_var2)
+    FE = fe(df,name_var1,name_var2)
+    MEAN_MOD = mean(df,name_var1,name_var1)
+    MEAN_OBS = mean(df,name_var2,name_var2)
+    percentile_98 = percentile(df,name_var1,name_var2)
+    name1 = name_var1+' 98th'
+    name2 = name_var2+' 98th'
+    
+    g = pd.DataFrame([MEAN_MOD,MEAN_OBS,MB,ME,FB,FE,RMSE,r_squared, percentile_98[name1][0],percentile_98[name2][0]])
+    g.index = ['Forecast Mean', 'Observation Mean', 'MB','ME','FB [%]','FE [%]', "RMSE", "R^2 [-]",'Forecast 98th','Observation 98th']
+    g.columns = [name_var1]
+    return g
 # =============================================================================
 # #Create a test dataframe to ensure the functions are correct
 # df_test=pd.DataFrame()

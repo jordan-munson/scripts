@@ -524,9 +524,13 @@ for species in pollutant:
                     d33=d.loc[mask]
                     d3 = d3.append(d33)
                     s = '9/1/2009'
-                    e = '11/20/2009'
+                    e = '11/30/2009'
+                    if species == 'O3':
+                        e = '11/29/2010' 
+                    else:
+                        e = '11/30/2010'
                     dates = pd.date_range(start=s,end=e)
-                    ax = fig.add_subplot(6,2,4+i)
+                    #ax = fig.add_subplot(6,2,4+i)
                     
                 if season == 'Winter':
                     if year == 2009:   # Don't have 2008 data, so have to skip first iteration
@@ -563,8 +567,14 @@ for species in pollutant:
                     mask = (d.index > year+'-5-1') & (d.index <= year+'-5-31')
                     d33=d.loc[mask]
                     d3 = d3.append(d33)
-                    dates = pd.date_range(start='3/1/2009',end='5/31/2009')
-                    ax = fig.add_subplot(6,2,2+i)
+                    s = '3/1/2009'
+                    e = '5/31/2009'
+                    if species == 'O3':
+                        e = '5/30/2010' 
+                    else:
+                        e = '5/31/2010'
+                    dates = pd.date_range(start=s,end=e)
+                    #ax = fig.add_subplot(6,2,2+i)
 
                     
             #plt.rcParams["figure.figsize"] = (8,4)
@@ -615,63 +625,63 @@ for species in pollutant:
                 db['datetime'] = dates
                 db = db.set_index('datetime')
             #db = db.resample('D', convention='start').mean()
-            
-            # Plotting section
-            #ax = fig.add_subplot(1,i,1)
-            #Plot
-            db.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'red'])
-            ax.set_xlim(s,e) # set limits in the hopes of removing doubled last label
-            plt.setp(ax.get_xticklabels())#, horizontalalignment='right') # angle x axis labels
-            if species == 'PM2.5':
-                #ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
-                ax.set_ylim(0,30)
-                height = 20 # Height of annotations in graphs
-                spc = 1.2 # Space the annotations are moved up and down
-            else:
-                #ax.set_ylabel('Ozone (ppb)')
-                ax.set_ylim(20,75)
-                #ax.set_ylim(0,120) # for use with 8 hour max ave
-                height=10
-                spc = 2
-            
-            #ax.set_xlim('2009-1-1','2018-7-1')
-            myFmt = DateFormatter("%b")
-            months = mdates.MonthLocator() 
-            days = mdates.DayLocator(bymonthday=(1,1))  
-            ax.xaxis.set_major_formatter(myFmt)
-            ax.xaxis.set_major_locator(months)
-            ax.xaxis.set_minor_locator(days)
-            ax.set_xlabel('')        # Gets rid of the 'DateTime' x label and replaces with a space
-# =============================================================================
-#             ax.set_title(str(season),fontsize=12) # sets the titles of individ plots as the season, and makes the font smaller
-# =============================================================================
-            #plt.legend(['Observation','Forecast'],prop={'size': 8})
-            sze = 10 #size of annotation text            
-            
-            # Set letter denoting plot
-            if i ==0:
-                if season == 'Winter':
-                    abc = '(a)'
-                    plt.legend(['Observation','Forecast'],prop={'size': 8})
+            if season == 'Summer' or season == 'Winter':
+                # Plotting section
+                #ax = fig.add_subplot(1,i,1)
+                #Plot
+                db.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'red'])
+                ax.set_xlim(s,e) # set limits in the hopes of removing doubled last label
+                plt.setp(ax.get_xticklabels())#, horizontalalignment='right') # angle x axis labels
+                if species == 'PM2.5':
+                    #ax.set_ylabel('$PM_{2.5} (ug/m^3)$')
+                    ax.set_ylim(0,30)
+                    height = 20 # Height of annotations in graphs
+                    spc = 1.2 # Space the annotations are moved up and down
                 else:
-                    abc = '(d)'
+                    #ax.set_ylabel('Ozone (ppb)')
+                    ax.set_ylim(20,75)
+                    #ax.set_ylim(0,120) # for use with 8 hour max ave
+                    height=10
+                    spc = 2
+                
+                #ax.set_xlim('2009-1-1','2018-7-1')
+                myFmt = DateFormatter("%b")
+                months = mdates.MonthLocator() 
+                days = mdates.DayLocator(bymonthday=(1,1))  
+                ax.xaxis.set_major_formatter(myFmt)
+                ax.xaxis.set_major_locator(months)
+                ax.xaxis.set_minor_locator(days)
+                ax.set_xlabel('')        # Gets rid of the 'DateTime' x label and replaces with a space
+    # =============================================================================
+    #             ax.set_title(str(season),fontsize=12) # sets the titles of individ plots as the season, and makes the font smaller
+    # =============================================================================
+                #plt.legend(['Observation','Forecast'],prop={'size': 8})
+                sze = 10 #size of annotation text            
+                
+                # Set letter denoting plot
+                if i ==0:
+                    if season == 'Winter':
+                        abc = '(a)'
+                        plt.legend(['Observation','Forecast'],prop={'size': 8})
+                    else:
+                        abc = '(d)'
+                        ax.get_legend().remove()
+                if i ==1:
                     ax.get_legend().remove()
-            if i ==1:
-                ax.get_legend().remove()
-                if season == 'Winter':
-                    abc = '(b)'
-                else:
-                    abc = '(e)'
-            if i ==2:
-                ax.get_legend().remove()
-                if season == 'Winter':
-                    abc = '(c)'
-                else:
-                    abc = '(f)'
-            #ax.text(0.5, 1.1,abc, ha='right', va='center', transform=ax.transAxes)
-            ax.set_title(abc)
-    
-            plt.grid(True)    # Add grid lines to make graph interpretation easier
+                    if season == 'Winter':
+                        abc = '(b)'
+                    else:
+                        abc = '(e)'
+                if i ==2:
+                    ax.get_legend().remove()
+                    if season == 'Winter':
+                        abc = '(c)'
+                    else:
+                        abc = '(f)'
+                #ax.text(0.5, 1.1,abc, ha='right', va='center', transform=ax.transAxes)
+                ax.set_title(abc)
+        
+                plt.grid(True)    # Add grid lines to make graph interpretation easier
             
             #Calculate Statistics
             try:
@@ -684,12 +694,7 @@ for species in pollutant:
                 aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species)    
                 stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
                 
-                #Drop some stats to put on plots
-                aq_stats = aq_stats.drop('MB',0)        
-                aq_stats = aq_stats.drop('ME',0)
-                aq_stats = aq_stats.drop('RMSE',0)
-                aq_stats = aq_stats.drop('NMB',0)
-                aq_stats = aq_stats.drop('NME',0)
+
             except (ZeroDivisionError):
                 pass
                 

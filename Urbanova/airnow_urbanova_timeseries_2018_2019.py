@@ -22,16 +22,17 @@ import os
 from netCDF4 import Dataset
 from matplotlib.backends.backend_pdf import PdfPages
 from calendar import monthrange
+
 print('Start of airnow Analysis')
 
 
 starttime = time.time()
-day='01'
+day='11'
 month = '01' 
-year  = '2019' 
+year  = '2018' 
 
-endday = '11'
-endmonth='07'
+endday = '11'#'31'
+endmonth='07'#'12'
 endyear='2019'
 
 end_year=int(endyear)
@@ -51,12 +52,15 @@ air_path = inputDir + 'Urbanova_ref_site_comparison/AIRPACT/'
 # stats_dir = inputDir
 # =============================================================================
 
-# Set file paths
-file_modelled_base = inputDir +'/airnow/merged_'+str(end_year)+'_Urb_airnow_forecasts.csv'
-print(file_modelled_base)
+# Set file paths and read Urbanova data
+file_modelled_base = inputDir +'/airnow/merged_'+str(year)+'_Urb_airnow_forecasts.csv'
+file_modelled_base1 = inputDir +'/airnow/merged_'+str(endyear)+'_Urb_airnow_forecasts.csv'
+file_modelled_base = pd.read_csv(file_modelled_base).drop('Unnamed: 0',axis=1)
+file_modelled_base1 = pd.read_csv(file_modelled_base1).drop('Unnamed: 0',axis=1)
+                                 
+file_modelled_base = file_modelled_base.append(file_modelled_base1)
+
 file_airnowsites  = inputDir+ '/aqsid.csv'
-#file_airnowsites  = '/data/lar/projects/Urbanova/2018/2018040400/POST/CCTM/aqsid.csv' # Hard coded as some aqsid files do not include all site ID's, this one does.
-print(file_airnowsites)
 
 begin_time = time.time()
 
@@ -69,99 +73,86 @@ end = timezone.localize(end)
 
 start_date = year+'-'+month+'-'+day
 end_date = endyear+'-'+endmonth+'-'+endday
-'''
-print("Start date is "+ start.strftime("%Y%m%d") )
 
-## Pull AIRNow data and concatenate
-# prepare time loop to read model output
-date_diff =end -start
-date_diff =  int(round( date_diff.total_seconds()/60/60/24)) # total hour duration
-
-print("start date is "+ start.strftime("%Y%m%d") )
-now = start
-
-merged = []
-
-# For loop to find the AIRNOW dat files for specified time period
-for t in range(0, date_diff):
-    
-    # set a directory containing Urbanova AIRNOW data
-    datadir = urb_path + now.strftime("%Y") + "/" + now.strftime("%Y%m%d")+"00/POST/CCTM/" 
-
-    # Complete file path to data 
-    f= datadir +"AIRNowSites_" +  now.strftime("%Y%m%d") + "_v6.dat"
-    print(t, f)
-    
-    read = pd.read_csv(f)
-    merged.append(read)
-    
-    #Changes day to next
-    now += timedelta(hours=24)
-    
-    # Handles missing days
-    try:
-        datadir = urb_path + now.strftime("%Y") + "/" + now.strftime("%Y%m%d")+"00/POST/CCTM/" 
-        f= datadir +"AIRNowSites_" +  now.strftime("%Y%m%d") + "_v6.dat" 
-        read = pd.read_csv(f)
-    except:
-        print('adding 24 hours')
-        now += timedelta(hours=24)
-    try:
-        datadir = urb_path + now.strftime("%Y") + "/" + now.strftime("%Y%m%d")+"00/POST/CCTM/" 
-        f= datadir +"AIRNowSites_" +  now.strftime("%Y%m%d") + "_v6.dat"
-        read = pd.read_csv(f)
-    except:
-        print('adding another 24 hours')
-        now += timedelta(hours=24)
-     
-result = pd.concat(merged)
-result.to_csv(inputDir + '/merged.csv',index=False)
-
-print('AIRNOW data concatenated')
-'''
-# Open statistics script
-exec(open(stats_dir +"statistical_functions.py").read()) 
-#%%
-# Need to load 2019 data from individual sites
 df_obs_orig = pd.DataFrame()
+# download AP-5 data
+df_obs_orig1 = pd.DataFrame()
+# =============================================================================
+# folder = ['000100060', '000100110', '000100111', '000100118', '000100119', '000100125', '000100127', '000100128', '000100132', '000100134',
+#           '000100135', '000100140', '000100304', '000100308', '000101003', '000101005', '000101101', '000101202', '000101301', '000101401',
+#           '000101501', '000101601', '000101801', '000102001', '000102102', '000102602', '000103302', '000103502', '000104101', '000105301',
+#           '000105604', '000106701', '000107100', '060231004', '060231005', '060631007', '060890004', '060890007', '060890009', '060893003',
+#           '060932001', '061030004', '061050002', '160010010', '160010017', '160050015', '160050020', '160090010', '160090011', '160130004',
+#           '160150001', '160150002', '160170003', '160190011', '160210002', '160211007', '160211008', '160230101', '160270002', '160291009',
+#           '160490002', '160490003', '160491012', '160499991', '160530003', '160550003', '160570005', '160571000', '160571012', '160590004',
+#           '160650002', '160671011', '160690012', '160690013', '160690014', '160790017', '160830007', '160850002', '160871004', '300130001',
+#           '300290049', '300298001', '300310017', '300310019', '300490004', '300490026', '300530018', '300630024', '300630037', '300630038',
+#           '300810007', '300890007', '300930005', '410010004', '410030013', '410050004', '410050102', '410090004', '410111036', '410130100',
+#           '410170004', '410170120', '410190002', '410230002', '410250003', '410290019', '410290133', '410290201', '410290203', '410292129',
+#           '410310007', '410330011', '410330036', '410330114', '410350004', '410370001', '410390059', '410390060', '410391007', '410391009',
+#           '410392013', '410399004', '410430009', '410430104', '410432002', '410432003', '410470007', '410470041', '410470123', '410510080',
+#           '410512008', '410590121', '410591003', '410610120', '410610123', '410630001', '410650007', '410650008', '410670004', '410670005',
+#           '410670111', '490030003', '490050007', '490110004', '490353006', '490353010', '490353013', '490450004', '490494001', '490495010',
+#           '490570002', '490571003', '113490352005', '530010003', '530030004', '530050002', '530050003', '530070007', '530070010', '530070011',
+#           '530090013', '530090015', '530090017', '530110011', '530110022', '530110024', '530130002', '530150015', '530210002', '530251002',
+#           '530251003', '530270011', '530272002', '530299999', '530310003', '530330010', '530330017', '530330023', '530330030', '530330031',
+#           '530330057', '530330080', '530331011', '530332004', '530350007', '530370002', '530410004', '530450007', '530470004', '530470009',
+#           '530470010', '530470013', '530530012', '530530024', '530530029', '530530031', '530531010', '530531018', '530570011', '530570015',
+#           '530579999', '530610005', '530610020', '530611007', '530630001', '530630021', '530630046', '530630047', '530639995', '530639997',
+#           '530639999', '530650002', '530650005', '530670005', '530670013', '530710005', '530730005', '530730019', '530750003', '530750005',
+#           '530750006', '530770005', '530770009', '530770015', '530770016', '840160410002', '840410352222', '840410390101', '840530230001',
+#           '840530330069', '840530339990', '840530390006', '840530499991', '840530739992', 'TT1010002', 'TT1010003']
+# =============================================================================
 folder = ['160090011', '160550003', '160550004', '530630001',
        '530630021', '530630046', '530630047', '530639995', '530639997',
        '530650002', '530750006', '530639999']
 apan_col_names = ['datetime','O3_AP5_4km','PM2.5_AP5_4km','CO_AP5_4km','NO_AP5_4km','NO2_AP5_4km','NOX_AP5_4km','WSPM2.5_AP5_4km','PM10_AP5_4km','SO2_AP5_4km',
                   'O3_obs','PM2.5_obs','CO_obs','NO_obs','NO2_obs','NOX_obs','PM10_obs','SO2_obs']
+
 for file in folder:
     try:
-        x = pd.read_csv('http://lar.wsu.edu/R_apps/2019ap5/data/byAQSID/'+file+'.apan',names=apan_col_names,header=None,skiprows=1)
+        x = pd.read_csv('http://lar.wsu.edu/R_apps/'+'2019'+'ap5/data/byAQSID/'+file+'.apan',names=apan_col_names,header=None,skiprows=1)
         x['site_id'] = file
-        df_obs_orig=df_obs_orig.append(x)
+        df_obs_orig1=df_obs_orig1.append(x)
+        
+        x1 = pd.read_csv('http://lar.wsu.edu/R_apps/'+'2018'+'ap5/data/byAQSID/'+file+'.apan',names=apan_col_names,header=None,skiprows=1)
+        x1['site_id'] = file
+        df_obs_orig=df_obs_orig.append(x1)
     except:
-        print('http://lar.wsu.edu/R_apps/2019ap5/data/byAQSID/'+file+'.apan')
+        print('http://lar.wsu.edu/R_apps/'+'2019'+'ap5/data/byAQSID/'+file+'.apan')
         continue
+  
+# There are a couple cells in the downloaded dataset with this in it. Don;t know why, they shouldn't be there. This line removes them.
+#if year == 2018: # For some reason, this breaks when used on other years. 
+#df_obs_orig = df_obs_orig[df_obs_orig.CO_AP5_4km != '******']
 
-
-g = pd.DataFrame(['Forecast Mean', 'Observation Mean', 'MB','ME','FB [%]','FE [%]',"NMB [%]", "NME [%]", "RMSE", "R^2 [-]",'Forecast 98th','Observation 98th'])
-g.index = ['Forecast Mean', 'Observation Mean', 'MB','ME','FB [%]','FE [%]',"NMB [%]", "NME [%]", "RMSE", "R^2 [-]",'Forecast 98th','Observation 98th']
+df_obs_orig = df_obs_orig.append(df_obs_orig1)
+    
+# Open statistics script
+exec(open(stats_dir +"statistical_functions.py").read()) 
+#%%
+g = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
+g.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 g = g.drop(0,1)
-
 species = ['PM2.5','OZONE','CO','NO2']
 for pollutant in species:
     if pollutant == 'PM2.5':
         abrv = 'PM2.5'
         unit = '($ug/m^3$)'
         y_max = 30
-        t_title = endyear+' Daily Mean '+pollutant
+        t_title = 'Daily Mean '+pollutant
         s_title = t_title
     if pollutant == 'OZONE':
         abrv = 'O3'
         unit = '(ppb)'
         y_max = 70
-        t_title = ' O3 Max Daily 8-Hour Average'
+        t_title = 'O3 DM8A'  
         s_title = t_title
     if pollutant == 'CO':
         abrv = 'CO'
         unit = '(ppb)'
         y_max = 500
-        t_title = 'CO Max Daily 8-Hour Average'
+        t_title = 'CO DM8A'
         s_title = t_title  
     if pollutant == 'NO2':
         abrv = 'NO2'
@@ -177,8 +168,8 @@ for pollutant in species:
         col_names_modeled = ['date', 'time', 'site_id', 'pollutant', 'concentration']
         col_names_observed= ['datetime', 'site_id', 'O3_AP5_4km', 'PM2.5_AP5_4km', 'O3_obs', 'PM2.5_obs']
         #df_base  = pd.read_csv(file_modelled_base, header=None, names=col_names_modeled, sep='|',dtype='unicode')   #AIRNOW data is seperated by |, thus it has to be specified here
-        df_base  = pd.read_csv(file_modelled_base).drop('Unnamed: 0',axis=1) # new method
-        df_obs   = df_obs_orig
+        df_base  = file_modelled_base.copy() # new method
+        df_obs   = df_obs_orig.copy().drop(['CO_AP5_4km', 'NOX_AP5_4km','NO_AP5_4km', 'NO2_AP5_4km','CO_obs', 'NOX_obs','NO_obs','NO2_obs','SO2_AP5_4km', 'SO2_obs'],axis=1)
         df_sites = pd.read_csv(file_airnowsites, skiprows=[1],dtype='unicode') # skip 2nd row which is blank
         df_sites.rename(columns={'AQSID':'site_id'}, inplace=True)
         print('O3/PM2.5 files read')
@@ -186,16 +177,16 @@ for pollutant in species:
         col_names_modeled = ['date', 'time', 'site_id', 'pollutant', 'concentration']
         col_names_observed= ['datetime', 'site_id','CO_AP5_4km', 'NOX_AP5_4km','NO_AP5_4km', 'NO2_AP5_4km','CO_obs', 'NOX_obs','NO_obs','NO2_obs']
         #df_base   = pd.read_csv(file_modelled_base, header=None, names=col_names_modeled, sep='|',dtype='unicode')   #AIRNOW data is seperated by |, thus it has to be specified here
-        df_base  = pd.read_csv(file_modelled_base).drop('Unnamed: 0',axis=1) # new method
-        df_obs   = df_obs_orig
+        df_base  = file_modelled_base.copy() # new method
+        df_obs   = df_obs_orig.copy().drop(['O3_AP5_4km', 'PM2.5_AP5_4km', 'O3_obs', 'PM2.5_obs','SO2_AP5_4km', 'SO2_obs'],axis=1)
         df_sites = pd.read_csv(file_airnowsites, skiprows=[1],dtype='unicode') # skip 2nd row which is blank
         df_sites.rename(columns={'AQSID':'site_id'}, inplace=True)
         print('CO/NOX files read')  
     else:
         col_names_modeled = ['date', 'time', 'site_id', 'pollutant', 'concentration']
         col_names_observed= ['datetime', 'site_id', 'SO2_AP5_4km', 'SO2_obs']
-        df_base   = pd.read_csv(file_modelled_base, header=None, names=col_names_modeled, sep='|',dtype='unicode')   #AIRNOW data is seperated by |, thus it has to be specified here
-        df_obs   = df_obs_orig
+        df_base   = file_modelled_base.copy()   #AIRNOW data is seperated by |, thus it has to be specified here
+        df_obs   = df_obs_orig.copy()
         df_sites = pd.read_csv(file_airnowsites, skiprows=[1],dtype='unicode') # skip 2nd row which is blank
         df_sites.rename(columns={'AQSID':'site_id'}, inplace=True)
         print('SO2 files read')        
@@ -293,16 +284,14 @@ for pollutant in species:
 
     fig,ax=plt.subplots(1,1, figsize=(12,4))
             
-    d.ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'blue', 'red'], label=['OBS', 'sens', 'base'])
-# =============================================================================
-#     plt.axvline(dt.datetime(2018, 5, 11),color = 'green')
-#     plt.axvline(dt.datetime(2018, 12, 21),color = 'green')
-# =============================================================================
+    d.ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'green', 'red'], label=['OBS', 'sens', 'base'])
+    plt.axvline(dt.datetime(2018, 5, 11),color = 'green')
+    plt.axvline(dt.datetime(2018, 12, 21),color = 'green')
     
     ax.set_title(t_title)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
     ax.set_ylabel(abrv+' '+unit)
-    ax.set_xlabel('PST')
+    ax.set_xlabel('')
     ax.legend(['OBS', 'AP5_4km', 'AP5_1.33km'], fontsize=12)
     ax.set_ylim(0,y_max)
     ax.yaxis.grid(True) # horizontal lines
@@ -320,8 +309,7 @@ for pollutant in species:
         aq_stats_4km = stats_version(d1, abrv+'_AP5_4km', abrv+'_obs')
         aq_stats_1p33km = stats_version(d1, abrv+'_AP5_1.33km', abrv+'_obs')
         aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
-        g = pd.merge(g, aq_stats, how = 'inner', left_index = True, right_index = True)
-        
+        stats_combined = pd.concat([aq_stats],axis=1,join_axes=[aq_stats.index])        
      
     #Drop some stats to put on plots
 #        aq_stats = aq_stats.drop('MB',0)        
@@ -362,38 +350,11 @@ for pollutant in species:
     fig.autofmt_xdate()
    # print(d)
 
-#Calculate Statistics
-# =============================================================================
-#     try:
-#         #Run stats functions
-#         aq_stats_4km = stats(d, abrv+'_AP5_4km', abrv+'_obs')
-#         aq_stats_1p33km = stats(d, abrv+'_AP5_1.33km', abrv+'_obs')
-#         aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
-#     
-#         aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_1.33km', '1.33km ' + site_nameinfo)    
-#         aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
-#    
-#     #Clean up column names
-#         aq_stats.columns = aq_stats.columns.str.replace('1.33km ' + site_nameinfo, '1.33km')    
-#         aq_stats.columns = aq_stats.columns.str.replace('4km ' + site_nameinfo, '4km')     
-#     
-#     #Drop some stats to put on plots
-#         aq_stats = aq_stats.drop('MB',0)        
-#         aq_stats = aq_stats.drop('ME',0)
-#         aq_stats = aq_stats.drop('RMSE',0)
-#         aq_stats = aq_stats.drop('NMB',0)
-#         aq_stats = aq_stats.drop('NME',0)
-# 
-# #            ax.text(0,-0.12, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
-#         plt.savefig(inputDir +'/airnow/'+month+'/scatter_plots/scatter_'+abrv+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf', pad_inches=0.1, bbox_inches='tight') #Placed this here so that if there is no oberved data, it won't save an empty plot
-# 
-#     except (ZeroDivisionError):
-#         pass
-# =============================================================================
-    plt.show()
     plt.savefig(inputDir +'/airnow/scatter_plots/scatter_'+abrv+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf', pad_inches=0.1, bbox_inches='tight')
+    plt.show()
     plt.close()
     
+# Scatter plots 1.33km vs 4km
     fig,ax=plt.subplots(1,1, figsize=(8,8))
     #d = df_tseries.copy()
     #d=d.set_index('datetime')
@@ -413,7 +374,7 @@ for pollutant in species:
     fig.autofmt_xdate()
    # print(d)
 
-    plt.savefig(inputDir +'/airnow/scatter_plots/scatter_urbvsap_2019_'+abrv+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf', pad_inches=0.1, bbox_inches='tight')
+    plt.savefig(inputDir +'/airnow/scatter_plots/scatter_urbvsap_'+abrv+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf', pad_inches=0.1, bbox_inches='tight')
     plt.show()
     plt.close()
 # =============================================================================
@@ -468,16 +429,16 @@ for pollutant in species:
 #         plt.savefig(inputDir+'/airnow/'+month+'/diurnal_plot/'+abrv+'_'+site_nameinfo+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf',  pad_inches=0.1, bbox_inches='tight')
 # 
 # =============================================================================
-#%%
+
 # Run the function
 #airnow('OZONE','O3','($ppb$)')
 #airnow('PM2.5','PM2.5','($ug/m^3$)')
 #airnow('CO','CO','($ppb$)')
 #airnow('NOX','NOX','($ppb$)')
 #airnow('SO2','SO2','($ppb$)')     No SO2 data in airnow v5
-g = g.T
-print(g)
-g.to_csv(inputDir +'/airnow/airnow_'+str(end_year)+'_stats.csv')
+stats_combined = stats_combined.T
+print(stats_combined)
+stats_combined.to_csv(inputDir +'/airnow/airnow_stats.csv')
 end_time = time.time()
 print("Run time was %s seconds"%(end_time-begin_time))
 print("End of airnow Analysis")

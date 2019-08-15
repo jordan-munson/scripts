@@ -18,7 +18,8 @@ begin_time = time.time()
 inputDir = r'E:/Research/AIRPACT_eval/'
 stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
 aqsid = pd.read_csv(r'E:\Research\AIRPACT_eval/aqs_sites.csv')
-
+        
+        
 # Open statistics script
 exec(open(stat_path).read())
 
@@ -29,6 +30,12 @@ df_com.loc[:,'PM2.5_mod'] = pd.to_numeric(df_com.loc[:,'PM2.5_mod'], errors='coe
 df_com.loc[:,'O3_obs'] = pd.to_numeric(df_com.loc[:,'O3_obs'], errors='coerce')
 df_com.loc[:,'PM2.5_obs'] = pd.to_numeric(df_com.loc[:,'PM2.5_obs'], errors='coerce')
 df_com['datetime'] = pd.to_datetime(df_com['datetime'])
+
+# Load common AQSID
+df_com['AQSID'] = df_com['AQSID'].astype(str) # force this column as string to avoid any combining erros.
+df_aqsid_o3 = pd.read_csv(inputDir+'/o3_aqsid.csv',dtype=str).drop('Unnamed: 0', axis=1) # load in AQSID that are present for all versions of AIRPACT. This is created later in the script.
+df_aqsid_pm = pd.read_csv(inputDir+'/pm_aqsid.csv',dtype=str).drop('Unnamed: 0', axis=1) # load in AQSID that are present for all versions of AIRPACT. This is created later in the script.
+
 print('Data loading section done')
 
 # Set plot parameters
@@ -79,23 +86,26 @@ for species in pollutant:
     stats_com.index = ['Forecast Mean', 'Observation Mean', 'MB','ME','FB [%]','FE [%]',"NMB [%]", "NME [%]", "RMSE", "R^2 [-]",'Forecast 98th','Observation 98th','version','season','unit','species']
     stats_com = stats_com.drop(0,1)
     print(species)
-    da = df_com.dropna(subset=['Location Setting'])
+    da = df_com    #.dropna(subset=['Location Setting'])
     # Create the overal plot and its settings
     fig = plt.figure(figsize=(6,3),dpi=300)#8,4)) # seems to do nothing here really
     if species == 'PM2.5':
         #fig.set_ylabel('$PM_{2.5} (ug/m^3)$')
-        fig.text(-0.015, 0.5, 'PM$_{2.5}$ [\u03BCg m$^{-3}$]', va='center', rotation='vertical')
+        fig.text(-0.015, 0.5, '$PM_{2.5} [ug/m^3]$', va='center', rotation='vertical')
+        da = pd.merge(da,df_aqsid_pm,on='AQSID') # isolate to common aqsid
         var_units = '\u03BCg m$^{-3}$'
+
     else:
         #fig.set_ylabel('Ozone (ppb)') 
         fig.text(-0.015, 0.5, 'Ozone [ppb]', va='center', rotation='vertical')
+        da = pd.merge(da,df_aqsid_o3,on='AQSID') # isolate to common aqsid
         var_units = 'ppb'
 
     fig.tight_layout() # spaces the plots out a bit
 
-    fig.text(0.19, 1, 'AP-3', va='center',ha='center') # 0.98
-    fig.text(0.515, 1, 'AP-4', va='center',ha='center')
-    fig.text(0.84, 1, 'AP-5', va='center',ha='center')
+    fig.text(0.185, 1, 'AP-3', va='center',ha='center') # 0.98
+    fig.text(0.505, 1, 'AP-4', va='center',ha='center')
+    fig.text(0.83, 1, 'AP-5', va='center',ha='center')
     # seasons
     
     for version,i in zip(versions,[0,1,2]):#[0,4,8]):
@@ -117,7 +127,8 @@ for species in pollutant:
             #This section selects only data relevant to the aqs site
  
             # set dataframe maybe
-            d=df_com.copy()
+            #d=df_com.copy()
+            d = da.copy()
             d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
             #print('starting datetime conversion')
             d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
@@ -320,29 +331,30 @@ for species in pollutant:
                 #Run stats functions
                 aq_stats = stats_version(db, species+'_mod', species+'_obs')
             
-                aq_stats.columns = aq_stats.columns.str.replace(species, species+'_'+version+'_'+season)   
+                aq_stats.columns = aq_stats.columns.str.replace(species, species+'_'+version+'_'+season)     
+       
+                # Merge stats into single dataframe
+                aq_stats.columns = aq_stats.columns.str.replace('_mod', '')    
                 aq_stats = aq_stats.T
                 aq_stats['version'] = version
                 aq_stats['season'] = season
                 aq_stats['unit'] = var_units
-                aq_stats['species'] = species   
+                aq_stats['species'] = species
                 aq_stats = aq_stats.T
-                # Merge stats into single dataframe
-                aq_stats.columns = aq_stats.columns.str.replace('_mod', '')    
                 stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
 
             except (ZeroDivisionError):
                 print('Zero division error in stats section')
                 pass
     stats_com = stats_com.T
-    stats_com.to_csv(inputDir + '/stats/seasonal_'+species+'.csv')
+    stats_com.to_csv(inputDir + '/stats/seasonal_'+species+'_common.csv')
     try:
         if species == 'O3':
             print('O3')          
-            plt.savefig(inputDir+'/plots/seasons/'+'O3_8hr_seasons.png',  pad_inches=0.1, bbox_inches='tight')
+            plt.savefig(inputDir+'/plots/seasons/'+'O3_8hr_seasons_common.png',  pad_inches=0.1, bbox_inches='tight')
         else:
             print('PM')
-            plt.savefig(inputDir+'/plots/seasons/'+'PM_seasons.png',  pad_inches=0.1, bbox_inches='tight')
+            plt.savefig(inputDir+'/plots/seasons/'+'PM_seasons_common.png',  pad_inches=0.1, bbox_inches='tight')
         plt.show()
         plt.close()
     except(FileNotFoundError):

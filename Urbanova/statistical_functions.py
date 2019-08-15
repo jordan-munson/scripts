@@ -142,8 +142,8 @@ def stats_version(df,name_var1,name_var2):
     name1 = name_var1+' 98th'
     name2 = name_var2+' 98th'
     
-    g = pd.DataFrame([MEAN_MOD,MEAN_OBS,MB,ME,FB,FE,RMSE,r_squared, percentile_98[name1][0],percentile_98[name2][0]])
-    g.index = ['Forecast Mean', 'Observation Mean', 'MB','ME','FB [%]','FE [%]', "RMSE", "R^2 [-]",'Forecast 98th','Observation 98th']
+    g = pd.DataFrame([MEAN_MOD,MEAN_OBS,MB,ME,FB,FE,NMB,NME,RMSE,r_squared, percentile_98[name1][0],percentile_98[name2][0]])
+    g.index = ['Forecast Mean', 'Observation Mean', 'MB','ME','FB [%]','FE [%]',"NMB [%]", "NME [%]", "RMSE", "R^2 [-]",'Forecast 98th','Observation 98th']
     g.columns = [name_var1]
     return g
 

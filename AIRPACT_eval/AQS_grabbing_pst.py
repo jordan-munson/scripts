@@ -9,19 +9,21 @@ Script based off of Kai Fan
 
 import pandas as pd
 import time
+import datetime as dt
+
 #Set state
 
-# =============================================================================
-# species = ['o3','pm_FRM/FEM','pm_non_FRM/FEM']
-# species_code = ['44201','88101','88502']
-# name = ''
-# num = 3
-# =============================================================================
+species = ['o3','pm_FRM/FEM','pm_non_FRM/FEM']
+species_code = ['44201','88101','88502']
+name = ''
+num = 3
 
-species = ['Winds','Temperature','Pressure','RH']
-species_code = ['WIND','TEMP','PRESS','RH_DP']
-name = '_met'
-num = 4
+# =============================================================================
+# species = ['Winds','Temperature','Pressure','RH']
+# species_code = ['WIND','TEMP','PRESS','RH_DP']
+# name = '_met'
+# num = 4
+# =============================================================================
 
 def aqs(state,ac):
     AQS={}
@@ -40,10 +42,10 @@ def aqs(state,ac):
             dict_AQS = AQS       
  
     AQS_df = pd.concat(dict_AQS)
-    AQS_df = AQS_df.drop(['Parameter Code','POC','Datum','Date GMT','Time GMT','MDL','Uncertainty',
-                          'Qualifier','Method Type','Method Code','Method Name','Date of Last Change'], axis=1)
+    AQS_df = AQS_df.drop(['Parameter Code','POC','Datum','MDL','Uncertainty',
+                          'Qualifier','Method Type','Method Code','Date Local','Time Local','Method Name','Date of Last Change'], axis=1)
    
-    AQS_df.to_csv(r'E:/Research/AIRPACT_eval/AQS_data/'+state+'_aqs'+name+'.csv')
+    AQS_df.to_csv(r'E:/Research/AIRPACT_eval/AQS_data/'+state+'_aqs'+name+'_pst.csv')
     print(state + ' Done')
 
 aqs('Washington','_WA')
@@ -124,14 +126,14 @@ if num == 3:
     print('Model data read')
     
     # Read AQS data
-    df_wa = pd.read_csv(inputDir + 'AQS_data/Washington_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-    df_or = pd.read_csv(inputDir + 'AQS_data/Oregon_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-    df_id = pd.read_csv(inputDir + 'AQS_data/Idaho_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-    #df_cc = pd.read_csv(inputDir + 'Canada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-    df_mt = pd.read_csv(inputDir + 'AQS_data/Montana_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-    df_ca = pd.read_csv(inputDir + 'AQS_data/California_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-    df_nv = pd.read_csv(inputDir + 'AQS_data/Nevada_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
-    df_ut = pd.read_csv(inputDir + 'AQS_data/Utah_aqs.csv', sep = ',',parse_dates=[['Date Local', 'Time Local']] )
+    df_wa = pd.read_csv(inputDir + 'AQS_data/Washington_aqs_pst.csv', sep = ',',parse_dates=[['Date GMT','Time GMT']] )
+    df_or = pd.read_csv(inputDir + 'AQS_data/Oregon_aqs_pst.csv', sep = ',',parse_dates=[['Date GMT','Time GMT']] )
+    df_id = pd.read_csv(inputDir + 'AQS_data/Idaho_aqs_pst.csv', sep = ',',parse_dates=[['Date GMT','Time GMT']] )
+    #df_cc = pd.read_csv(inputDir + 'Canada_aqs.csv', sep = ',',parse_dates=[['Date GMT','Time GMT']] )
+    df_mt = pd.read_csv(inputDir + 'AQS_data/Montana_aqs_pst.csv', sep = ',',parse_dates=[['Date GMT','Time GMT']] )
+    df_ca = pd.read_csv(inputDir + 'AQS_data/California_aqs_pst.csv', sep = ',',parse_dates=[['Date GMT','Time GMT']] )
+    df_nv = pd.read_csv(inputDir + 'AQS_data/Nevada_aqs_pst.csv', sep = ',',parse_dates=[['Date GMT','Time GMT']] )
+    df_ut = pd.read_csv(inputDir + 'AQS_data/Utah_aqs_pst.csv', sep = ',',parse_dates=[['Date GMT','Time GMT']] )
     
     #  Combine AQS data
     df_list = [df_wa,df_or,df_id,df_mt,df_ca,df_nv,df_ut]
@@ -146,7 +148,7 @@ if num == 3:
     
     # Drop columns of data we are not looking at so as to increase the speed of the script
     df_obs = df_obs.drop(['Unnamed: 0','Unnamed: 1','State Name','County Name','State Code','County Code','Site Num','Units of Measure','Latitude','Longitude'],axis=1)
-    df_obs = df_obs.rename(columns={'Date Local_Time Local': 'datetime','Parameter Name':'Parameter_Name'})
+    df_obs = df_obs.rename(columns={'Date GMT_Time GMT': 'datetime','Parameter Name':'Parameter_Name'})
     print('Observed data read and combined')
     
     # Only pulls ozone/pm data
@@ -163,6 +165,9 @@ if num == 3:
     df_obs = pd.merge(df_obs_o3, df_obs_pm, on =['datetime','AQSID'], how='outer')
     
     df_obs = pd.merge(df_obs,aqsid, how='outer') 
+    
+    df_obs["datetime"] = df_obs["datetime"].apply(lambda x: x - dt.timedelta(hours=8)) #Adjust to PST
+    
     #df_obs = df_obs.drop(['Latitude_x','Latitude_y','Longitude_x','Longitude_y'], axis=1)
       
     ##############################################################################
@@ -211,7 +216,7 @@ if num == 3:
     df_com = df_com.drop(['State Code','County Code','Site Number'],axis=1) # drop unecessary columns
     print('Combined dataframe finished')
     
-    df_com.to_csv(inputDir+'AQS_data/df_com_aplong.csv')
+    df_com.to_csv(inputDir+'AQS_data/df_com_aplong_pst.csv')
     
     
         

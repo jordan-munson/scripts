@@ -86,6 +86,10 @@ print(date_diff)
 
 #%%
 # =============================================================================
+# 
+# # =============================================================================
+# # Read in and format met data, then save it 
+# # =============================================================================
 # # Read the met data
 # df1 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_200951_2010818.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
 # df2 = pd.read_csv(base_dir + '/airpact_met_data/AQS/airpact_aqs_met_201091_20121020.csv').drop(['Unnamed: 0','ix','iy'],axis=1)
@@ -201,8 +205,12 @@ print(date_diff)
 
 #%%
 # Read in dataframes made previously, for speed. Make sure to comment out the above
-df_obs = pd.read_csv(base_dir+'/df_obs_met.csv').drop(['Unnamed: 0'], axis=1)
-df_airpact = pd.read_csv(base_dir+'/df_airpact_met.csv').drop(['Unnamed: 0'], axis=1)
+df_obs = pd.read_csv(base_dir+'/df_obs_met.csv').drop(['Unnamed: 0'], axis=1).rename(columns={'AQS_ID':'AQSID'})
+df_airpact = pd.read_csv(base_dir+'/df_airpact_met.csv').drop(['Unnamed: 0'], axis=1).rename(columns={'AQS_ID':'AQSID'})
+
+df_obs['AQSID'] = df_obs['AQSID'].astype(str)
+df_airpact['AQSID'] = df_airpact['AQSID'].astype(str)
+
 # Conversions to datetime
 df_airpact['DateTime'] = pd.to_datetime(df_airpact['DateTime'])
 df_obs['datetime'] = pd.to_datetime(df_obs['datetime'])
@@ -213,7 +221,7 @@ setting = ['URBAN AND CENTER CITY','SUBURBAN','RURAL']
 print('Data combined')
 
 # Set plot parameters
-mpl.rcParams['font.family'] = 'lucida sans'  # the font used for all labelling/text
+mpl.rcParams['font.family'] = 'calibri'  # the font used for all labelling/text
 mpl.rcParams['font.size'] = 10.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
@@ -937,7 +945,135 @@ print('plots complete')
 # stats_all.to_csv(base_dir+'/AQS_stats/aqs_stats.csv')
 # =============================================================================
 #%%
-# Make plots and do stats for the different versions of AIRPACT (3,4,5)
+# =============================================================================
+# Determine common AQS sites
+# =============================================================================
+
+modded_airpact_for_aqs = df_airpact.rename(columns={'TEMP2':'aqs_temp','WDIR10':'aqs_wdir','WSPD10':'aqs_wspd','PRSFC':'aqs_pressure','Q2':'aqs_rh'}).copy()
+
+for species in ['aqs_temp','aqs_pressure','aqs_rh','aqs_wspd','aqs_wdir']:
+    
+    for version in ['AP-3','AP-4','AP-5','Total']:
+        # Set date range used based of versions
+        if version == 'AP-3':
+            start_date ='2009-05-01'
+            end_date = '2012-12-31'
+        elif version == 'AP-4':
+            start_date ='2013-01-01'
+            end_date = '2015-12-31'
+        elif version == 'AP-5':
+            start_date ='2016-01-01'
+            end_date = '2018-12-31'
+        elif version == 'Total':
+            start_date ='2009-05-01'
+            end_date = '2018-12-31'
+            
+        # locate correct data
+        mask = (df_obs['datetime'] > start_date) & (df_obs['datetime'] <= end_date) # Create a mask to determine the date range used
+        df_mod = df_obs.loc[mask]                
+        
+        mask = (modded_airpact_for_aqs['DateTime'] > start_date) & (modded_airpact_for_aqs['DateTime'] <= end_date) # Create a mask to determine the date range used
+        df_mod1 = modded_airpact_for_aqs.loc[mask] 
+        
+               
+        # section below creates the "common" AQSID dataframes. Necessary to keep in case new data is ever introduced
+        if species == 'aqs_temp':
+            if version == 'AP-3':
+                aqsid_temp_ap3 = pd.DataFrame(df_mod.dropna(subset = ['aqs_temp'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_temp_ap3_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_temp'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_temp_ap3 = pd.merge(aqsid_temp_ap3,aqsid_temp_ap3_1)
+            if version == 'AP-4':
+                aqsid_temp_ap4 = pd.DataFrame(df_mod.dropna(subset = ['aqs_temp'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_temp_ap4_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_temp'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_temp_ap4 = pd.merge(aqsid_temp_ap4,aqsid_temp_ap4_1)
+            if version == 'AP-5':
+                aqsid_temp_ap5 = pd.DataFrame(df_mod.dropna(subset = ['aqs_temp'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_temp_ap5_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_temp'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_temp_ap5 = pd.merge(aqsid_temp_ap5,aqsid_temp_ap5_1)
+            if version == 'Total':
+                aqsid_temp_total = pd.DataFrame(df_mod.dropna(subset = ['aqs_temp'])['AQSID'].unique(),columns = ['AQSID'])
+                
+        if species == 'aqs_pressure':
+            if version == 'AP-3':
+                aqsid_press_ap3 = pd.DataFrame(df_mod.dropna(subset = ['aqs_pressure'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_press_ap3_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_pressure'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_press_ap3 = pd.merge(aqsid_press_ap3,aqsid_press_ap3_1)
+            if version == 'AP-4':
+                aqsid_press_ap4 = pd.DataFrame(df_mod.dropna(subset = ['aqs_pressure'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_press_ap4_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_pressure'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_press_ap4 = pd.merge(aqsid_press_ap4,aqsid_press_ap4_1)
+            if version == 'AP-5':
+                aqsid_press_ap5 = pd.DataFrame(df_mod.dropna(subset = ['aqs_pressure'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_press_ap5_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_pressure'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_press_ap5 = pd.merge(aqsid_press_ap5,aqsid_press_ap5_1)
+
+        if species == 'aqs_rh':
+            if version == 'AP-3':
+                aqsid_rh_ap3 = pd.DataFrame(df_mod.dropna(subset = ['aqs_rh'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_rh_ap3_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_rh'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_rh_ap3 = pd.merge(aqsid_rh_ap3,aqsid_rh_ap3_1)
+            if version == 'AP-4':
+                aqsid_rh_ap4 = pd.DataFrame(df_mod.dropna(subset = ['aqs_rh'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_rh_ap4_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_rh'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_rh_ap4 = pd.merge(aqsid_rh_ap4,aqsid_rh_ap4_1)
+            if version == 'AP-5':
+                aqsid_rh_ap5 = pd.DataFrame(df_mod.dropna(subset = ['aqs_rh'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_rh_ap5_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_rh'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_rh_ap5 = pd.merge(aqsid_rh_ap5,aqsid_rh_ap5_1)
+                
+        if species == 'aqs_wspd':
+            if version == 'AP-3':
+                aqsid_wspd_ap3 = pd.DataFrame(df_mod.dropna(subset = ['aqs_wspd'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_wspd_ap3_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_wspd'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_wspd_ap3 = pd.merge(aqsid_wspd_ap3,aqsid_wspd_ap3_1)
+            if version == 'AP-4':
+                aqsid_wspd_ap4 = pd.DataFrame(df_mod.dropna(subset = ['aqs_wspd'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_wspd_ap4_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_wspd'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_wspd_ap4 = pd.merge(aqsid_wspd_ap4,aqsid_wspd_ap4_1)
+            if version == 'AP-5':
+                aqsid_wspd_ap5 = pd.DataFrame(df_mod.dropna(subset = ['aqs_wspd'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_wspd_ap5_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_wspd'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_wspd_ap5 = pd.merge(aqsid_wspd_ap5,aqsid_wspd_ap5_1)
+ 
+        if species == 'aqs_wdir':
+            if version == 'AP-3':
+                aqsid_wdir_ap3 = pd.DataFrame(df_mod.dropna(subset = ['aqs_wdir'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_wdir_ap3_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_wdir'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_wdir_ap3 = pd.merge(aqsid_wdir_ap3,aqsid_wdir_ap3_1)
+            if version == 'AP-4':
+                aqsid_wdir_ap4 = pd.DataFrame(df_mod.dropna(subset = ['aqs_wdir'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_wdir_ap4_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_wdir'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_wdir_ap4 = pd.merge(aqsid_wdir_ap4,aqsid_wdir_ap4_1)
+            if version == 'AP-5':
+                aqsid_wdir_ap5 = pd.DataFrame(df_mod.dropna(subset = ['aqs_wdir'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_wdir_ap5_1 = pd.DataFrame(df_mod1.dropna(subset = ['aqs_wdir'])['AQSID'].unique(),columns = ['AQSID'])
+                aqsid_wdir_ap5 = pd.merge(aqsid_wdir_ap5,aqsid_wdir_ap5_1)  
+                
+# last section of the "common" creation here.
+aqsid_temp = pd.merge(aqsid_temp_ap3,aqsid_temp_ap4)
+aqsid_temp = pd.merge(aqsid_temp,aqsid_temp_ap5)#.to_csv(inputDir+'/o3_aqsid.csv')
+
+# last section of the "common" creation here.
+aqsid_press = pd.merge(aqsid_press_ap3,aqsid_press_ap4)
+aqsid_press = pd.merge(aqsid_press,aqsid_press_ap5)#.to_csv(inputDir+'/o3_aqsid.csv')
+
+# last section of the "common" creation here.
+aqsid_rh = pd.merge(aqsid_rh_ap3,aqsid_rh_ap4)
+aqsid_rh = pd.merge(aqsid_rh,aqsid_rh_ap5)#.to_csv(inputDir+'/o3_aqsid.csv')
+
+# last section of the "common" creation here.
+aqsid_wspd = pd.merge(aqsid_wspd_ap3,aqsid_wspd_ap4)
+aqsid_wspd = pd.merge(aqsid_wspd,aqsid_wspd_ap5)#.to_csv(inputDir+'/o3_aqsid.csv')
+
+# last section of the "common" creation here.
+aqsid_wdir = pd.merge(aqsid_wdir_ap3,aqsid_wdir_ap4)
+aqsid_wdir = pd.merge(aqsid_wdir,aqsid_wdir_ap5)#.to_csv(inputDir+'/o3_aqsid.csv')
+
+#%%
+new_list = ['aqs_temp','aqs_pressure','aqs_rh','aqs_wspd','aqs_wdir','aqs_specific_humidity'] # Remember to add in winds here
+# =============================================================================
+# # Make plots and do stats for the different versions of AIRPACT (3,4,5)
+# =============================================================================
 versions = ['ap3','ap4','ap5'] #List versions
 for version in versions:
     stats_all = pd.DataFrame() # statistics for each station
@@ -999,6 +1135,10 @@ for version in versions:
         
         wd1 = df_mod1['WDIR10']    # MCIP files record wind speed, no need to calculate
         
+        # Convert aqs data from F to C
+        if 'aqs_temp' in df_h:
+            df_h['aqs_temp'] = (df_h['aqs_temp']-32)*(5/9)
+            
         # Calculate 2-m (approximately) relative humidity using Q2, TEMP2, PRSFC, & constants
         # Formula taken from:
         # http://mailman.ucar.edu/pipermail/wrf-users/2012/002546.html
@@ -1010,11 +1150,16 @@ for version in versions:
         rh1 = df_mod1['Q2'] / ( (pq0 / df_mod1['PRSFC']) * np.exp(a2 * 
                        (df_mod1['TEMP2'] - a3) / (df_mod1['TEMP2'] - a4)) )
         
+        df_mod1['specific_humidity_model'] = df_mod1['Q2']/(1+df_mod1['Q2'])
+        
+        df_h['aqs_specific_humidity'] = (df_h['aqs_rh']/100) * ( (pq0 / df_h['aqs_pressure']) * np.exp(a2 * 
+                       (df_h['aqs_temp'] - a3) / (df_h['aqs_temp'] - a4)) ) # This gets mixing ratio
+        
+        df_h['aqs_specific_humidity'] = df_h['aqs_specific_humidity']/(1+df_h['aqs_specific_humidity']) # this convserts mixing ratio to specific humidity
+        
         rh_new1 = rh1 * 100 # convert from fraction to %    
         #rh_new1  = df_mod1['Q2']/1000    #Do this to get the mixing ration instead of RH
-        # Convert aqs data from F to C
-        if 'aqs_temp' in df_h:
-            df_h['aqs_temp'] = (df_h['aqs_temp']-32)*(5/9)
+
             
         #Try different way to create the dataframes, so as to retain all model data
         df_models=df_mod1
@@ -1029,7 +1174,12 @@ for version in versions:
         df_models = df_models.reset_index().drop(['index'],axis=1)
         
         df_models = df_models.set_index('date_time').drop(['site_name'],axis=1)
-        df_h = df_h.set_index('date_time').drop(['Local Site Name'],axis=1)
+        
+        df_models1 = df_models.copy()
+        df_h1 = df_h.copy()
+# =============================================================================
+#         df_h = df_h.set_index('date_time').drop(['Local Site Name'],axis=1)
+# =============================================================================
         
         # Checks the size of the dataframes
         #mem_df_h=df_h.memory_usage(index=True).sum()
@@ -1048,19 +1198,16 @@ for version in versions:
         #except ValueError:
         #    continue
         
-        #Average the data monthly
-        df_models = df_models.resample('M', convention='start').mean()
-        df_h = df_h.resample('M', convention='start').mean()
-    
-        del(df_mod1)
-        df_all = pd.merge(df_models,df_h, how ='outer',left_index=True,right_index=True)
-        del(df_models)
+
         
         # Select variables, specify labels, units and y-limits, and plot model 
         # variables based on MesoWest variable names
-        new_list = ['aqs_temp','aqs_pressure','aqs_rh','aqs_wspd','aqs_wdir'] # Remember to add in winds here
+        
         for w in new_list:
             var_name = str(w)
+            # reload fresh data
+            df_models = df_models1.copy()
+            df_h = df_h1.copy()
             
             # Skip variable if all values are zeros or NaNs
             if df_h[var_name].isnull().all()==True or all(df_h[var_name]==0):
@@ -1075,6 +1222,7 @@ for version in versions:
                 var_units = 'C°'
                 ymin = 0
                 ymax = 40
+                df_h = pd.merge(df_h,aqsid_temp)
                 
             if var_name=='aqs_pressure':
                 var_name_mod1 = 'PRSFC_1'
@@ -1084,6 +1232,7 @@ for version in versions:
                 var_units = 'mb'
                 ymin = 850
                 ymax = 1050
+                df_h = pd.merge(df_h,aqsid_press)
                 
             if var_name=='aqs_wspd':
                 var_name_mod1 = 'WS_1'
@@ -1093,6 +1242,7 @@ for version in versions:
                 var_units = 'm/s'
                 ymin = 0
                 ymax = 6
+                df_h = pd.merge(df_h,aqsid_wspd)
                 
             if var_name=='aqs_wdir':  
                 var_name_mod1 = 'WD_1'
@@ -1102,6 +1252,7 @@ for version in versions:
                 var_units = '°'
                 ymin = -1
                 ymax = 1
+                df_h = pd.merge(df_h,aqsid_wdir)
                 
             if var_name=='aqs_rh':
                 var_name_mod1 = 'RH_1'
@@ -1111,6 +1262,15 @@ for version in versions:
                 var_units = '%'
                 ymin = 0
                 ymax = 110
+                df_h = pd.merge(df_h,aqsid_rh)
+            if var_name == 'aqs_specific_humidity':
+                var_name_mod1 = 'specific_humidity_model'
+            
+                var_label = 'Specific Humidity'
+                var_units = '[-]'
+                ymin = 0
+                ymax = 1
+                df_h = pd.merge(df_h,aqsid_rh)
                 
            # if var_name=='precip_accum':
             #    var_name_mod1 = 'PRECIP_1'
@@ -1121,7 +1281,13 @@ for version in versions:
                 #ymin = 0 
                 #ymax = 10 
             
+            #Average the data monthly
+            df_models = df_models.resample('M', convention='start').mean()
+            df_h = df_h.set_index('date_time')
+            df_h = df_h.resample('M', convention='start').mean()
             
+        
+            df_all = pd.merge(df_models,df_h, how ='outer',left_index=True,right_index=True)
             ################################################
             ##########     COMPUTE STATISTICS     ##########
             ################################################
@@ -1280,7 +1446,7 @@ for version in versions:
         #ix = ix.append(ix1)
         #df_met_all = pd.concat([df_met_all,df_mod1])
     stats_all = stats_all.reset_index()
-    stats_all.to_csv(base_dir+'/AQS_stats/aqs_stats_%s.csv' %(version))
+    stats_all.to_csv(base_dir+'/AQS_stats/aqs_stats_%s_common.csv' %(version))
 print('plots complete')    
 
 #%%
@@ -1348,6 +1514,10 @@ for version in versions:
     
     wd1 = df_mod1['WDIR10']    # MCIP files record wind speed, no need to calculate
     
+    # Convert aqs data from F to C
+
+    df_h['aqs_temp'] = (df_h['aqs_temp']-32)*(5/9)
+        
     # Calculate 2-m (approximately) relative humidity using Q2, TEMP2, PRSFC, & constants
     # Formula taken from:
     # http://mailman.ucar.edu/pipermail/wrf-users/2012/002546.html
@@ -1356,8 +1526,6 @@ for version in versions:
     a3 = 273.16
     a4 = 35.86
     
-    if 'aqs_temp' in df_h:
-        df_h['aqs_temp'] = (df_h['aqs_temp']-32)*(5/9)
     #Q2 is the water vapor mixing ratio at 2m. kg/kg
     rh1 = df_mod1['Q2'] / ( (pq0 / df_mod1['PRSFC']) * np.exp(a2 * 
                    (df_mod1['TEMP2'] - a3) / (df_mod1['TEMP2'] - a4)) )
@@ -1371,11 +1539,10 @@ for version in versions:
     
     rh_new1 = rh1 * 100 # convert from fraction to %    
     mix_ratio  = df_mod1['Q2']/1000    #Do this to get the mixing ration instead of RH in g/kg
-    # Convert aqs data from F to C
 
         
     #Try different way to create the dataframes, so as to retain all model data
-    df_models=df_mod1
+    df_models=df_mod1.copy()
     df_models['TEMP2'] = df_models['TEMP2'] - 273.15
     df_models['PRSFC'] = df_models['PRSFC']/100
     df_models['rh1'] = rh_new1
@@ -1442,6 +1609,7 @@ for version in versions:
             var_units = 'C°'
             ymin = 0
             ymax = 40
+            df_h = pd.merge(df_h,aqsid_temp)
             
         if var_name=='aqs_pressure':
             var_name_mod1 = 'PRSFC_1'
@@ -1451,6 +1619,7 @@ for version in versions:
             var_units = 'mb'
             ymin = 850
             ymax = 1050
+            df_h = pd.merge(df_h,aqsid_press)
             
         if var_name=='aqs_wspd':
             var_name_mod1 = 'WS_1'
@@ -1460,6 +1629,7 @@ for version in versions:
             var_units = 'm/s'
             ymin = 0
             ymax = 6
+            df_h = pd.merge(df_h,aqsid_wspd)
             
         if var_name=='aqs_wdir':  
             var_name_mod1 = 'WD_1'
@@ -1469,6 +1639,7 @@ for version in versions:
             var_units = '°'
             ymin = -1
             ymax = 1
+            df_h = pd.merge(df_h,aqsid_wdir)
             
         if var_name=='aqs_rh':
             var_name_mod1 = 'RH_1'
@@ -1478,14 +1649,16 @@ for version in versions:
             var_units = '%'
             ymin = 0
             ymax = 110
+            df_h = pd.merge(df_h,aqsid_rh)
             
         if var_name == 'aqs_specific_humidity':
             var_name_mod1 = 'specific_humidity_model'
         
             var_label = 'Specific Humidity'
             var_units = '[-]'
-            ymin = 2
-            ymax = 8
+            ymin = 0
+            ymax = 10
+            df_h = pd.merge(df_h,aqsid_rh)       
                 # if var_name=='precip_accum':
         #    var_name_mod1 = 'PRECIP_1'
          #   mod_var1 = df_mod1['RAINNC']
@@ -1600,7 +1773,7 @@ for version in versions:
         ax.fmt_xdata = mdates.DateFormatter('%Y-%m')
         #plt.show()
         
-        fig1.savefig(outputdir + '/time_series/type/aqs_%s_%s_total_timeseries.png' %(st_name, var_name),bbox_inches='tight')
+        fig1.savefig(outputdir + '/time_series/type/aqs_%s_%s_total_timeseries_common.png' %(st_name, var_name),bbox_inches='tight')
         plt.show()
         plt.close()
 
@@ -1668,7 +1841,7 @@ for version in versions:
     #ix = ix.append(ix1)
     #df_met_all = pd.concat([df_met_all,df_mod1])
 stats_all = stats_all.reset_index().drop(['model','station ID'],axis=1)
-stats_all.to_csv(base_dir+'/AQS_stats/aqs_stats_%s.csv' %('total'))
+stats_all.to_csv(base_dir+'/AQS_stats/aqs_stats_%s_common.csv' %('total'))
     
 #%%
 ########################################################
@@ -1697,7 +1870,7 @@ for n in np.arange(len(vname_obs)):
 
     # save stats into an Excel file
     
-    writer = pd.ExcelWriter(outputdir + 'stats' + '_' + start.strftime('%Y%m%d')  + '-' +  end.strftime('%Y%m%d') + '.xlsx')
+    writer = pd.ExcelWriter(outputdir + 'stats' + '_' + start.strftime('%Y%m%d')  + '-' +  end.strftime('%Y%m%d') + '_common.xlsx')
     stats_overall.to_excel(writer,'Sheet1',index=False)
     writer.save()
 
@@ -1902,6 +2075,9 @@ ws1 = df_mod1['WSPD10']    # MCIP files record wind speed, no need to calculate
 
 wd1 = df_mod1['WDIR10']    # MCIP files record wind speed, no need to calculate
 
+# Convert aqs data from F to C
+df_h['aqs_temp'] = (df_h['aqs_temp']-32)*(5/9)
+    
 # Calculate 2-m (approximately) relative humidity using Q2, TEMP2, PRSFC, & constants
 # Formula taken from:
 # http://mailman.ucar.edu/pipermail/wrf-users/2012/002546.html
@@ -1913,17 +2089,17 @@ a4 = 35.86
 rh1 = df_mod1['Q2'] / ( (pq0 / df_mod1['PRSFC']) * np.exp(a2 * 
                (df_mod1['TEMP2'] - a3) / (df_mod1['TEMP2'] - a4)) )
 
-rh_new1 = rh1 * 100 # convert from fraction to %    
-#rh_new1  = df_mod1['Q2']/1000    #Do this to get the mixing ration instead of RH
-# Convert aqs data from F to C
-df_h['aqs_temp'] = (df_h['aqs_temp']-32)*(5/9)
-
 df_mod1['specific_humidity_model'] = ((df_mod1['Q2'])/(1+df_mod1['Q2']))*1000
-    
-df_h['aqs_specific_humidity'] = ((df_h['aqs_rh']/100) * ( (pq0 / (df_h['aqs_pressure']*100)) * np.exp(a2 * 
-               (df_h['aqs_temp']+273-a3) / (df_h['aqs_temp']+273 - a4)) ))#*1000 # This gets mixing ratio
+
+df_h['aqs_specific_humidity'] = (df_h['aqs_rh']/100) * ( (pq0 / (df_h['aqs_pressure']*100)) * np.exp(a2 * 
+               (df_h['aqs_temp']+273-a3) / (df_h['aqs_temp']+273 - a4)) ) # This gets mixing ratio
     
 df_h['aqs_specific_humidity'] = ((df_h['aqs_specific_humidity'])/(1+df_h['aqs_specific_humidity']))*1000 # this convserts mixing ratio to specific humidity
+    
+
+rh_new1 = rh1 * 100 # convert from fraction to %    
+#rh_new1  = df_mod1['Q2']/1000    #Do this to get the mixing ration instead of RH
+
     
 #Try different way to create the dataframes, so as to retain all model data
 df_models=df_mod1
@@ -1938,8 +2114,9 @@ df_models = df_models.rename(columns = {'DateTime':'date_time','TEMP2':'TEMP2_1'
 df_models = df_models.reset_index().drop(['index'],axis=1)
 
 df_models = df_models.set_index('date_time').drop(['site_name'],axis=1)
-df_h = df_h.set_index('date_time') #.drop(['Local Site Name'],axis=1)
-
+#df_h = df_h.set_index('date_time') #.drop(['Local Site Name'],axis=1)
+df_h1 = df_h.copy()
+df_models1 = df_models.copy()
 # Checks the size of the dataframes
 #mem_df_h=df_h.memory_usage(index=True).sum()
 #mem_df_models = df_models.memory_usage(index=True).sum()
@@ -1957,22 +2134,21 @@ df_h = df_h.set_index('date_time') #.drop(['Local Site Name'],axis=1)
 #except ValueError:
 #    continue
 
-df_sitenum = df_h # Set this to later on determine number of sites
+df_sitenum = df_models # Set this to later on determine number of sites
 #Average the data monthly
-df_models = df_models.resample('M', convention='start').mean()
-df_h = df_h.resample('M', convention='start').mean()
 
-del(df_mod1)
-df_all = pd.merge(df_models,df_h, how ='outer',left_index=True,right_index=True)
-del(df_models)
+
 
 # Select variables, specify labels, units and y-limits, and plot model 
 # variables based on MesoWest variable names
 new_list = ['aqs_temp','aqs_pressure','aqs_rh','aqs_wspd','aqs_wdir','aqs_specific_humidity'] # Remember to add in winds here
 for w in new_list:
     var_name = str(w)
+    df_h = df_h1.copy()
+    df_models = df_models1.copy()
     
     temp1 = df_sitenum
+    temp1 = temp1.dropna()
     temp1 = temp1.groupby(['Local Site Name']).count()
     temp1 = len(temp1.index.get_level_values(0))
     # Skip variable if all values are zeros or NaNs
@@ -1989,6 +2165,7 @@ for w in new_list:
         var_units = 'C°'
         ymin = 0
         ymax = 40
+        df_h = pd.merge(df_h,aqsid_temp)
         
     if var_name=='aqs_pressure':
         var_name_mod1 = 'PRSFC_1'
@@ -1999,6 +2176,7 @@ for w in new_list:
         var_units = 'mb'
         ymin = 850
         ymax = 1050
+        df_h = pd.merge(df_h,aqsid_press)
         
     if var_name=='aqs_wspd':
         var_name_mod1 = 'WS_1'
@@ -2009,6 +2187,7 @@ for w in new_list:
         var_units = 'm/s'
         ymin = 1
         ymax = 6
+        df_h = pd.merge(df_h,aqsid_wspd)
         
     if var_name=='aqs_wdir':  
         var_name_mod1 = 'WD_1'
@@ -2019,6 +2198,7 @@ for w in new_list:
         var_units = '°'
         ymin = -1
         ymax = 1
+        df_h = pd.merge(df_h,aqsid_wdir)
         
     if var_name=='aqs_rh':
         var_name_mod1 = 'RH_1'
@@ -2029,14 +2209,17 @@ for w in new_list:
         var_units = '%'
         ymin = 0
         ymax = 110
+        df_h = pd.merge(df_h,aqsid_rh)
         
     if var_name == 'aqs_specific_humidity':
         var_name_mod1 = 'specific_humidity_model'
     
         var_label = 'Specific Humidity'
         var_units = '[-]'
+        st_name = 'AIRPACT Monthly Specific Humidity'
         ymin = 2
         ymax = 8
+        df_h = pd.merge(df_h,aqsid_rh)   
         
    # if var_name=='precip_accum':
     #    var_name_mod1 = 'PRECIP_1'
@@ -2047,7 +2230,11 @@ for w in new_list:
         #ymin = 0 
         #ymax = 10 
     
+    df_models = df_models.resample('M', convention='start').mean()
+    df_h = df_h.set_index('date_time')
+    df_h = df_h.resample('M', convention='start').mean()
     
+    df_all = pd.merge(df_models,df_h, how ='outer',left_index=True,right_index=True)
     ################################################
     ##########     COMPUTE STATISTICS     ##########
     ################################################
@@ -2146,7 +2333,9 @@ for w in new_list:
 #     ax.text(1.17, 0.2,'# of sites '+str(temp1), 
 #              ha='center', va='center', transform=ax.transAxes)        # Plot number of sites
 # =============================================================================
-    ax.text(0.98, 0.92,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes)
+# =============================================================================
+#     ax.text(0.98, 0.92,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes)
+# =============================================================================
     
     if var_name == 'aqs_temp':
         ax.legend(loc='upper left')
@@ -2170,16 +2359,7 @@ for w in new_list:
     
     
     # Create Airpact version change annotation
-# =============================================================================
-#     ax.annotate('AP3',xy=(0.09,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax1,yax2),color='red',size=size) # Left Arrow AP3
-#     ax.annotate('AP3',xy=(xax4,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax1,yax2),color='red',size=size) # Right Arrow AP3
-#  
-#     ax.annotate('AP4',xy=(xax4,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax2,yax2),color='red',size=size) # Left Arrow AP4       
-#     ax.annotate('AP4',xy=(xax5,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax2,yax2),color='red',size=size) # Right Arrow AP4
-#     
-#     ax.annotate('AP5',xy=(xax5,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax3,yax2),color='red',size=size) # Left Arrow AP5
-#     ax.annotate('AP5',xy=(xax6,yax),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(xax3,yax2),color='red',size=size) # Right Arrow AP5
-# =============================================================================
+
     # set version annotations settiungs
     text_height = 0.07 # 0.005 almost works
     x1 = 0.429
@@ -2190,20 +2370,22 @@ for w in new_list:
     t2 = (x2-x1)/2+x1
     t3 = (x3-x2)/2+x2
     
-    ax.annotate('AP3',xy=(0.07,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Left Arrow AP3 # previous height of 0.061 for the xytext
-    ax.annotate('AP3',xy=(x1,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Right Arrow AP3
-    
-    ax.annotate('AP4',xy=(x1,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Left Arrow AP4
-    ax.annotate('AP4',xy=(x2,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Right Arrow AP4
-
-    ax.annotate('AP5',xy=(x2,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Left Arrow AP5
-    ax.annotate('AP5',xy=(x3,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Right Arrow AP5
-
+# =============================================================================
+#     ax.annotate('AP3',xy=(0.07,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Left Arrow AP3 # previous height of 0.061 for the xytext
+#     ax.annotate('AP3',xy=(x1,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Right Arrow AP3
+#     
+#     ax.annotate('AP4',xy=(x1,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Left Arrow AP4
+#     ax.annotate('AP4',xy=(x2,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Right Arrow AP4
+# 
+#     ax.annotate('AP5',xy=(x2,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Left Arrow AP5
+#     ax.annotate('AP5',xy=(x3,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Right Arrow AP5
+# 
+# =============================================================================
     # Add significant event annotations to plots
     #ax.annotate('12km to 4km',xy=(0.405,0.75),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(0.405,.8),color='red',size='x-small') # Right Arrow AP3
     ax.set_xlabel('')
     plt.show()
-    fig1.savefig(outputdir + '/time_series/type/aqs_%s_timeseries_site.png' %(var_name),bbox_inches='tight')
+    fig1.savefig(outputdir + '/time_series/type/aqs_%s_timeseries_site_common.png' %(var_name),bbox_inches='tight')
     plt.close()
     
 
@@ -2273,7 +2455,7 @@ for w in new_list:
 #df_met_all = pd.concat([df_met_all,df_mod1])
 print('plots complete')    
 stats_all = stats_all.reset_index()
-stats_all.to_csv(base_dir+'/AQS_stats/aqs_stats.csv')
+stats_all.to_csv(base_dir+'/AQS_stats/aqs_stats_common.csv')
 #%%
 # List how many sites are used for each type
 temp1 = df_obs.loc[(df_obs['Location Setting'] == 'RURAL')].rename(columns={'Location Setting': 'type'})
