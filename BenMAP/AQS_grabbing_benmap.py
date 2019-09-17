@@ -15,7 +15,7 @@ base_dir = r'E:/Research/Benmap/'
 species = ['o3'] #['pm_FRM/FEM','pm_non_FRM/FEM']# when changing bacl, don't forget to rename the save file line
 species_code = ['44201'] # ['88101','88502']
 
-start_year = 2018
+start_year = 2016 
 end_year = start_year+1
 
 # =============================================================================
@@ -50,6 +50,7 @@ def aqs(begining,ending):
     AQS_df.to_csv(base_dir+'AQS_data/aqs_o3_benmap'+'_'+str(begining)+'.csv')
 
 aqs(start_year,end_year)
+print('AQS Download done')
 #%%
 # =============================================================================
 # # =============================================================================
@@ -116,11 +117,17 @@ df['Monitor Description'] = "'MethodCode=.','LandUse=.','LocationSetting=.','Pro
 
 # reorginize df
 df = df[['Monitor Name', 'Monitor Description','Latitude', 'Longitude','Metric','Seasonal Metric','Statistic', 'Date GMT', 'Values']]
+df['Values'] = df['Values']*1000
 
 # Create date range
 date1 = str(start_year)+'-01-01'
 date2 = str(start_year)+'-12-31'
 mydates = pd.date_range(date1, date2, freq='D').tolist()
+
+# Remove dates other than the specified year
+df['Date GMT'] = df['Date GMT'].astype(str)
+df = df[~df['Date GMT'].str.contains(str(start_year-1))] # remove data not of the year specified
+df = df[~df['Date GMT'].str.contains(str(start_year+1))] # remove data not of the year specified
 
 # Convert date in df to datetime
 df['Date GMT'] = pd.to_datetime(df['Date GMT'])
@@ -129,6 +136,7 @@ df_b = pd.DataFrame(data=mydates,columns=['Date GMT'])
 df_c = pd.DataFrame(columns=['Monitor Name','Monitor Description','Latitude','Longitude','Metric','Seasonal Metric','Statistic','Date GMT','Values'])
 for sites in mysites:
     df_a = df.loc[df['Monitor Name']==sites, df.columns] # Locate a single site
+    
     
     df_a = pd.merge(df_a,df_b, how = 'outer') # merge to create dataframe with all days of the year
     df_d = df_a.set_index('Date GMT').drop(['Latitude','Longitude'],axis=1)

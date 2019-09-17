@@ -10,8 +10,13 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import numpy as np
 
 inputDir = r'C:/Users/riptu/Documents/My BenMAP-CE Files/Result/APVR/AIRPACT/'
+thesisDir = r'C:/Users/riptu/Documents/My BenMAP-CE Files/Result/APVR/thesis/'
+plotDir = r'E:\Research\Benmap\plots/'
+stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
+exec(open(stat_path).read())
 
 
 # Set plot parameters
@@ -104,7 +109,7 @@ percent_mortality['Total'] = percent_mortality['WA'] + percent_mortality['OR'] +
 legend_x = 1.1
 # Begin plotting
 # Plotting section
-fig = plt.figure(figsize=(10,8),dpi=200)
+fig = plt.figure(figsize=(7.5,7),dpi=100)
 fig.suptitle('Longterm PM$_{2.5}$ Mortality',y=0.95,fontsize=18,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
 
@@ -293,29 +298,65 @@ siteid = pd.concat((siteid,siteid_3))
 siteid = siteid.rename(columns={"State Code": "Col", "County Code": "Row"})
 siteid['Col'] = pd.to_numeric(siteid['Col'])
 
+
+
+# =============================================================================
+# # Load BenMAP data
+# mon_2016 = pd.merge(pd.read_csv(inputDir + '2016_mon_csv_county.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Monitor'})
+# mon_2016['Year'] = 2016
+# mon_2017 = pd.merge(pd.read_csv(inputDir + '2017_mon_csv_county.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Monitor'})
+# mon_2017['Year'] = 2017
+# mon_2018 = pd.merge(pd.read_csv(inputDir + '2018_mon_csv_county.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Monitor'})
+# mon_2018['Year'] = 2018
+# 
+# model_2016 = pd.merge(pd.read_csv(inputDir + '2016_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
+# model_2016['Year'] = 2016
+# model_2017 = pd.merge(pd.read_csv(inputDir + '2017_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
+# model_2017['Year'] = 2017
+# model_2018 = pd.merge(pd.read_csv(inputDir + '2018_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
+# model_2018['Year'] = 2018
+# 
+# # Load Zanobetti health results
+# # Load BenMAP data
+# zanobetti_2016 = pd.merge(pd.read_csv(inputDir + '2016_zanobetti_CSV.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Model'})
+# zanobetti_2016['Year'] = 2016
+# zanobetti_2017 = pd.merge(pd.read_csv(inputDir + '2017_zanobetti_CSV.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Model'})
+# zanobetti_2017['Year'] = 2017
+# zanobetti_2018 = pd.merge(pd.read_csv(inputDir + '2018_zanobetti_CSV.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Model'})
+# zanobetti_2018['Year'] = 2018
+# 
+# =============================================================================
+# =============================================================================
+# The section below loads data in a manner that does not leave out certain counties. The above method would be needed to identify counties for a table
+# =============================================================================
 # Load BenMAP data
-mon_2016 = pd.merge(pd.read_csv(inputDir + '2016_mon_csv_county.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Monitor'})
+mon_2016 = pd.merge(pd.read_csv(inputDir + '2016_mon_csv_county.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col'],how='outer').rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Monitor'})
 mon_2016['Year'] = 2016
-mon_2017 = pd.merge(pd.read_csv(inputDir + '2017_mon_csv_county.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Monitor'})
+mon_2017 = pd.merge(pd.read_csv(inputDir + '2017_mon_csv_county.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col'],how='outer').rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Monitor'})
 mon_2017['Year'] = 2017
-mon_2018 = pd.merge(pd.read_csv(inputDir + '2018_mon_csv_county.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Monitor'})
+mon_2018 = pd.merge(pd.read_csv(inputDir + '2018_mon_csv_county.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col'],how='outer').rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Monitor'})
 mon_2018['Year'] = 2018
 
-model_2016 = pd.merge(pd.read_csv(inputDir + '2016_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
+model_2016 = pd.merge(pd.read_csv(inputDir + '2016_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col'],how='outer').rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
 model_2016['Year'] = 2016
-model_2017 = pd.merge(pd.read_csv(inputDir + '2017_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
+model_2017 = pd.merge(pd.read_csv(inputDir + '2017_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col'],how='outer').rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
 model_2017['Year'] = 2017
-model_2018 = pd.merge(pd.read_csv(inputDir + '2018_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
+model_2018 = pd.merge(pd.read_csv(inputDir + '2018_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col'],how='outer').rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
 model_2018['Year'] = 2018
 
 # Load Zanobetti health results
 # Load BenMAP data
-zanobetti_2016 = pd.merge(pd.read_csv(inputDir + '2016_zanobetti_CSV.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Model'})
+zanobetti_2016 = pd.merge(pd.read_csv(inputDir + '2016_zanobetti_CSV.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col'],how='outer').rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Model'})
 zanobetti_2016['Year'] = 2016
-zanobetti_2017 = pd.merge(pd.read_csv(inputDir + '2017_zanobetti_CSV.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Model'})
+zanobetti_2017 = pd.merge(pd.read_csv(inputDir + '2017_zanobetti_CSV.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col'],how='outer').rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Model'})
 zanobetti_2017['Year'] = 2017
-zanobetti_2018 = pd.merge(pd.read_csv(inputDir + '2018_zanobetti_CSV.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Model'})
+zanobetti_2018 = pd.merge(pd.read_csv(inputDir + '2018_zanobetti_CSV.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col'],how='outer').rename(columns={"Point Estimate": "Monitor",'Delta':'Delta_Model'})
 zanobetti_2018['Year'] = 2018
+
+
+
+
+
 
 # Combine information
 df_com = pd.concat([mon_2016,mon_2017,mon_2018])#.drop(['Row','Col'],axis=1)
@@ -345,6 +386,8 @@ df_z = pd.concat([zanobetti_2016,zanobetti_2017,zanobetti_2018])#.drop(['Row','C
 # 
 # =============================================================================
 df_com['Year'] = df_com['Year'].astype(str)
+
+df_table = df_com.copy()
 df_com = df_com.set_index('County Name')#.T
 
 df_z['Year'] = df_z['Year'].astype(str)
@@ -389,7 +432,7 @@ df_states['Col'] = df_states['Col'].drop_duplicates()
 df_states = df_states.dropna()
 
 # Plotting section
-fig = plt.figure(dpi=100,figsize=(8,7))
+fig = plt.figure(dpi=100,figsize=(7.5,7))
 fig.suptitle('PNW PM$_{2.5}$ Mortality',y=0.94,fontsize=12,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
 fig.text(0.06, 0.5, 'Latitude', va='center', rotation='vertical')
@@ -412,39 +455,39 @@ alpha = 0.5
 ax = fig.add_subplot(3,3,7)
 plt.title('2018 Monitor')
 im = df_counties.loc[df_counties['Year'] == '2018'].plot(column='Monitor', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
-states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 ax = fig.add_subplot(3,3,4)
 plt.title('2017 Monitor')
 im = df_counties.loc[df_counties['Year'] == '2017'].plot(column='Monitor', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 im.axes.get_xaxis().set_visible(False)
-states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 ax = fig.add_subplot(3,3,1)
 plt.title('2016 Monitor')
 im = df_counties.loc[df_counties['Year'] == '2016'].plot(column='Monitor', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 im.axes.get_xaxis().set_visible(False)
-states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 ax = fig.add_subplot(3,3,8)
 plt.title('2018 Model')
 im = df_counties.loc[df_counties['Year'] == '2018'].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 im.axes.get_yaxis().set_visible(False)
-states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 ax = fig.add_subplot(3,3,5)
 plt.title('2017 Model')
 im = df_counties.loc[df_counties['Year'] == '2017'].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 im.axes.get_yaxis().set_visible(False)
 im.axes.get_xaxis().set_visible(False)
-states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 ax = fig.add_subplot(3,3,2)
 plt.title('2016 Model')
 im = df_counties.loc[df_counties['Year'] == '2016'].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 im.axes.get_yaxis().set_visible(False)
 im.axes.get_xaxis().set_visible(False)
-states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 # =============================================================================
 # Zanobetti portion
 # =============================================================================
@@ -452,21 +495,21 @@ ax = fig.add_subplot(3,3,9)
 plt.title('2018 Zanobetti')
 im = df_z.loc[df_z['Year'] == '2018'].plot(column='Monitor', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 im.axes.get_yaxis().set_visible(False)
-states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 ax = fig.add_subplot(3,3,6)
 plt.title('2017 Zanobetti')
 im = df_z.loc[df_z['Year'] == '2017'].plot(column='Monitor', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 im.axes.get_yaxis().set_visible(False)
 im.axes.get_xaxis().set_visible(False)
-states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 ax = fig.add_subplot(3,3,3)
 plt.title('2016 Zanobetti')
 im = df_z.loc[df_z['Year'] == '2016'].plot(column='Monitor', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 im.axes.get_yaxis().set_visible(False)
 im.axes.get_xaxis().set_visible(False)
-states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 plt.show()
 plt.close()
 
@@ -479,7 +522,7 @@ highest_county_mort_z = pd.merge(df_z.loc[df_z['Year']=='2017'].sort_values(by='
 # =============================================================================
 # # Plotting section for model vs monitor
 # =============================================================================
-fig = plt.figure(figsize=(10,9),dpi=200)
+fig = plt.figure(figsize=(7.5,7),dpi=100)
 fig.suptitle('Mortality in the PNW due to PM$_{2.5}$',y=0.97,fontsize=20,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
 fig.text(0.06, 0.5, 'Latitude', va='center', rotation='vertical')
@@ -502,12 +545,12 @@ for endpoint, i, j in zip(endpoints,[1,3,5],[2,4,6]):
     ax = fig.add_subplot(3,2,i)
     plt.title(endpoint)
     im = df_counties.loc[df_counties['Year'] == endpoint].plot(column='Monitor', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
-    states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+    states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
     ax = fig.add_subplot(3,2,j)
     plt.title(endpoint)
     im = df_counties.loc[df_counties['Year'] == endpoint].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
-    states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+    states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 plt.show()
 plt.close()
@@ -515,7 +558,7 @@ plt.close()
 # =============================================================================
 # # Plotting section for model vs monitor
 # =============================================================================
-fig = plt.figure(figsize=(10,9),dpi=200)
+fig = plt.figure(figsize=(7.5,7),dpi=100)
 fig.suptitle('PM$_{2.5}$ in the PNW',y=0.97,fontsize=20,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
 fig.text(0.06, 0.5, 'Latitude', va='center', rotation='vertical')
@@ -538,12 +581,12 @@ for endpoint, i, j in zip(endpoints,[1,3,5],[2,4,6]):
     ax = fig.add_subplot(3,2,i)
     plt.title(endpoint)
     im = df_counties.loc[df_counties['Year'] == endpoint].plot(column='Delta_Monitor', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
-    states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+    states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
     ax = fig.add_subplot(3,2,j)
     plt.title(endpoint)
     im = df_counties.loc[df_counties['Year'] == endpoint].plot(column='Delta_Model', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
-    states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+    states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 plt.show()
 plt.close()
@@ -567,23 +610,23 @@ plt.close()
 #     ax = fig.add_subplot(3,4,i)
 #     plt.title(endpoint)
 #     im = df_counties.loc[df_counties['Year'] == endpoint].plot(column='Monitor', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
-#     states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+#     states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 # 
 #     ax = fig.add_subplot(3,4,j)
 #     plt.title(endpoint)
 #     im = df_counties.loc[df_counties['Year'] == endpoint].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
-#     states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+#     states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 #     
 #     vmax = 10
 #     ax = fig.add_subplot(3,4,k)
 #     plt.title('endpoint')
 #     im = df_counties.loc[df_counties['Year'] == endpoint].plot(column='Delta_Monitor', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
-#     states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+#     states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 #     
 #     ax = fig.add_subplot(3,4,z)
 #     plt.title('endpoint')
 #     im = df_counties.loc[df_counties['Year'] == endpoint].plot(column='Delta_Model', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
-#     states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+#     states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 # 
 # plt.show()
 # plt.close()
@@ -628,7 +671,9 @@ drop_list = [ #'Delta',
 # monitor_2018 = pd.merge(pd.read_csv(inputDir + '2018_monitor_PM_O3_output.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
 # =============================================================================
 
-model_2018 = pd.merge(pd.read_csv(inputDir + '2018_model_PM_O3_output.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
+#model_2018 = pd.merge(pd.read_csv(inputDir + '2018_model_PM_O3_output.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
+model_2018 = pd.read_csv(inputDir + '2018_model_PM_O3_output.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index().rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
+
 monitor_2018 = pd.merge(pd.read_csv(inputDir + '2018_monitor_PM_O3_output.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
 value_2018 = pd.merge(pd.read_csv(inputDir + '2018_model_PM_O3_output_valuation.CSV').rename(columns = {'Column':'Col'}).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
 top_valuation = pd.merge(value_2018.loc[value_2018['Pollutant'] == 'PM2.5'].loc[value_2018['Endpoint'] == 'Mortality, All Cause'].sort_values(by='Model', ascending=False).head(),siteid)
@@ -680,7 +725,7 @@ for endpoint, i, j in zip(endpoints,[1,3,5,7],[2,4,6,8]):
     ax = fig.add_subplot(4,2,i)
     plt.title(endpoint)
     im = df_mod.loc[df_mod['Endpoint Group'] == endpoint].loc[df_mod['Pollutant'] == 'PM2.5'].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
-    states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+    states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
     # Set colorbar max/mins
     if i == 1: # mortality
@@ -700,7 +745,7 @@ for endpoint, i, j in zip(endpoints,[1,3,5,7],[2,4,6,8]):
     ax = fig.add_subplot(4,2,j)
     plt.title(endpoint)
     im = df_mod.loc[df_mod['Endpoint Group'] == endpoint].loc[df_mod['Pollutant'] == 'Ozone'].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
-    states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+    states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 plt.show()
 plt.close()
@@ -712,13 +757,13 @@ plt.close()
 # =============================================================================
 
 # Plotting section
-fig = plt.figure(figsize=(10,12))#dpi=100)
-fig.suptitle('2018 PNW PM$_{2.5}$ Health Impacts',y=0.93,fontsize=20,ha='center') # title
+fig = plt.figure(figsize=(7.5,10))#dpi=100)
+fig.suptitle('2018 PNW PM$_{2.5}$ Health Impacts',y=1.02,fontsize=20,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
 fig.text(0.06, 0.75, 'Latitude', va='center', rotation='vertical')
 fig.text(0.5, 0.09, 'Longitude', va='center', ha = 'center')
-fig.text(0.265, 0.89, 'Incidence', va='center', ha = 'center',fontsize=18)
-fig.text(0.685, 0.89, '% Incidence', va='center', ha = 'center',fontsize=18)
+fig.text(0.225, 0.98, 'Incidence', va='center', ha = 'center',fontsize=18)
+fig.text(0.715, 0.98, '% Incidence', va='center', ha = 'center',fontsize=18)
 
 # Colorbar
 divider = make_axes_locatable(ax)
@@ -748,7 +793,7 @@ for endpoint, i, j in zip(endpoints,[1,3,5,7],[2,4,6,8]):
     ax = fig.add_subplot(4,2,i)
     plt.title(endpoint)
     im = df_mod.loc[df_mod['Endpoint Group'] == endpoint].loc[df_mod['Pollutant'] == 'PM2.5'].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
-    states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+    states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
     # Set colorbar max/mins
     if i == 1: # mortality
@@ -769,8 +814,8 @@ for endpoint, i, j in zip(endpoints,[1,3,5,7],[2,4,6,8]):
     d = df_mod.loc[df_mod['Endpoint Group'] == endpoint].loc[df_mod['Pollutant'] == 'PM2.5']
     d['Model'] = d['Model']/d['Population']*100
     im = d.plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
-    states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
-
+    states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+fig.tight_layout() # spaces the plots out a bit
 plt.show()
 plt.close()
 #%%
@@ -779,9 +824,8 @@ plt.close()
 # =============================================================================
 
 # Plotting section
-fig = plt.figure(figsize=(10,4),dpi=200)
+fig = plt.figure(figsize=(6,4),dpi=150)
 #fig.suptitle('2018 PNW PM$_{2.5}$ Health Impacts',y=0.93,fontsize=20,ha='center') # title
-fig.tight_layout() # spaces the plots out a bit
 #fig.text(0.06, 0.5, 'Latitude', va='center', rotation='vertical')
 #fig.text(0.5, 0.09, 'Longitude', va='center', ha = 'center')
 #fig.text(0.265, 0.82, 'Incidence', va='center', ha = 'center',fontsize=18)
@@ -804,7 +848,7 @@ for endpoint in endpoints:
     ax = fig.add_subplot(2,2,1)
     plt.title('Incidence')
     im = df_mod.loc[df_mod['Endpoint Group'] == endpoint].loc[df_mod['Pollutant'] == 'PM2.5'].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
-    states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+    states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
     vmax = .1
     
@@ -813,7 +857,7 @@ for endpoint in endpoints:
     d = df_mod.loc[df_mod['Endpoint Group'] == endpoint].loc[df_mod['Pollutant'] == 'PM2.5']
     d['Model'] = d['Model']/d['Population']*100
     im = d.plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
-    states = df_states.plot(column = 'zeros',cmap='winter', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+    states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 plt.show()
 plt.close()
 #%%
@@ -821,13 +865,8 @@ plt.close()
 # DEQ analysis section
 # =============================================================================
 
-df_deq = pd.merge(pd.read_csv(inputDir + 'deq_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
-df_deq = pd.read_csv(inputDir + 'deq_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index().rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
 
-# =============================================================================
-# print(df_deq.drop(['Endpoint Group','State Name','Delta_Model'],axis=1).loc[df_mod['Endpoint Group'] == endpoint].sort_values(by=['Model'], ascending=False).loc[df_mod['County Name'] == 'Sherman'].head())
-# a = df_deq.drop(['Endpoint Group','State Name','Delta_Model'],axis=1).loc[df_mod['Endpoint Group'] == endpoint].sort_values(by=['Model'], ascending=False).loc[df_mod['County Name'] == 'Sherman'].head()
-# =============================================================================
+df_deq = pd.read_csv(inputDir + 'deq_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index().rename(columns={"Point Estimate": "Model",'Delta':'Delta_Model'})
 
 counties = counties
 df_mod = pd.merge(df_deq,counties) # Merging eliminates the rest of the country
@@ -873,3 +912,379 @@ for endpoint in endpoints:
     states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,linewidth=linewidth,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 plt.show()
 plt.close()
+#%%
+# =============================================================================
+# Create comprehensive table
+# =============================================================================
+
+# Find highest impact counties
+df_deq = pd.merge(pd.read_csv(inputDir + 'deq_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "DEQ",'Delta':'pollutant_DEQ'}).drop(['Row','Col'],axis=1)
+#df_deq['Year'] = '2014-2017'
+# =============================================================================
+# a = df_deq.drop(['Endpoint Group','State Name'],axis=1).loc[df_deq['Pollutant'] == 'Ozone'].loc[df_deq['Endpoint Group'] == endpoint].sort_values(by=['Model'], ascending=False).head()
+# print(a)
+# =============================================================================
+
+# load in data
+df_model_2016 = pd.merge(pd.read_csv(thesisDir + '2016_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "mod_2016",'Delta':'pollutant_model'})
+df_model_2017 = pd.merge(pd.read_csv(thesisDir + '2017_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "mod_2017",'Delta':'pollutant_model'})
+df_model_2018 = pd.merge(pd.read_csv(thesisDir + '2018_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "mod_2018",'Delta':'pollutant_model'})
+
+df_monitor_2016 = pd.merge(pd.read_csv(thesisDir + '2016_monitor_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "mon_2016",'Delta':'pollutant_monitor'})
+df_monitor_2017 = pd.merge(pd.read_csv(thesisDir + '2017_monitor_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "mon_2017",'Delta':'pollutant_monitor'})
+df_monitor_2018 = pd.merge(pd.read_csv(thesisDir + '2018_monitor_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index(),siteid, on = ['Row','Col']).rename(columns={"Point Estimate": "mon_2018",'Delta':'pollutant_monitor'})
+
+# Add column with year
+df_model_2016['Year'] = '2016'
+df_model_2017['Year'] = '2017'
+df_model_2018['Year'] = '2018'
+df_monitor_2016['Year'] = '2016'
+df_monitor_2017['Year'] = '2017'
+df_monitor_2018['Year'] = '2018'
+
+#combine data
+df_table = pd.concat([df_monitor_2016,df_monitor_2017,df_monitor_2018])#.drop(['Row','Col'],axis=1)
+df_table1 = pd.concat([df_model_2016,df_model_2017,df_model_2018]).drop(['Row','Col'],axis=1)
+df_table = pd.merge(df_table,df_table1,on=['State Name','County Name','Year','Population','Endpoint Group','Pollutant'],how='outer')
+df_table = pd.merge(df_table,df_deq,on=['State Name','County Name','Population','Endpoint Group','Pollutant'],how='outer')
+df_table['Pollutant'] = df_table['Pollutant'].replace('PM2.5 ','PM2.5') # Some have an extra space at the end for some reason..
+
+
+#%%
+# =============================================================================
+# Plot df_table
+# =============================================================================
+# Barplot
+functions = ['Mortality','Asthma Exacerbation','Emergency Room Visits  Respiratory','filler']
+pollutants = ['PM2.5', 'Ozone']
+years = ['2016','2017','2018']
+inc_or_per = ['incidence']#,'percent']
+for iop in inc_or_per:
+    for species in pollutants:   
+        for function in functions:
+            
+            if function == 'filler': 
+                if species == 'PM2.5':
+                    function = 'Work Loss Days'
+                else:
+                    function = 'School Loss Days'
+            fig = plt.figure(figsize=(7.5,6),dpi=100)
+            
+            for year,i in zip(years,[1,2,3]):
+                # select data
+                d = df_table.copy()
+                d['Endpoint Group'] = d['Endpoint Group'].astype(str)
+                d = d.loc[d['Pollutant'] == species].loc[d['Endpoint Group'] == function]
+                d = d.sort_values(by='DEQ', ascending=False).reset_index(drop=True) # Sort by DEQ for consistency
+                ymax = max(max(d['mod_2016'].dropna()),max(d['mod_2017'].dropna()),max(d['mod_2018'].dropna()))
+                if iop == 'incidence':
+                    
+                    d1 = d.loc[d['Year'] == year].head(20)
+                    top_counties = d1['County Name'].to_list()
+                    d2 = d.loc[d['Year'] == year]
+                    #print(d2.sum())
+                    for name in top_counties:
+                        #print(name)
+                        d2 = d2[d2['County Name'] != name] # this for loop eliminates the top 20
+                        
+                    d2 = pd.DataFrame(d2.sum()).T
+                    d2['County Name'] = 'Residual' # rename, otherwise a massive combined name is here and messes up the plot
+                    
+                    d = d.loc[d['Year'] == year].head(20)
+                    d = pd.concat([d,d2])
+                    #print(d.sum())
+                    
+                    ymax = max(max(d['mon_2016'].dropna()),max(d['mon_2017'].dropna()),max(d['mon_2018'].dropna()),
+                               max(d['mod_2016'].dropna()),max(d['mod_2017'].dropna()),max(d['mod_2018'].dropna()),
+                               max(d['DEQ'].dropna()),max(d['DEQ'].dropna()),max(d['DEQ'].dropna())) # Base this on DEQ as it is high
+                else:
+                    d = d.loc[d['Year'] == year].head(20)
+                
+                labels = d['County Name']
+                x = np.arange(len(d['County Name']))  # the label locations
+                width = 0.35  # the width of the bars
+                
+                ax = fig.add_subplot(3,1,i)
+                
+                if iop == 'incidence':
+                    rects1 = ax.bar(x - width/1.5, d['mod_'+year], width, label='Model')
+                    rects2 = ax.bar(x, d['mon_'+year], width, label='Monitor')
+                    rects3 = ax.bar(x + width/1.5, d['DEQ'], width, label='DEQ')
+                    ax.set_ylim(0, ymax+10)
+                else:
+                    rects1 = ax.bar(x - width/1.5, d['mod_'+year]/d['Population']*100, width, label='Model')
+                    rects2 = ax.bar(x, d['mon_'+year]/d['Population']*100, width, label='Monitor')
+                    rects3 = ax.bar(x + width/1.5, d['DEQ']/d['Population']*100, width, label='DEQ')
+                    ax.set_ylim(0, .07) # .13 for PM mortality, 0.07 for Ozone
+                    
+                
+                
+                #Label plot
+                if i ==1:
+                    ax.legend()
+                    ax.set_title('2016 (a)')
+                if i ==2:
+                    ax.set_ylabel(species +' '+function)
+                    ax.set_title('2017 (b)')
+                if i ==3:
+                    plt.xticks(x, labels, rotation='vertical')
+                    ax.set_title('2018 (c)')
+                else:
+                    plt.xticks(x, '', rotation='vertical')
+                ax.tick_params(axis='x', which='both', length=0)
+    
+            #fig.tight_layout()
+            function_save = function.replace(" ", "_")
+            plt.savefig(plotDir + 'barplots/'+species+'_'+function_save+'_'+iop+'_barplot.png')
+            plt.show()
+#%%
+# =============================================================================
+#         Other type of barplot
+# =============================================================================
+# Barplot
+columns = ['County Name',
+ 'Endpoint Group',
+ 'Pollutant',
+ 'Population',
+ 'State Name',
+ 'Year',
+ 'mon_2016',
+ 'mon_2017',
+ 'mon_2018',
+ 'pollutant_monitor',
+ 'mod_2016',
+ 'mod_2017',
+ 'mod_2018',
+ 'pollutant_model',
+ 'DEQ',
+ 'pollutant_DEQ']
+functions = ['Mortality','Asthma Exacerbation','Emergency Room Visits  Respiratory','filler']
+pollutants = ['PM2.5', 'Ozone']
+years = ['2016','2017','2018']
+inc_or_per = ['percent']
+for iop in inc_or_per:
+    for species in pollutants:  
+        fig = plt.figure(figsize=(7.5,6),dpi=100)
+        for year,i in zip(years,[1,2,3]):
+            ax = fig.add_subplot(3,1,i)
+            
+                    
+            # select data
+            d = df_table.copy()
+            d['Endpoint Group'] = d['Endpoint Group'].astype(str)
+            d = d.loc[d['Pollutant'] == species]
+            d = d.sort_values(by='DEQ', ascending=False).reset_index(drop=True) # Sort by DEQ for consistency
+            d = d.loc[d['Year'] == year]
+            d = d.loc[d['County Name'] == 'King']
+            labels = d['Endpoint Group'].replace('Emergency Room Visits  Respiratory', 'ER Visits, Respiratory')
+            x = np.arange(len(d['County Name']))  # the label locations
+            width = 0.35  # the width of the bars
+
+            ymax = .1
+                
+
+            rects1 = ax.bar(x - width/1.5, d['mod_'+year]/d['Population']*100, width, label='Model')
+            rects2 = ax.bar(x, d['mon_'+year]/d['Population']*100, width, label='Monitor')
+            rects3 = ax.bar(x + width/1.5, d['DEQ']/d['Population']*100, width, label='DEQ')
+            #ax.set_ylim(0, ymax) # .13 for PM mortality, 0.07 for Ozone
+            
+            plt.yscale('log')
+            ax.set_ylim(0.001, 1000)
+                
+                
+            #Label plot
+            if i ==1:
+                ax.legend()
+                ax.set_title('2016 (a)')
+            if i ==2:
+                ax.set_ylabel('Incidence' +' [%]')
+                ax.set_title('2017 (b)')
+            if i ==3:
+                plt.xticks(x, labels)
+                ax.set_title('2018 (c)')
+            else:
+                plt.xticks(x, '', rotation='vertical')
+            ax.tick_params(axis='x', which='both', length=0)
+    
+        #fig.tight_layout()
+        #function_save = function.replace(" ", "_")
+        plt.savefig(plotDir + 'barplots/'+species+'_'+iop+'_king_barplot.png')
+        plt.show()
+
+#%%
+
+# Scatter plot
+health_stats = pd.DataFrame(['Forecast Mean','Observatio Mean','MB','ME','FB [%]','FE [%]','NMB [%]','NME [%]','RMSE','R^2 [-]','Forecast 98th','Observation 98th'])
+health_stats = health_stats.set_index(0)
+for species in pollutants:  
+    fig = plt.figure(figsize=(7.5,10),dpi=100)
+    for function,k in zip(functions,[0,3,6,9]):
+        
+        if function == 'filler': 
+            if species == 'PM2.5':
+                function = 'Work Loss Days'
+            else:
+                function = 'School Loss Days'
+                
+        for year,i in zip(years,[1,2,3]):
+            # select data
+            d = df_table.copy()
+            d['Endpoint Group'] = d['Endpoint Group'].astype(str)
+            d = d.loc[d['Pollutant'] == species].loc[d['Endpoint Group'] == function]
+            d = d.sort_values(by='DEQ', ascending=False).reset_index(drop=True) # Sort by DEQ for consistency
+            d = d.loc[d['Year'] == year]#.head(20)
+            
+            labels = d['County Name']
+            x = np.arange(len(d['County Name']))  # the label locations
+            width = 0.35  # the width of the bars
+            size= 25
+            j = i+k
+            ax = fig.add_subplot(4,3,j)
+            
+            d = d.dropna(subset=['DEQ','mod_'+year,'mon_'+year])
+            rects1 = ax.scatter(d['DEQ'],d['mod_'+year], label='Model',s=size,alpha = 0.7)
+            rects2 = ax.scatter(d['DEQ'],d['mon_'+year], label='Monitor',s=size, alpha = 0.7)
+            
+            # find best fit line and run stats
+            z1 = np.polyfit(d['DEQ'],d['mod_'+year], 1)
+            z2 = np.polyfit(d['DEQ'],d['mon_'+year], 1)
+            mod_stats = stats_version(d, 'mod_'+year, 'DEQ')
+            mod_stats = mod_stats.rename(columns={'mod_'+year:'Model_'+year+'_'+species+ '_'+function})
+            mon_stats = stats_version(d, 'mon_'+year, 'DEQ')
+            mon_stats = mon_stats.rename(columns={'mon_'+year:'Monitor_'+year+'_'+species + '_'+function})
+            health_stats = pd.merge(health_stats,mon_stats, left_index=True,right_index=True)
+            health_stats = pd.merge(health_stats,mod_stats, left_index=True,right_index=True)
+            
+            r2_mod = mod_stats['Model_'+year+'_'+species+ '_'+function][9]
+            r2_mon = mon_stats['Monitor_'+year+'_'+species+ '_'+function][9]
+            text_string = '\n'.join((
+                r'Mod $%.2f$' % (r2_mod, ),
+                r'Mon $%.2f$' % (r2_mon, )))
+
+
+            # place a text box in upper right in axes coords
+            ax.text(0.6, 0.25, text_string, transform=ax.transAxes,
+            verticalalignment='top')#, bbox=props)
+
+            plt.plot([-200, 20000000], [-200, 20000000], 'k-',linewidth=0.7)
+
+            ax.set_xlim(0, max(d['mod_'+year]))
+            ax.set_ylim(0, max(d['mod_'+year]))
+            ax.set_aspect('equal')
+            #Label plot
+            if j ==1:
+                ax.legend()
+                ax.set_title('2016')
+            if j ==2:
+                ax.set_title('2017')
+            if j==3:
+                ax.set_title('2018')
+            if j == 11:
+                ax.set_xlabel('DEQ')
+                
+            if i ==1:                
+                ax.set_ylabel(function)
+
+            #else:
+                #plt.xticks(x, '', rotation='vertical')
+            #ax.tick_params(axis='x', which='both', length=0)
+
+    fig.tight_layout()
+    function_save = function.replace(" ", "_")
+    plt.savefig(plotDir + 'scatter/'+species+'_scatter.png')
+    plt.show()
+health_stats = health_stats.T
+health_stats = health_stats.drop(['Observation 98th','Forecast 98th','NMB [%]','NME [%]'],axis=1)
+#%%
+# Print total values
+years = ['2016','2017','2018']
+metrics= ['mod_2016','mod_2017','mod_2018','mon_2016','mon_2017','mon_2018','DEQ']
+for species in pollutants:
+    print(species)
+    for year in years:
+        print(year)
+        for metric in metrics:
+            try:
+                print(sum(df_table.loc[df_table['Pollutant'] == species].loc[df_table['Endpoint Group'] == 'Mortality'].loc[df_table['Year'] == year].dropna(subset=[metric])[metric]))
+            except:
+                continue
+#%%
+
+
+
+# Print total values
+years = ['2016','2017','2018']
+metrics= ['pollutant_model','pollutant_monitor','pollutant_DEQ']
+for species in pollutants:
+    print(species)
+    for year in years:
+        print(year)
+        for metric in metrics:
+            try:
+                print(np.mean(df_table.loc[df_table['Pollutant'] == species].loc[df_table['Endpoint Group'] == 'Mortality'].loc[df_table['Year'] == year].dropna(subset=[metric])[metric]))
+            except:
+                continue
+
+
+#%%
+# =============================================================================
+# Plot all things - DEQ, Model, Monitor
+# =============================================================================
+
+
+
+
+# Plotting section
+#fig.suptitle('2018 PNW PM$_{2.5}$ Health Impacts',y=0.93,fontsize=20,ha='center') # title
+#
+#fig.text(0.06, 0.5, 'Latitude', va='center', rotation='vertical')
+#fig.text(0.5, 0.09, 'Longitude', va='center', ha = 'center')
+#fig.text(0.265, 0.82, 'Incidence', va='center', ha = 'center',fontsize=18)
+#fig.text(0.685, 0.82, '% Incidence', va='center', ha = 'center',fontsize=18)
+
+
+
+endpoints = ['Mortality'] # sets the endpoints we are looking at
+pollutants = ['PM2.5']
+# Add subplots
+for pollutant in pollutants:
+    for endpoint in endpoints:
+        fig = plt.figure(figsize=(6,4),dpi=150)
+        for year,i,j,k in zip(years,[1,2,3],[4,5,6],[7,8,9]):  
+            
+            # Colorbar
+            #divider = make_axes_locatable(ax)
+            cax = divider.append_axes("right", size="5%", pad=0.2) # depends on the user needs
+            alpha = 0.7
+            linewidth = 1
+            
+        
+            d = df_table.copy()
+            d = pd.merge(d,counties)
+            d = gpd.GeoDataFrame(d)
+            
+            
+            vmax = 250
+            vmin = 0
+                 
+            ax = fig.add_subplot(3,3,i)
+            plt.title(year)
+            im = d.loc[d['Endpoint Group'] == endpoint].loc[d['Pollutant'] == pollutant].dropna(subset=['mon_'+year]).plot(column='mon_'+year, cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
+            states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,linewidth=linewidth,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+            
+            ax = fig.add_subplot(3,3,j)
+            #plt.title(year)
+            im = d.loc[d['Endpoint Group'] == endpoint].loc[d['Pollutant'] == pollutant].dropna(subset=['mod_'+year]).plot(column='mod_'+year, cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
+            states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,linewidth=linewidth,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+            
+            ax = fig.add_subplot(3,3,k)
+            #plt.title(year)
+            im = d.loc[d['Endpoint Group'] == endpoint].loc[d['Pollutant'] == pollutant].dropna(subset=['DEQ']).plot(column='DEQ', cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
+            states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,linewidth=linewidth,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+            
+    
+        #fig.tight_layout() # spaces the plots out a bit
+        plt.show()
+        plt.close()
+d = pd.merge(df_table,counties)
+d.to_csv(r'E:\Research\Benmap\output/df_table.csv')

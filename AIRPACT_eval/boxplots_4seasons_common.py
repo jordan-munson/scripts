@@ -310,6 +310,9 @@ for species in pollutant:
     set_box_color(bpl, 'red')
     set_box_color(bpr, 'black')
     ax.grid(False)
+    plt.plot([], c='Red', label='Forecast')
+    plt.plot([], c='Black', label='Observation')
+    plt.legend()
     
     
     
@@ -362,7 +365,7 @@ for species in pollutant:
     set_box_color(bpr, 'black')
     plt.plot([], c='Red', label='Forecast')
     plt.plot([], c='Black', label='Observation')
-    plt.legend()
+    
     
     # Removex ticks
     plt.tick_params(
