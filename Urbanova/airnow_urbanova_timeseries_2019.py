@@ -30,8 +30,8 @@ day='01'
 month = '01' 
 year  = '2019' 
 
-endday = '11'
-endmonth='07'
+endday = '01'
+endmonth='10'
 endyear='2019'
 
 end_year=int(endyear)
@@ -244,8 +244,8 @@ for pollutant in species:
     #df_tseries = df_tseries.dropna(subset = ['pollutant'])
 
     # Set plot parameters
-    mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-    mpl.rcParams['font.size'] = 20.0
+    mpl.rcParams['font.family'] = 'calibri'  # the font used for all labelling/text
+    mpl.rcParams['font.size'] = 10.0
     mpl.rcParams['xtick.major.size']  = 10
     mpl.rcParams['xtick.major.width'] = 2
     mpl.rcParams['xtick.minor.size']  = 5
@@ -291,7 +291,7 @@ for pollutant in species:
     t2 = pd.to_datetime(t2)
 #Plot
 
-    fig,ax=plt.subplots(1,1, figsize=(12,4))
+    fig,ax=plt.subplots(1,1, figsize=(7.5,4),dpi=300)
             
     d.ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'blue', 'red'], label=['OBS', 'sens', 'base'])
 # =============================================================================
@@ -342,7 +342,7 @@ for pollutant in species:
     #print(df_tseries)
     
 # Scatter plots
-    fig,ax=plt.subplots(1,1, figsize=(8,8))
+    fig,ax=plt.subplots(1,1, figsize=(6,6),dpi=300)
     #d = df_tseries.copy()
     #d=d.set_index('datetime')
     #d = d.resample('D').mean()
@@ -394,7 +394,7 @@ for pollutant in species:
     plt.savefig(inputDir +'/airnow/scatter_plots/scatter_'+abrv+'_'+ year +month +day+ '-' + endyear + endmonth + endday+'.pdf', pad_inches=0.1, bbox_inches='tight')
     plt.close()
     
-    fig,ax=plt.subplots(1,1, figsize=(8,8))
+    fig,ax=plt.subplots(1,1, figsize=(6,6),dpi=300)
     #d = df_tseries.copy()
     #d=d.set_index('datetime')
     #d = d.resample('D').mean()

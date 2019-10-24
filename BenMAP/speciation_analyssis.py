@@ -183,7 +183,7 @@ inc_or_per = ['incidence']#,'percent']
 for iop in inc_or_per:
     #for species in pollutants:   
             function = 'Speciation'
-            fig = plt.figure(figsize=(7.5,6),dpi=100)
+            fig = plt.figure(figsize=(7.5,6),dpi=300)
             
             for year,i in zip(years,[1,2,3]):
                 # select data
@@ -218,15 +218,35 @@ for iop in inc_or_per:
                 
                 
                 
-                d1 = d1.sort_values(by='Concentration', ascending=False).reset_index(drop=True) # Sort by DEQ for consistency                
-                d1 = d1.head(20).sort_values(by='County Name', ascending=True)  
-                county_names = d1['County Name']
-                county_names=pd.DataFrame(county_names).head(20) # need the head, otherwise there is an odd last row
-                county_names['State Name'] = d1['State Name']
-                d2 = pd.merge(d2,county_names).sort_values(by='County Name', ascending=True) # This ensures the same counties are used
-                d3 = pd.merge(d3,county_names).sort_values(by='County Name', ascending=True)
-                d4 = pd.merge(d4,county_names).sort_values(by='County Name', ascending=True)
-                d5 = pd.merge(d5,county_names).sort_values(by='County Name', ascending=True)
+                d1 = d1.sort_values(by='Concentration', ascending=False).reset_index(drop=True) # Sort by DEQ for consistency  
+                print(d1.loc[d1['County Name']=='Grant'].loc[d1['State Name'] == 'Washington'])
+                # Select same counties as in the PM2.5 barplot
+                county_names = ['King', 'Pierce', 'Snohomish', 'Multnomah', 'Ada', 'Spokane', 'Washington', 'Clackamas', 'Clark',
+                                'Yakima', 'Marion', 'Canyon', 'Lane', 'Thurston', 'Kitsap', 'Benton', 'Jackson', 'Kootenai',
+                                'Whatcom', 'Deschutes']
+                county_names1 = county_names.copy()
+                county_names = pd.DataFrame(county_names).rename(columns={0:'County Name'})
+
+                d1 = pd.merge(d1,county_names).sort_values(by='County Name', ascending=True).reset_index(drop=True).drop(1).set_index('County Name').reindex(county_names1).reset_index()
+                d2 = pd.merge(d2,county_names).sort_values(by='County Name', ascending=True).reset_index(drop=True).drop(1).set_index('County Name').reindex(county_names1).reset_index() # This ensures the same counties are used
+                d3 = pd.merge(d3,county_names).sort_values(by='County Name', ascending=True).reset_index(drop=True).drop(1).set_index('County Name').reindex(county_names1).reset_index()
+                d4 = pd.merge(d4,county_names).sort_values(by='County Name', ascending=True).reset_index(drop=True).drop(1).set_index('County Name').reindex(county_names1).reset_index()
+                d5 = pd.merge(d5,county_names).sort_values(by='County Name', ascending=True).reset_index(drop=True).drop(1).set_index('County Name').reindex(county_names1).reset_index()
+                
+# =============================================================================
+#                 d1 = d1.set_index('County Name')
+#                 d1 = d1.reindex(county_names1)
+# =============================================================================
+# =============================================================================
+#                 d1 = d1.head(20).sort_values(by='County Name', ascending=True)  
+#                 county_names = d1['County Name']
+#                 county_names=pd.DataFrame(county_names).head(20) # need the head, otherwise there is an odd last row
+#                 county_names['State Name'] = d1['State Name']
+#                 d2 = pd.merge(d2,county_names).sort_values(by='County Name', ascending=True) # This ensures the same counties are used
+#                 d3 = pd.merge(d3,county_names).sort_values(by='County Name', ascending=True)
+#                 d4 = pd.merge(d4,county_names).sort_values(by='County Name', ascending=True)
+#                 d5 = pd.merge(d5,county_names).sort_values(by='County Name', ascending=True)
+# =============================================================================
 # =============================================================================
 #                 d2 = d2.sort_values(by='Concentration', ascending=False).reset_index(drop=True) # Sort by DEQ for consistency                
 #                 d2 = d2.head(20)
@@ -237,21 +257,34 @@ for iop in inc_or_per:
 #                 d5 = d5.sort_values(by='Concentration', ascending=False).reset_index(drop=True) # Sort by DEQ for consistency                
 #                 d5 = d5.head(20)
 # =============================================================================
-                ymax = max(d1['Concentration'])
+                ymax = 7 #max(d4['Concentration'])
                 labels = d1['County Name']
                 x = np.arange(len(d1['Col']))  # the label locations
                 
-                width = 0.35  # the width of the bars
+                width = 0.8  # the width of the bars
                 
                 ax = fig.add_subplot(3,1,i)
-                dist = 1.3
+                dist = 0.3
                 if iop == 'incidence':
-                    rects1 = ax.bar(x - width/dist, d1['Concentration'], width, label='AECIJ')
-                    rects2 = ax.bar(x - width/dist/2, d2['Concentration'], width, label='ANH4IJ')
-                    rects3 = ax.bar(x, d3['Concentration'], width, label='ANO3IJ')
-                    rects4 = ax.bar(x + width/dist/2, d2['Concentration'], width, label='APOCIJ')
-                    rects5 = ax.bar(x + width/dist, d2['Concentration'], width, label='ASO4IJ')
-                    ax.set_ylim(0, ymax+1)
+# =============================================================================
+#                     rects1 = ax.bar(x - dist, d4['Concentration'], width, label='APOCIJ')
+#                     rects2 = ax.bar(x - dist/2, d3['Concentration'], width, label='ANO3IJ')
+#                     rects3 = ax.bar(x, d5['Concentration'], width, label='ASO4IJ')
+#                     rects4 = ax.bar(x + dist/2, d1['Concentration'], width, label='AECIJ')
+#                     rects5 = ax.bar(x + dist, d2['Concentration'], width, label='ANH4IJ')
+# =============================================================================
+                    d1 = d1['Concentration'].reset_index(drop=True)
+                    d2 = d2['Concentration'].reset_index(drop=True)
+                    d3 = d3['Concentration'].reset_index(drop=True)
+                    d4 = d4['Concentration'].reset_index(drop=True)
+                    d5 = d5['Concentration'].reset_index(drop=True)
+                    
+                    rects1 = ax.bar(x, d4, width, label='OC')
+                    rects2 = ax.bar(x, d3, width, label='NO3',bottom = d4 )
+                    rects3 = ax.bar(x, d5, width, label='SO4',bottom = d4+d3)
+                    rects4 = ax.bar(x, d1, width, label='EC',bottom =d4+d3+d5)
+                    rects5 = ax.bar(x, d2, width, label='NH4',bottom =d4+d3+d5+d1)
+                    ax.set_ylim(0, ymax)
                 else:
                     rects1 = ax.bar(x - width/1.5, d['mod_'+year]/d['Population']*100, width, label='Model')
                     rects2 = ax.bar(x, d['mon_'+year]/d['Population']*100, width, label='Monitor')
@@ -262,7 +295,8 @@ for iop in inc_or_per:
                 
                 #Label plot
                 if i ==1:
-                    ax.legend()
+                    ax.legend(bbox_to_anchor=(1, 1), loc='upper left', ncol=1)
+                    #plt.legend(bbox_to_anchor=(0, 1), loc='upper left', ncol=1)
                     ax.set_title('2016 (a)')
                 if i ==2:
                     ax.set_ylabel('\u03BCg m$^{-3}$')
@@ -274,7 +308,7 @@ for iop in inc_or_per:
                     plt.xticks(x, '', rotation='vertical')
                 ax.tick_params(axis='x', which='both', length=0)
     
-            #fig.tight_layout()
+            fig.tight_layout()
             plt.savefig(plotDir + 'barplots/'+'speciation'+'_'+iop+'_barplot.png')
             plt.show()
 #%%

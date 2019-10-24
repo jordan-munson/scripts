@@ -103,6 +103,15 @@ df_pm25 = df_pm25.drop(['Time GMT'],axis='columns')
 df_pm25['Date GMT'] = pd.to_datetime(df_pm25['Date GMT'])
 df_pm25["Date GMT"] = df_pm25["Date GMT"].apply(lambda x: x - dt.timedelta(hours=8)) #Adjust to PST
 
+grant = df_pm25.copy()
+grant = grant.loc[grant['County Name']=='Grant']
+grant_2016 = grant.loc[grant['Year']=='2016']
+grant_2017 = grant.loc[grant['Year']=='2017']
+grant_2018 = grant.loc[grant['Year']=='2018']
+grant_2016 = grant_2016['Sample Measurement'].mean()
+grant_2017 = grant_2017['Sample Measurement'].mean()
+grant_2018 = grant_2018['Sample Measurement'].mean()
+
 print(df_wa['Parameter Name'].unique())
 print(df_or['Parameter Name'].unique())
 print(df_id['Parameter Name'].unique())

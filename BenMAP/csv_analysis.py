@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
+import matplotlib.colors as colors
+from shapely.geometry import Point
 
 inputDir = r'C:/Users/riptu/Documents/My BenMAP-CE Files/Result/APVR/AIRPACT/'
 thesisDir = r'C:/Users/riptu/Documents/My BenMAP-CE Files/Result/APVR/thesis/'
@@ -431,6 +433,7 @@ df_states = gpd.GeoDataFrame(df_states)
 df_states['Col'] = df_states['Col'].drop_duplicates()
 df_states = df_states.dropna()
 
+
 # Plotting section
 fig = plt.figure(dpi=100,figsize=(7.5,7))
 fig.suptitle('PNW PM$_{2.5}$ Mortality',y=0.94,fontsize=12,ha='center') # title
@@ -453,37 +456,37 @@ alpha = 0.5
 
 # Add subplots
 ax = fig.add_subplot(3,3,7)
-plt.title('2018 Monitor')
+plt.title('2018 AQS')
 im = df_counties.loc[df_counties['Year'] == '2018'].plot(column='Monitor', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 ax = fig.add_subplot(3,3,4)
-plt.title('2017 Monitor')
+plt.title('2017 AQS')
 im = df_counties.loc[df_counties['Year'] == '2017'].plot(column='Monitor', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 im.axes.get_xaxis().set_visible(False)
 states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 ax = fig.add_subplot(3,3,1)
-plt.title('2016 Monitor')
+plt.title('2016 AQS')
 im = df_counties.loc[df_counties['Year'] == '2016'].plot(column='Monitor', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 im.axes.get_xaxis().set_visible(False)
 states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 ax = fig.add_subplot(3,3,8)
-plt.title('2018 Model')
+plt.title('2018 AIRPACT')
 im = df_counties.loc[df_counties['Year'] == '2018'].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 im.axes.get_yaxis().set_visible(False)
 states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 ax = fig.add_subplot(3,3,5)
-plt.title('2017 Model')
+plt.title('2017 AIRPACT')
 im = df_counties.loc[df_counties['Year'] == '2017'].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 im.axes.get_yaxis().set_visible(False)
 im.axes.get_xaxis().set_visible(False)
 states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
 
 ax = fig.add_subplot(3,3,2)
-plt.title('2016 Model')
+plt.title('2016 AIRPACT')
 im = df_counties.loc[df_counties['Year'] == '2016'].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=False,ax=ax,vmin=vmin,vmax=vmax)
 im.axes.get_yaxis().set_visible(False)
 im.axes.get_xaxis().set_visible(False)
@@ -527,8 +530,8 @@ fig.suptitle('Mortality in the PNW due to PM$_{2.5}$',y=0.97,fontsize=20,ha='cen
 fig.tight_layout() # spaces the plots out a bit
 fig.text(0.06, 0.5, 'Latitude', va='center', rotation='vertical')
 fig.text(0.5, 0.09, 'Longitude', va='center', ha = 'center')
-fig.text(0.30, 0.92, 'Monitor', va='center', ha = 'center',fontsize=18)
-fig.text(0.72, 0.92, 'Model', va='center', ha = 'center',fontsize=18)
+fig.text(0.30, 0.92, 'AQS', va='center', ha = 'center',fontsize=18)
+fig.text(0.72, 0.92, 'AIRPACT', va='center', ha = 'center',fontsize=18)
 
 # Colorbar
 divider = make_axes_locatable(ax)
@@ -563,7 +566,7 @@ fig.suptitle('PM$_{2.5}$ in the PNW',y=0.97,fontsize=20,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
 fig.text(0.06, 0.5, 'Latitude', va='center', rotation='vertical')
 fig.text(0.5, 0.09, 'Longitude', va='center', ha = 'center')
-fig.text(0.30, 0.92, 'Monitor', va='center', ha = 'center',fontsize=18)
+fig.text(0.30, 0.92, 'AQS', va='center', ha = 'center',fontsize=18)
 fig.text(0.72, 0.92, 'AP-5', va='center', ha = 'center',fontsize=18)
 
 # Colorbar
@@ -692,8 +695,8 @@ df_mon = gpd.GeoDataFrame(df_mon) # needs to be a GeoDataframe
 fig = plt.figure(figsize=(10,12))#dpi=100)
 fig.suptitle('2018 PNW AQ Health Impacts',y=0.93,fontsize=20,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
-fig.text(0.06, 0.75, 'Latitude', va='center', rotation='vertical')
-fig.text(0.5, 0.09, 'Longitude', va='center', ha = 'center')
+#fig.text(0.06, 0.75, 'Latitude', va='center', rotation='vertical')
+#fig.text(0.5, 0.09, 'Longitude', va='center', ha = 'center')
 fig.text(0.265, 0.9, 'PM$_{2.5}$', va='center', ha = 'center',fontsize=18)
 fig.text(0.685, 0.9, 'Ozone', va='center', ha = 'center',fontsize=18)
 
@@ -726,10 +729,11 @@ for endpoint, i, j in zip(endpoints,[1,3,5,7],[2,4,6,8]):
     plt.title(endpoint)
     im = df_mod.loc[df_mod['Endpoint Group'] == endpoint].loc[df_mod['Pollutant'] == 'PM2.5'].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
     states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
-
+    im.axes.get_xaxis().set_visible(False)
+    im.axes.get_yaxis().set_visible(False)
     # Set colorbar max/mins
     if i == 1: # mortality
-        vmax = 60
+        vmax = 250#60
         vmin = 0
     if i == 3: # Asthma
         vmax = 10000
@@ -746,7 +750,8 @@ for endpoint, i, j in zip(endpoints,[1,3,5,7],[2,4,6,8]):
     plt.title(endpoint)
     im = df_mod.loc[df_mod['Endpoint Group'] == endpoint].loc[df_mod['Pollutant'] == 'Ozone'].plot(column='Model', cmap=cmap, edgecolor=edgecolor, legend=True,ax=ax,vmin=vmin,vmax=vmax)
     states = df_states.plot(column = 'zeros',cmap='Greys', legend=False,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
-
+    im.axes.get_xaxis().set_visible(False)
+    im.axes.get_yaxis().set_visible(False)
 plt.show()
 plt.close()
 
@@ -948,14 +953,44 @@ df_table1 = pd.concat([df_model_2016,df_model_2017,df_model_2018]).drop(['Row','
 df_table = pd.merge(df_table,df_table1,on=['State Name','County Name','Year','Population','Endpoint Group','Pollutant'],how='outer')
 df_table = pd.merge(df_table,df_deq,on=['State Name','County Name','Population','Endpoint Group','Pollutant'],how='outer')
 df_table['Pollutant'] = df_table['Pollutant'].replace('PM2.5 ','PM2.5') # Some have an extra space at the end for some reason..
+#%%
+# =============================================================================
+# # Format data that does not lose sites like merging with siteid does
+# =============================================================================
+# load in data
+df_deq = pd.read_csv(inputDir + 'deq_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index().rename(columns={"Point Estimate": "DEQ",'Delta':'pollutant_DEQ'})
 
+df_model_2016 = pd.read_csv(thesisDir + '2016_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index().rename(columns={"Point Estimate": "mod_2016",'Delta':'pollutant_model'})
+df_model_2017 = pd.read_csv(thesisDir + '2017_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index().rename(columns={"Point Estimate": "mod_2017",'Delta':'pollutant_model'})
+df_model_2018 = pd.read_csv(thesisDir + '2018_model_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index().rename(columns={"Point Estimate": "mod_2018",'Delta':'pollutant_model'})
+
+df_monitor_2016 = pd.read_csv(thesisDir + '2016_monitor_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index().rename(columns={"Point Estimate": "mon_2016",'Delta':'pollutant_monitor'})
+df_monitor_2017 = pd.read_csv(thesisDir + '2017_monitor_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index().rename(columns={"Point Estimate": "mon_2017",'Delta':'pollutant_monitor'})
+df_monitor_2018 = pd.read_csv(thesisDir + '2018_monitor_csv.CSV').drop(drop_list,axis=1).sort_values(by=['Col','Row'], ascending=False).reset_index(drop=True).set_index('Col').drop([56,6,32,49,30]).reset_index().rename(columns={"Point Estimate": "mon_2018",'Delta':'pollutant_monitor'})
+
+# Add column with year
+df_model_2016['Year'] = '2016'
+df_model_2017['Year'] = '2017'
+df_model_2018['Year'] = '2018'
+df_monitor_2016['Year'] = '2016'
+df_monitor_2017['Year'] = '2017'
+df_monitor_2018['Year'] = '2018'
+
+#combine data
+df_table_inclusive = pd.concat([df_monitor_2016,df_monitor_2017,df_monitor_2018])#.drop(['Row','Col'],axis=1)
+df_table1 = pd.concat([df_model_2016,df_model_2017,df_model_2018])#.drop(['Row','Col'],axis=1)
+df_table_inclusive = pd.merge(df_table_inclusive,df_table1,on=['Year','Population','Endpoint Group','Pollutant','Col','Row'],how='outer')
+df_table_inclusive = pd.merge(df_table_inclusive,df_deq,on=['Population','Endpoint Group','Pollutant','Col','Row'],how='outer')
+df_table_inclusive['Pollutant'] = df_table_inclusive['Pollutant'].replace('PM2.5 ','PM2.5') # Some have an extra space at the end for some reason..
+
+df_table_inclusive.to_csv(r'E:\Research\Benmap\output/df_table_inclusive.csv')
 
 #%%
 # =============================================================================
 # Plot df_table
 # =============================================================================
 # Barplot
-functions = ['Mortality','Asthma Exacerbation','Emergency Room Visits  Respiratory','filler']
+functions = ['Mortality']#,'Asthma Exacerbation','Emergency Room Visits  Respiratory','filler']
 pollutants = ['PM2.5', 'Ozone']
 years = ['2016','2017','2018']
 inc_or_per = ['incidence']#,'percent']
@@ -968,7 +1003,7 @@ for iop in inc_or_per:
                     function = 'Work Loss Days'
                 else:
                     function = 'School Loss Days'
-            fig = plt.figure(figsize=(7.5,6),dpi=100)
+            fig = plt.figure(figsize=(6,6),dpi=300)
             
             for year,i in zip(years,[1,2,3]):
                 # select data
@@ -976,11 +1011,13 @@ for iop in inc_or_per:
                 d['Endpoint Group'] = d['Endpoint Group'].astype(str)
                 d = d.loc[d['Pollutant'] == species].loc[d['Endpoint Group'] == function]
                 d = d.sort_values(by='DEQ', ascending=False).reset_index(drop=True) # Sort by DEQ for consistency
-                ymax = max(max(d['mod_2016'].dropna()),max(d['mod_2017'].dropna()),max(d['mod_2018'].dropna()))
+                ymax = (max(max(d['mon_2016'].dropna()),max(d['mon_2017'].dropna()),max(d['mon_2018'].dropna()))+max(max(d['mod_2016'].dropna()),max(d['mod_2017'].dropna()),max(d['mod_2018'].dropna()))+max(max(d['DEQ'].dropna()),max(d['DEQ'].dropna()),max(d['DEQ'].dropna())))*1.01 # Base this on DEQ as it is high
+                ymax = max(max(d['mod_2016'].dropna()),max(d['mod_2017'].dropna()),max(d['mod_2018'].dropna()),max(d['mon_2016'].dropna()),max(d['mon_2017'].dropna()),max(d['mon_2018'].dropna()),max(d['DEQ'].dropna()),max(d['DEQ'].dropna()),max(d['DEQ'].dropna()))
                 if iop == 'incidence':
                     
                     d1 = d.loc[d['Year'] == year].head(20)
                     top_counties = d1['County Name'].to_list()
+                    #print(top_counties)
                     d2 = d.loc[d['Year'] == year]
                     #print(d2.sum())
                     for name in top_counties:
@@ -991,12 +1028,21 @@ for iop in inc_or_per:
                     d2['County Name'] = 'Residual' # rename, otherwise a massive combined name is here and messes up the plot
                     
                     d = d.loc[d['Year'] == year].head(20)
-                    d = pd.concat([d,d2])
+                    #d = pd.concat([d,d2])
+                    
+                    # Set up textbox string for residual incidence
+                    rounding = -1
+                    d2_mod = int(round(d2['mod_'+year][0],rounding))
+                    d2_mon = int(round(d2['mon_'+year][0],rounding))
+                    d2_deq = int(round(d2['DEQ'][0],rounding))
+                    textstr = '\n'.join((
+                                r'Residual Incidence',
+                                r'AIRPACT=%.0f' % (d2_mod, ),
+                                r'AQS=%.0f' % (d2_mon, ),
+                                r'DEQ=%.0f' % (d2_deq, )))
                     #print(d.sum())
                     
-                    ymax = max(max(d['mon_2016'].dropna()),max(d['mon_2017'].dropna()),max(d['mon_2018'].dropna()),
-                               max(d['mod_2016'].dropna()),max(d['mod_2017'].dropna()),max(d['mod_2018'].dropna()),
-                               max(d['DEQ'].dropna()),max(d['DEQ'].dropna()),max(d['DEQ'].dropna())) # Base this on DEQ as it is high
+
                 else:
                     d = d.loc[d['Year'] == year].head(20)
                 
@@ -1005,26 +1051,42 @@ for iop in inc_or_per:
                 width = 0.35  # the width of the bars
                 
                 ax = fig.add_subplot(3,1,i)
+                mod = d['mod_'+year].reset_index(drop=True)
+                mon = d['mon_'+year].reset_index(drop=True)
+                deq = d['DEQ'].reset_index(drop=True)
                 
                 if iop == 'incidence':
-                    rects1 = ax.bar(x - width/1.5, d['mod_'+year], width, label='Model')
-                    rects2 = ax.bar(x, d['mon_'+year], width, label='Monitor')
+                    rects1 = ax.bar(x - width/1.5, d['mod_'+year], width, label='AIRPACT')
+                    rects2 = ax.bar(x, d['mon_'+year], width, label='AQS')
                     rects3 = ax.bar(x + width/1.5, d['DEQ'], width, label='DEQ')
                     ax.set_ylim(0, ymax+10)
+# =============================================================================
+#                     rects1 = ax.bar(x, mod, width, label='Model')
+#                     rects2 = ax.bar(x, mon, width, label='Monitor', bottom = mod)
+#                     rects3 = ax.bar(x, deq, width, label='DEQ', bottom = mon+mod )
+#                     ax.set_ylim(0,ymax)    
+# =============================================================================
                 else:
-                    rects1 = ax.bar(x - width/1.5, d['mod_'+year]/d['Population']*100, width, label='Model')
-                    rects2 = ax.bar(x, d['mon_'+year]/d['Population']*100, width, label='Monitor')
+                    rects1 = ax.bar(x - width/1.5, d['mod_'+year]/d['Population']*100, width, label='AIRPACT')
+                    rects2 = ax.bar(x, d['mon_'+year]/d['Population']*100, width, label='AQS')
                     rects3 = ax.bar(x + width/1.5, d['DEQ']/d['Population']*100, width, label='DEQ')
                     ax.set_ylim(0, .07) # .13 for PM mortality, 0.07 for Ozone
-                    
+                # PLace a textbox of residuals
+                props = dict(boxstyle='round', facecolor='white', alpha=0)
+                ax.text(0.8, 0.9, textstr, transform=ax.transAxes, #fontsize=14,
+                        verticalalignment='top', bbox=props, horizontalalignment='center')
                 
                 
                 #Label plot
                 if i ==1:
-                    ax.legend()
+                    ax.legend(loc='upper center')
                     ax.set_title('2016 (a)')
                 if i ==2:
-                    ax.set_ylabel(species +' '+function)
+                    if species =='PM2.5':
+                        ax.set_ylabel('PM$_{2.5}$ ' +function)
+                    else:
+                        ax.set_ylabel(species +' '+function)
+                    
                     ax.set_title('2017 (b)')
                 if i ==3:
                     plt.xticks(x, labels, rotation='vertical')
@@ -1064,7 +1126,7 @@ years = ['2016','2017','2018']
 inc_or_per = ['percent']
 for iop in inc_or_per:
     for species in pollutants:  
-        fig = plt.figure(figsize=(7.5,6),dpi=100)
+        fig = plt.figure(figsize=(6.5,6),dpi=200)
         for year,i in zip(years,[1,2,3]):
             ax = fig.add_subplot(3,1,i)
             
@@ -1074,17 +1136,49 @@ for iop in inc_or_per:
             d['Endpoint Group'] = d['Endpoint Group'].astype(str)
             d = d.loc[d['Pollutant'] == species]
             d = d.sort_values(by='DEQ', ascending=False).reset_index(drop=True) # Sort by DEQ for consistency
+            
+            
+            # Calculate total health impact values
+            mortality =pd.DataFrame(d.loc[d['Endpoint Group']=='Mortality'].sum()).T
+            asthma = pd.DataFrame(d.loc[d['Endpoint Group']=='Asthma Exacerbation'].sum()).T
+            emergency = pd.DataFrame(d.loc[d['Endpoint Group']=='Emergency Room Visits  Respiratory'].sum()).T
+            if species == 'Ozone':
+                schoolwork = pd.DataFrame(d.loc[d['Endpoint Group']=='School Loss Days'].sum()).T
+            else:
+                schoolwork = pd.DataFrame(d.loc[d['Endpoint Group']=='Work Loss Days'].sum()).T
+                
+            # select year
             d = d.loc[d['Year'] == year]
-            d = d.loc[d['County Name'] == 'King']
-            labels = d['Endpoint Group'].replace('Emergency Room Visits  Respiratory', 'ER Visits, Respiratory')
-            x = np.arange(len(d['County Name']))  # the label locations
+# =============================================================================
+#             # Plot for King County
+#             d = d.loc[d['County Name'] == 'King']
+# =============================================================================
+            # Find averages of all for each health function
+            d1 = pd.DataFrame(d.loc[d['Endpoint Group']=='Mortality'].mean()).T
+            d1['Endpoint Group'] = 'Mortality'
+            d2 = pd.DataFrame(d.loc[d['Endpoint Group']=='Asthma Exacerbation'].mean()).T
+            d2['Endpoint Group'] = 'Asthma Exacerbation'
+            d3 = pd.DataFrame(d.loc[d['Endpoint Group']=='Emergency Room Visits  Respiratory'].mean()).T
+            d3['Endpoint Group'] = 'Emergency Room Visits  Respiratory'
+            if species == 'Ozone':    
+                d4 = pd.DataFrame(d.loc[d['Endpoint Group']=='School Loss Days'].mean()).T
+                d4['Endpoint Group'] = 'School Loss Days'
+            else:
+                d4 = pd.DataFrame(d.loc[d['Endpoint Group']=='Work Loss Days'].mean()).T
+                d4['Endpoint Group'] = 'Work Loss Days'
+            d= pd.concat([d1,d2,d3,d4])
+            
+            
+            
+            labels = d['Endpoint Group'].replace('Emergency Room Visits  Respiratory', 'ER Visits')
+            x = np.arange(len(d['Endpoint Group']))  # the label locations
             width = 0.35  # the width of the bars
 
             ymax = .1
                 
 
-            rects1 = ax.bar(x - width/1.5, d['mod_'+year]/d['Population']*100, width, label='Model')
-            rects2 = ax.bar(x, d['mon_'+year]/d['Population']*100, width, label='Monitor')
+            rects1 = ax.bar(x - width/1.5, d['mod_'+year]/d['Population']*100, width, label='AIRPACT')
+            rects2 = ax.bar(x, d['mon_'+year]/d['Population']*100, width, label='AQS')
             rects3 = ax.bar(x + width/1.5, d['DEQ']/d['Population']*100, width, label='DEQ')
             #ax.set_ylim(0, ymax) # .13 for PM mortality, 0.07 for Ozone
             
@@ -1108,7 +1202,7 @@ for iop in inc_or_per:
     
         #fig.tight_layout()
         #function_save = function.replace(" ", "_")
-        plt.savefig(plotDir + 'barplots/'+species+'_'+iop+'_king_barplot.png')
+        plt.savefig(plotDir + 'barplots/'+species+'_'+iop+'_cumulative x_barplot.png')
         plt.show()
 
 #%%
@@ -1142,8 +1236,8 @@ for species in pollutants:
             ax = fig.add_subplot(4,3,j)
             
             d = d.dropna(subset=['DEQ','mod_'+year,'mon_'+year])
-            rects1 = ax.scatter(d['DEQ'],d['mod_'+year], label='Model',s=size,alpha = 0.7)
-            rects2 = ax.scatter(d['DEQ'],d['mon_'+year], label='Monitor',s=size, alpha = 0.7)
+            rects1 = ax.scatter(d['DEQ'],d['mod_'+year], label='AIRPACT',s=size,alpha = 0.7)
+            rects2 = ax.scatter(d['DEQ'],d['mon_'+year], label='AQS',s=size, alpha = 0.7)
             
             # find best fit line and run stats
             z1 = np.polyfit(d['DEQ'],d['mod_'+year], 1)
@@ -1199,20 +1293,25 @@ health_stats = health_stats.drop(['Observation 98th','Forecast 98th','NMB [%]','
 # Print total values
 years = ['2016','2017','2018']
 metrics= ['mod_2016','mod_2017','mod_2018','mon_2016','mon_2017','mon_2018','DEQ']
-for species in pollutants:
+for species in ['PM2.5','Ozone']:
+    print(' ')
     print(species)
     for year in years:
         print(year)
         for metric in metrics:
             try:
-                print(sum(df_table.loc[df_table['Pollutant'] == species].loc[df_table['Endpoint Group'] == 'Mortality'].loc[df_table['Year'] == year].dropna(subset=[metric])[metric]))
+                x = sum(df_table.loc[df_table['Pollutant'] == species].loc[df_table['Endpoint Group'] == 'Work Loss Days'].loc[df_table['Year'] == year].dropna(subset=[metric])[metric])
+                if x == 0:
+                    continue
+                else:
+                    print(year + ' '+metric + ' '+str(round(x)))
             except:
                 continue
 #%%
 
 
 
-# Print total values
+# Print total values pollutants
 years = ['2016','2017','2018']
 metrics= ['pollutant_model','pollutant_monitor','pollutant_DEQ']
 for species in pollutants:
@@ -1288,3 +1387,133 @@ for pollutant in pollutants:
         plt.close()
 d = pd.merge(df_table,counties)
 d.to_csv(r'E:\Research\Benmap\output/df_table.csv')
+#%%
+
+# =============================================================================
+# Plot pollutants
+# =============================================================================
+df_table.to_csv(r'E:\Research\Benmap\output/df_table1.csv')
+df_states.to_csv(r'E:\Research\Benmap\output/df_states.csv')
+# format county lines a bit to plot empty
+county_lines = counties.copy()
+county_lines['zeros'] = 0
+county_lines = pd.merge(df_table,county_lines)
+county_lines.to_csv(r'E:\Research\Benmap\output/county_lines.csv')
+county_lines = gpd.GeoDataFrame(county_lines)
+
+# Load in spatial data from BenMAP
+deq_ozone = gpd.read_file(r'C:\Users\riptu\Documents\My BenMAP-CE Files\Result\APVR\AIRPACT\pollutant_shapefiles/deq_ozone.shp')
+model_ozone = gpd.read_file(r'C:\Users\riptu\Documents\My BenMAP-CE Files\Result\APVR\AIRPACT\pollutant_shapefiles/airpact_ozone.shp')
+monitor_ozone = gpd.read_file(r'C:\Users\riptu\Documents\My BenMAP-CE Files\Result\APVR\AIRPACT\pollutant_shapefiles/monitor_ozone.shp')
+
+deq_pm = gpd.read_file(r'C:\Users\riptu\Documents\My BenMAP-CE Files\Result\APVR\AIRPACT\pollutant_shapefiles/deq_pm.shp')
+model_pm = gpd.read_file(r'C:\Users\riptu\Documents\My BenMAP-CE Files\Result\APVR\AIRPACT\pollutant_shapefiles/model_pm.shp')
+monitor_pm = gpd.read_file(r'C:\Users\riptu\Documents\My BenMAP-CE Files\Result\APVR\AIRPACT\pollutant_shapefiles/monitor_pm.shp')
+
+#urb_grid = gpd.read_file(r'C:\Users\riptu\Documents\My BenMAP-CE Files\Result\APVR\AIRPACT\pollutant_shapefiles/urbanova.shp')
+
+#
+
+
+datasets=['AIRPACT','AQS','DEQ']
+pollutants = ['Ozone','PM2.5']
+year = '2017' # Note, only have saved 2017 like this so far. Would need to change the lines above that load in files to get different year
+for pollutant in pollutants:
+    print(pollutant)
+    if pollutant == 'Ozone':
+        species = 'o3_'
+    else:
+        species = ''
+    # Load file containing AQS site lat/lon
+    aqs_sites = pd.read_csv(r'E:/Research/Benmap/AQS_data/daily_'+species+'aqs_formatted_'+year+'.csv')
+    aqs_sites['Monitor Name'] = aqs_sites['Monitor Name'].str[:2]
+    aqs_wa = aqs_sites[aqs_sites['Monitor Name'].str.contains("53")]
+    aqs_or = aqs_sites[aqs_sites['Monitor Name'].str.contains("41")]
+    aqs_id = aqs_sites[aqs_sites['Monitor Name'].str.contains("16")]
+    aqs_sites = pd.concat([aqs_wa,aqs_or,aqs_id])
+    aqs_sites = gpd.GeoDataFrame(aqs_sites)
+    geometry = [Point(xy) for xy in zip(aqs_sites.Longitude,aqs_sites.Latitude)]
+    aqs_sites = gpd.GeoDataFrame(aqs_sites,geometry=geometry)
+    aqs_sites = aqs_sites.drop(['Metric','Seasonal Metric','Statistic','Values'],axis=1)
+    
+    fig = plt.figure(figsize=(6.5,6.5),dpi=300)
+    for dataset,i in zip(datasets,[1,2,3]):
+        cax = divider.append_axes("right", size="5%", pad=0.2) # depends on the user needs
+        alpha = 0.7
+        linewidth = .3
+        
+        if pollutant == 'Ozone':
+            name = 'D8HourMax'
+            unit = '[ppb]'
+            vmax = 75
+            vmin = 20
+            
+            if dataset == 'DEQ':
+                d = deq_ozone.copy()
+                
+                label = dataset + ' (c)'
+            if dataset == 'AIRPACT':
+                d = model_ozone.copy()
+                label = dataset + ' (a)'
+                
+            if dataset == 'AQS':
+                d = monitor_ozone.copy()
+                label = dataset + ' (b)'
+                
+        else:
+            name = 'D24HourMean'
+            unit = '\u03BCg m$^{-3}$'
+            vmax = 25
+            vmin = 0
+            
+            if dataset == 'DEQ':
+                d = deq_pm.copy()
+                label = dataset + ' (c)'
+            if dataset == 'AIRPACT':
+                d = model_pm.copy()
+                label = dataset + ' (a)'
+            if dataset == 'AQS':
+                d = monitor_pm.copy()
+                label = dataset + ' (b)'
+        d = gpd.GeoDataFrame(d)
+        
+
+             
+        ax = fig.add_subplot(3,1,i)
+        plt.title(label)
+        im = d.dropna(subset=[name]).plot(column=name, cmap=cmap, legend=False,ax=ax,vmin=vmin,vmax=vmax,linewidth=1, edgecolor='face')
+        states = df_states.plot(column = 'zeros',cmap='hot', legend=False,linewidth=linewidth+.2,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)
+        states = county_lines.plot(column = 'zeros',cmap='hot', legend=False,linewidth=linewidth,ax=ax,vmin=vmin,vmax=vmax,facecolor='none',edgecolor='black',alpha=alpha)        
+        if dataset == 'AQS':
+            aqs_sites.plot(ax=ax,markersize=3,color='blue',edgecolor='white',linewidth=.3,marker='o',label='AQS sites')
+        ax.set_axis_off()
+        
+        
+        #set-up colorbar
+        norm = colors.Normalize(vmin=vmin, vmax=vmax)
+        cbar = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
+        
+        # add colorbar
+        ax_cbar = fig.colorbar(cbar, ax=ax)
+        # add label for the colorbar
+        ax_cbar.set_label(unit)
+# =============================================================================
+#         if i == 2:
+#             # add colorbar
+#             ax_cbar = fig.colorbar(cbar, ax=ax)
+#             # add label for the colorbar
+#             ax_cbar.set_label(unit)
+#         else:
+#             # add colorbar
+#             ax_cbar = fig.colorbar(cbar, ax=ax,alpha=0)
+#             ax_cbar.outline.set_visible(False)
+#             ax_cbar.set_ticks([])
+# =============================================================================
+
+        
+    fig.tight_layout() # spaces the plots out a bit
+    plt.savefig(plotDir + 'maps/'+pollutant+'_'+year+'_map.png')
+    plt.show()
+    plt.close()
+
+

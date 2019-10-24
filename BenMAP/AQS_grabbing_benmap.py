@@ -12,8 +12,8 @@ import datetime as dt
 
 base_dir = r'E:/Research/Benmap/'
 
-species = ['o3'] #['pm_FRM/FEM','pm_non_FRM/FEM']# when changing bacl, don't forget to rename the save file line
-species_code = ['44201'] # ['88101','88502']
+species =  ['pm_FRM/FEM','pm_non_FRM/FEM']#['o3']# when changing bacl, don't forget to rename the save file line
+species_code =  ['88101','88502'] # ['44201']
 
 start_year = 2016 
 end_year = start_year+1
@@ -29,7 +29,7 @@ end_year = start_year+1
 # =============================================================================
 def aqs(begining,ending):
     AQS={}
-    for i in range(0,1):
+    for i in range(0,len(species_code)):
         print(species[i])
         for j in range(begining,ending):
             dataframename = species[i]+str(j)
@@ -47,7 +47,7 @@ def aqs(begining,ending):
     AQS_df = AQS_df.drop(['Parameter Code','POC','Datum','Time Local','Date Local','MDL','Uncertainty',
                           'Qualifier','Method Type','Method Code','Method Name','Date of Last Change'], axis=1)
    
-    AQS_df.to_csv(base_dir+'AQS_data/aqs_o3_benmap'+'_'+str(begining)+'.csv')
+    AQS_df.to_csv(base_dir+'AQS_data/aqs_pm_benmap'+'_'+str(begining)+'.csv')
 
 aqs(start_year,end_year)
 print('AQS Download done')
@@ -85,7 +85,7 @@ print('AQS Download done')
 # =============================================================================
 # Hourly
 # =============================================================================
-df = pd.read_csv(base_dir+'AQS_data/aqs_o3_benmap_'+str(start_year)+'.csv',parse_dates=[['Date GMT', 'Time GMT']]).drop(['Parameter Name','Units of Measure','State Name','County Name','Unnamed: 0','Unnamed: 1'],axis=1)
+df = pd.read_csv(base_dir+'AQS_data/aqs_pm_benmap_'+str(start_year)+'.csv',parse_dates=[['Date GMT', 'Time GMT']]).drop(['Parameter Name','Units of Measure','State Name','County Name','Unnamed: 0','Unnamed: 1'],axis=1)
 df = df.rename(columns={'Date GMT_Time GMT': 'Date GMT'})
 df['Date GMT'] = pd.to_datetime(df['Date GMT'])
 df["Date GMT"] = df["Date GMT"].apply(lambda x: x - dt.timedelta(hours=8)) #Adjust to PST
@@ -179,7 +179,7 @@ for sites in mysites:
     df_c = df_c.append(df_a)
 
 df_c = df_c.drop(['Date GMT'],axis=1)
-df_c.to_csv(base_dir + 'AQS_data/daily_o3_aqs_formatted'+'_'+str(start_year)+'.csv',index=False, encoding='utf-8-sig')
+df_c.to_csv(base_dir + 'AQS_data/daily_pm_aqs_formatted'+'_'+str(start_year)+'.csv',index=False, encoding='utf-8-sig')
 
 
 #%%

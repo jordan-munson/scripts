@@ -998,7 +998,7 @@ for version in versions:
     df_mod1 = df_mod1.reset_index(drop=True)
     df_mod1['version'] = version
     
-
+    df_mod1['AQSID'] = df_mod1['AQSID'].astype(str)
         
     # If there is no site data, this skips the site and moves to the next
     '''
@@ -1012,11 +1012,11 @@ for version in versions:
     
     for species in pollutant:
         print(species)
-        df_mod1['AQSID'] = df_mod1['AQSID'].astype(str)
+        
         if species == 'O3': # only use sites common
-            df_mod1 = pd.merge(df_mod1,df_aqsid_o3,on='AQSID')
+            x = pd.merge(df_mod1,df_aqsid_o3,on='AQSID')
         else:
-            df_mod1 = pd.merge(df_mod1,df_aqsid_pm,on='AQSID')
+            x = pd.merge(df_mod1,df_aqsid_pm,on='AQSID')
             
 # =============================================================================
 #         # section below creates the "common" AQSID dataframes. Necessary to keep in case new data is ever introduced
@@ -1037,10 +1037,10 @@ for version in versions:
 #                 
 # =============================================================================
                 
-        df_mod1['species'] = species
+        x['species'] = species
         var_name = str(species+'_obs')
         
-        x=df_mod1.copy().ix[:,[species+'_obs',species+'_mod','datetime']]
+        x=x.ix[:,[species+'_obs',species+'_mod','datetime']]
         x = x.set_index('datetime') # Set datetime column as index
         
         #var_units = mw_data['UNITS'][var_name]

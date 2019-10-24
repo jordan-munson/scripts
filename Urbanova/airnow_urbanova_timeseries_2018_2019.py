@@ -31,8 +31,8 @@ day='11'
 month = '01' 
 year  = '2018' 
 
-endday = '11'#'31'
-endmonth='07'#'12'
+endday = '1'#'31'
+endmonth='10'#'12'
 endyear='2019'
 
 end_year=int(endyear)
@@ -135,6 +135,7 @@ g = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 g.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 g = g.drop(0,1)
 species = ['PM2.5','OZONE','CO','NO2']
+stats_combined = pd.DataFrame()
 for pollutant in species:
     if pollutant == 'PM2.5':
         abrv = 'PM2.5'
@@ -235,8 +236,8 @@ for pollutant in species:
     #df_tseries = df_tseries.dropna(subset = ['pollutant'])
 
     # Set plot parameters
-    mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-    mpl.rcParams['font.size'] = 20.0
+    mpl.rcParams['font.family'] = 'calibri'  # the font used for all labelling/text
+    mpl.rcParams['font.size'] = 10.0
     mpl.rcParams['xtick.major.size']  = 10
     mpl.rcParams['xtick.major.width'] = 2
     mpl.rcParams['xtick.minor.size']  = 5
@@ -282,7 +283,7 @@ for pollutant in species:
     t2 = pd.to_datetime(t2)
 #Plot
 
-    fig,ax=plt.subplots(1,1, figsize=(12,4))
+    fig,ax=plt.subplots(1,1, figsize=(7.5,4),dpi=300)
             
     d.ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'green', 'red'], label=['OBS', 'sens', 'base'])
     plt.axvline(dt.datetime(2018, 5, 11),color = 'green')
@@ -292,7 +293,7 @@ for pollutant in species:
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
     ax.set_ylabel(abrv+' '+unit)
     ax.set_xlabel('')
-    ax.legend(['OBS', 'AP5_4km', 'AP5_1.33km'], fontsize=12)
+    ax.legend(['OBS', 'AP5_4km', 'AP5_1.33km'], fontsize=10)
     ax.set_ylim(0,y_max)
     ax.yaxis.grid(True) # horizontal lines
     fig.autofmt_xdate()
@@ -309,7 +310,7 @@ for pollutant in species:
         aq_stats_4km = stats_version(d1, abrv+'_AP5_4km', abrv+'_obs')
         aq_stats_1p33km = stats_version(d1, abrv+'_AP5_1.33km', abrv+'_obs')
         aq_stats = pd.merge(aq_stats_1p33km, aq_stats_4km, how = 'inner', left_index = True, right_index = True)
-        stats_combined = pd.concat([aq_stats],axis=1,join_axes=[aq_stats.index])        
+        stats_combined = pd.concat([stats_combined,aq_stats],axis=1,join_axes=[aq_stats.index])        
      
     #Drop some stats to put on plots
 #        aq_stats = aq_stats.drop('MB',0)        
@@ -330,7 +331,7 @@ for pollutant in species:
     #print(df_tseries)
     
 # Scatter plots
-    fig,ax=plt.subplots(1,1, figsize=(8,8))
+    fig,ax=plt.subplots(1,1, figsize=(6,6),dpi=300)
     #d = df_tseries.copy()
     #d=d.set_index('datetime')
     #d = d.resample('D').mean()
@@ -355,7 +356,7 @@ for pollutant in species:
     plt.close()
     
 # Scatter plots 1.33km vs 4km
-    fig,ax=plt.subplots(1,1, figsize=(8,8))
+    fig,ax=plt.subplots(1,1, figsize=(6,6),dpi=300)
     #d = df_tseries.copy()
     #d=d.set_index('datetime')
     #d = d.resample('D').mean()
