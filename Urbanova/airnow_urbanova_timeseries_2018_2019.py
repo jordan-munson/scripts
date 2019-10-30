@@ -290,7 +290,8 @@ for pollutant in species:
     plt.axvline(dt.datetime(2018, 12, 21),color = 'green')
     
     ax.set_title(t_title)
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
+    #ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %y'))
+    print(d.head())
     ax.set_ylabel(abrv+' '+unit)
     ax.set_xlabel('')
     ax.legend(['OBS', 'AP5_4km', 'AP5_1.33km'], fontsize=10)
