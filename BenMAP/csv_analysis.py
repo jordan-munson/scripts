@@ -1010,7 +1010,7 @@ for iop in inc_or_per:
                 d = df_table.copy()
                 d['Endpoint Group'] = d['Endpoint Group'].astype(str)
                 d = d.loc[d['Pollutant'] == species].loc[d['Endpoint Group'] == function]
-                d = d.sort_values(by='DEQ', ascending=False).reset_index(drop=True) # Sort by DEQ for consistency
+                d = d.sort_values(by='Population', ascending=False).reset_index(drop=True) # Sort by DEQ for consistency
                 ymax = (max(max(d['mon_2016'].dropna()),max(d['mon_2017'].dropna()),max(d['mon_2018'].dropna()))+max(max(d['mod_2016'].dropna()),max(d['mod_2017'].dropna()),max(d['mod_2018'].dropna()))+max(max(d['DEQ'].dropna()),max(d['DEQ'].dropna()),max(d['DEQ'].dropna())))*1.01 # Base this on DEQ as it is high
                 ymax = max(max(d['mod_2016'].dropna()),max(d['mod_2017'].dropna()),max(d['mod_2018'].dropna()),max(d['mon_2016'].dropna()),max(d['mon_2017'].dropna()),max(d['mon_2018'].dropna()),max(d['DEQ'].dropna()),max(d['DEQ'].dropna()),max(d['DEQ'].dropna()))
                 if iop == 'incidence':
