@@ -134,7 +134,7 @@ exec(open(stats_dir +"statistical_functions.py").read())
 g = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 g.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 g = g.drop(0,1)
-species = ['PM2.5','OZONE','CO','NO2']
+species = ['PM2.5','OZONE']#,'CO','NO2']
 stats_combined = pd.DataFrame()
 for pollutant in species:
     if pollutant == 'PM2.5':
@@ -237,7 +237,7 @@ for pollutant in species:
 
     # Set plot parameters
     mpl.rcParams['font.family'] = 'calibri'  # the font used for all labelling/text
-    mpl.rcParams['font.size'] = 10.0
+    mpl.rcParams['font.size'] = 20.0
     mpl.rcParams['xtick.major.size']  = 10
     mpl.rcParams['xtick.major.width'] = 2
     mpl.rcParams['xtick.minor.size']  = 5
@@ -286,15 +286,15 @@ for pollutant in species:
     fig,ax=plt.subplots(1,1, figsize=(7.5,4),dpi=300)
             
     d.ix[:,[abrv+'_obs', abrv+'_AP5_4km', abrv+'_AP5_1.33km']].plot(kind='line', style='-', ax=ax, color=['black', 'green', 'red'], label=['OBS', 'sens', 'base'])
-    plt.axvline(dt.datetime(2018, 5, 11),color = 'green')
-    plt.axvline(dt.datetime(2018, 12, 21),color = 'green')
+    plt.axvline(dt.datetime(2018, 5, 11),color = 'blue')
+    plt.axvline(dt.datetime(2018, 12, 21),color = 'blue')
     
     ax.set_title(t_title)
     #ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d %y'))
     print(d.head())
     ax.set_ylabel(abrv+' '+unit)
     ax.set_xlabel('')
-    ax.legend(['OBS', 'AP5_4km', 'AP5_1.33km'], fontsize=10)
+    ax.legend(['AirNow', 'AP-5', 'Urbanova'] ,fontsize=16)
     ax.set_ylim(0,y_max)
     ax.yaxis.grid(True) # horizontal lines
     fig.autofmt_xdate()

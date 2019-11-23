@@ -22,8 +22,9 @@ exec(open(stat_path).read())
 
 
 # Set plot parameters
+dpi = 300
 mpl.rcParams['font.family'] = 'calibri'  # the font used for all labelling/text
-mpl.rcParams['font.size'] = 10 # 10 for paper. 28 for presentations
+mpl.rcParams['font.size'] = 28 # 10 for paper. 28 for presentations
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
 mpl.rcParams['xtick.minor.size']  = 5
@@ -111,7 +112,7 @@ percent_mortality['Total'] = percent_mortality['WA'] + percent_mortality['OR'] +
 legend_x = 1.1
 # Begin plotting
 # Plotting section
-fig = plt.figure(figsize=(7.5,7),dpi=100)
+fig = plt.figure(figsize=(10,10),dpi=dpi)
 fig.suptitle('Longterm PM$_{2.5}$ Mortality',y=0.95,fontsize=18,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
 
@@ -435,7 +436,7 @@ df_states = df_states.dropna()
 
 
 # Plotting section
-fig = plt.figure(dpi=100,figsize=(7.5,7))
+fig = plt.figure(dpi=dpi,figsize=(10,10))
 fig.suptitle('PNW PM$_{2.5}$ Mortality',y=0.94,fontsize=12,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
 fig.text(0.06, 0.5, 'Latitude', va='center', rotation='vertical')
@@ -525,7 +526,7 @@ highest_county_mort_z = pd.merge(df_z.loc[df_z['Year']=='2017'].sort_values(by='
 # =============================================================================
 # # Plotting section for model vs monitor
 # =============================================================================
-fig = plt.figure(figsize=(7.5,7),dpi=100)
+fig = plt.figure(figsize=(10,10),dpi=dpi)
 fig.suptitle('Mortality in the PNW due to PM$_{2.5}$',y=0.97,fontsize=20,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
 fig.text(0.06, 0.5, 'Latitude', va='center', rotation='vertical')
@@ -561,7 +562,7 @@ plt.close()
 # =============================================================================
 # # Plotting section for model vs monitor
 # =============================================================================
-fig = plt.figure(figsize=(7.5,7),dpi=100)
+fig = plt.figure(figsize=(10,10),dpi=dpi)
 fig.suptitle('PM$_{2.5}$ in the PNW',y=0.97,fontsize=20,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
 fig.text(0.06, 0.5, 'Latitude', va='center', rotation='vertical')
@@ -692,7 +693,7 @@ df_mon = pd.merge(monitor_2018,counties) # Merging eliminates the rest of the co
 df_mon = gpd.GeoDataFrame(df_mon) # needs to be a GeoDataframe
 
 # Plotting section
-fig = plt.figure(figsize=(10,12))#dpi=100)
+fig = plt.figure(figsize=(10,12),dpi=dpi)
 fig.suptitle('2018 PNW AQ Health Impacts',y=0.93,fontsize=20,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
 #fig.text(0.06, 0.75, 'Latitude', va='center', rotation='vertical')
@@ -762,7 +763,7 @@ plt.close()
 # =============================================================================
 
 # Plotting section
-fig = plt.figure(figsize=(7.5,10))#dpi=100)
+fig = plt.figure(figsize=(10,12),dpi=dpi)
 fig.suptitle('2018 PNW PM$_{2.5}$ Health Impacts',y=1.02,fontsize=20,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
 fig.text(0.06, 0.75, 'Latitude', va='center', rotation='vertical')
@@ -829,7 +830,7 @@ plt.close()
 # =============================================================================
 
 # Plotting section
-fig = plt.figure(figsize=(6,4),dpi=150)
+fig = plt.figure(figsize=(12,10),dpi=dpi)
 #fig.suptitle('2018 PNW PM$_{2.5}$ Health Impacts',y=0.93,fontsize=20,ha='center') # title
 #fig.text(0.06, 0.5, 'Latitude', va='center', rotation='vertical')
 #fig.text(0.5, 0.09, 'Longitude', va='center', ha = 'center')
@@ -880,7 +881,7 @@ df_mod['Pollutant'] = df_mod['Pollutant'].replace('PM2.5 ','PM2.5') # Asthma Exa
 df_mod['Endpoint Group'] = df_mod['Endpoint Group'].replace('Emergency Room Visits  Respiratory','Emergency Room Visits') # Asthma Exacerbation for some reason had a tailing space at the end... this removes that
 
 # Plotting section
-fig = plt.figure(figsize=(6,4),dpi=150)
+fig = plt.figure(figsize=(12,10),dpi=dpi)
 #fig.suptitle('2018 PNW PM$_{2.5}$ Health Impacts',y=0.93,fontsize=20,ha='center') # title
 fig.tight_layout() # spaces the plots out a bit
 #fig.text(0.06, 0.5, 'Latitude', va='center', rotation='vertical')
@@ -947,9 +948,6 @@ df_monitor_2016['Year'] = '2016'
 df_monitor_2017['Year'] = '2017'
 df_monitor_2018['Year'] = '2018'
 
-# Fix AIRPACT baseline incidence error
-#df_model_2017['mod_2017'] = df_model_2017.loc[df_model_2017['Pollutant'] == 'Ozone']['mod_2017']*0.42 # fix baseline incidence calculation
-
 #combine data
 df_table = pd.concat([df_monitor_2016,df_monitor_2017,df_monitor_2018])#.drop(['Row','Col'],axis=1)
 df_table1 = pd.concat([df_model_2016,df_model_2017,df_model_2018]).drop(['Row','Col'],axis=1)
@@ -1006,7 +1004,7 @@ for iop in inc_or_per:
                     function = 'Work Loss Days'
                 else:
                     function = 'School Loss Days'
-            fig = plt.figure(figsize=(6,6),dpi=300)
+            fig = plt.figure(figsize=(10,10),dpi=dpi)
             
             for year,i in zip(years,[1,2,3]):
                 # select data
@@ -1053,15 +1051,14 @@ for iop in inc_or_per:
                 x = np.arange(len(d['County Name']))  # the label locations
                 width = 0.35  # the width of the bars
                 
-                ax = fig.add_subplot(3,1,i)
-                # fix airpact baseline incidence issue
+                # Fix AIRPACT baseline incidence issue
                 if species == 'Ozone' and year == '2017':
                     print(year,species)
                     d['mod_2017'] = d['mod_2017']*0.42
                 if species == 'Ozone' and year == '2018':
                     print(year,species)
-                    d['mod_2018'] = d['mod_2018']*0.42
-
+                    d['mod_2018'] = d['mod_2018']*0.42                
+                ax = fig.add_subplot(3,1,i)
                 mod = d['mod_'+year].reset_index(drop=True)
                 mon = d['mon_'+year].reset_index(drop=True)
                 deq = d['DEQ'].reset_index(drop=True)
@@ -1137,7 +1134,7 @@ years = ['2016','2017','2018']
 inc_or_per = ['percent']
 for iop in inc_or_per:
     for species in pollutants:  
-        fig = plt.figure(figsize=(6.5,6),dpi=200)
+        fig = plt.figure(figsize=(10,10),dpi=dpi)
         for year,i in zip(years,[1,2,3]):
             ax = fig.add_subplot(3,1,i)
             
@@ -1213,10 +1210,10 @@ for iop in inc_or_per:
                 ax.set_ylabel('Incidence' +' [%]')
                 ax.set_title('2017 (b)')
             if i ==3:
-                plt.xticks(x, labels)
+                plt.xticks(x, labels,rotation=20)
                 ax.set_title('2018 (c)')
             else:
-                plt.xticks(x, '', rotation='vertical')
+                plt.xticks(x, '', rotation=30)
             ax.tick_params(axis='x', which='both', length=0)
     
         #fig.tight_layout()
@@ -1230,7 +1227,7 @@ for iop in inc_or_per:
 health_stats = pd.DataFrame(['Forecast Mean','Observatio Mean','MB','ME','FB [%]','FE [%]','NMB [%]','NME [%]','RMSE','R^2 [-]','Forecast 98th','Observation 98th'])
 health_stats = health_stats.set_index(0)
 for species in pollutants:  
-    fig = plt.figure(figsize=(7.5,10),dpi=100)
+    fig = plt.figure(figsize=(10,12),dpi=dpi)
     for function,k in zip(functions,[0,3,6,9]):
         
         if function == 'filler': 
@@ -1254,8 +1251,6 @@ for species in pollutants:
             j = i+k
             ax = fig.add_subplot(4,3,j)
             
-            d = d.dropna(subset=['DEQ','mod_'+year,'mon_'+year])
-            
             # fix airpact baseline incidence issue
             if species == 'Ozone' and year == '2017':
                 print(year,species)
@@ -1263,7 +1258,8 @@ for species in pollutants:
             if species == 'Ozone' and year == '2018':
                 print(year,species)
                 d['mod_2018'] = d['mod_2018']*0.42
-                    
+            
+            d = d.dropna(subset=['DEQ','mod_'+year,'mon_'+year])
             rects1 = ax.scatter(d['DEQ'],d['mod_'+year], label='AIRPACT',s=size,alpha = 0.7)
             rects2 = ax.scatter(d['DEQ'],d['mon_'+year], label='AQS',s=size, alpha = 0.7)
             
@@ -1376,7 +1372,7 @@ pollutants = ['PM2.5']
 # Add subplots
 for pollutant in pollutants:
     for endpoint in endpoints:
-        fig = plt.figure(figsize=(6,4),dpi=150)
+        fig = plt.figure(figsize=(12,10),dpi=dpi)
         for year,i,j,k in zip(years,[1,2,3],[4,5,6],[7,8,9]):  
             
             # Colorbar
@@ -1464,7 +1460,7 @@ for pollutant in pollutants:
     aqs_sites = gpd.GeoDataFrame(aqs_sites,geometry=geometry)
     aqs_sites = aqs_sites.drop(['Metric','Seasonal Metric','Statistic','Values'],axis=1)
     
-    fig = plt.figure(figsize=(6.5,6.5),dpi=300)
+    fig = plt.figure(figsize=(14,10),dpi=dpi)
     for dataset,i in zip(datasets,[1,2,3]):
         cax = divider.append_axes("right", size="5%", pad=0.2) # depends on the user needs
         alpha = 0.7
@@ -1479,14 +1475,14 @@ for pollutant in pollutants:
             if dataset == 'DEQ':
                 d = deq_ozone.copy()
                 
-                label = dataset + ' (c)'
+                label = dataset
             if dataset == 'AIRPACT':
                 d = model_ozone.copy()
-                label = dataset + ' (a)'
+                label = dataset
                 
             if dataset == 'AQS':
                 d = monitor_ozone.copy()
-                label = dataset + ' (b)'
+                label = dataset
                 
         else:
             name = 'D24HourMean'
@@ -1496,13 +1492,13 @@ for pollutant in pollutants:
             
             if dataset == 'DEQ':
                 d = deq_pm.copy()
-                label = dataset + ' (c)'
+                label = dataset
             if dataset == 'AIRPACT':
                 d = model_pm.copy()
-                label = dataset + ' (a)'
+                label = dataset
             if dataset == 'AQS':
                 d = monitor_pm.copy()
-                label = dataset + ' (b)'
+                label = dataset
         d = gpd.GeoDataFrame(d)
         
 

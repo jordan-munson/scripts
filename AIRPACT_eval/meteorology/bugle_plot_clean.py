@@ -21,13 +21,14 @@ outputdir = r'E:/Research/AIRPACT_eval/plots/bugle'
 df_stats = pd.read_csv(inputdir+'aqs_version_stats.csv')#.drop(['Unnamed: 0'],axis=1)
 
 # Seperate types
-df_o3 = df_stats.loc[df_stats['index']=='O3_mod_hourly']
-df_o3_dm8a = df_stats.loc[df_stats['index']=='O3_mod']
+df_o3 = df_stats.loc[df_stats['index']=='O3_mod_hourly'].drop(14)
+df_o3_dm8a = df_stats.loc[df_stats['index']=='O3_mod'].drop(12)
 df_o3_tot = df_o3.append(df_o3_dm8a)
-df_pm = df_stats.loc[df_stats['index']=='PM2.5_mod_hourly']
-df_pm_daily = df_stats.loc[df_stats['index']=='PM2.5_mod']
+df_pm = df_stats.loc[df_stats['index']=='PM2.5_mod_hourly'].drop(15)
+df_pm_daily = df_stats.loc[df_stats['index']=='PM2.5_mod'].drop(13)
+
 # Set plot parameters
-mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
+mpl.rcParams['font.family'] = 'calibri'  # the font used for all labelling/text
 mpl.rcParams['font.size'] = 20.0
 mpl.rcParams['xtick.major.size']  = 10
 mpl.rcParams['xtick.major.width'] = 2
@@ -42,6 +43,9 @@ mpl.rcParams['xtick.direction']   = 'in'
 
 figsize = (6,4)
 legend_loc = 'upper right'
+
+criteria_ls = '-'
+goal_ls = ':'
 #%%
 # Plot
 
@@ -58,8 +62,8 @@ ax.set(title='PM$_{2.5}$',xlabel='Mean',ylabel='FB (%)')
 # Add color to the plot, colors signifying which site type
 colors = ['r','g','b']
 
-ax.scatter(df_pm['Mean'],df_pm['FB'],c=colors, marker = 'o', label = 'Hourly')
-ax.scatter(df_pm_daily['Mean'],df_pm_daily['FB'],c=colors, marker = 'D',label='Daily')
+ax.scatter(df_pm['Forecast Mean'],df_pm['FB [%]'],c=colors, marker = 'o', label = 'Hourly')
+ax.scatter(df_pm_daily['Forecast Mean'],df_pm_daily['FB [%]'],c=colors, marker = 'D',label='Daily')
 
 
 # Define props
@@ -90,13 +94,13 @@ def graph(func, x_range,color,ls,label):
    
 
 # Criteria lines
-graph(lambda x: 70*(np.power(0.3, x))+60, (0,11),'black','-.','Criteria') # Top
-graph(lambda x: -70*(np.power(0.3, x))-60, (0,11),'black','-.','') # Bottom
+graph(lambda x: 70*(np.power(0.3, x))+60, (0,11),'black',criteria_ls,'Criteria') # Top
+graph(lambda x: -70*(np.power(0.3, x))-60, (0,11),'black',criteria_ls,'') # Bottom
 
 # Goal lines
-graph(lambda x: 70*(np.power(0.3, x))+30, (0,11),'black','--','Goal') # Top
-graph(lambda x: -70*(np.power(0.3, x))-30, (0,11),'black','--','') # Bottom
-ax.text(-0.13, 1.08,'A',fontsize = 20, ha='right', va='center', transform=ax.transAxes)
+graph(lambda x: 70*(np.power(0.3, x))+30, (0,11),'black',goal_ls,'Goal') # Top
+graph(lambda x: -70*(np.power(0.3, x))-30, (0,11),'black',goal_ls,'') # Bottom
+#ax.text(-0.13, 1.08,'A',fontsize = 20, ha='right', va='center', transform=ax.transAxes)
 
 plt.legend(prop={'size': 14},loc = 'upper left')
 fig.savefig(outputdir + '/airpact_bugle_version_pm.png' ,bbox_inches='tight')
@@ -115,8 +119,8 @@ ax.set(title='Ozone',xlabel='Mean',ylabel='FB (%)')
 # Add color to the plot, colors signifying which site type
 colors = ['r','g','b']
 
-ax.scatter(df_o3['Mean'],df_o3['FB'],c=colors, marker = 'o',label='Hourly')
-ax.scatter(df_o3_dm8a['Mean'],df_o3_dm8a['FB'],c=colors, marker = 'D',label='DM8HA')
+ax.scatter(df_o3['Forecast Mean'],df_o3['FB [%]'],c=colors, marker = 'o',label='Hourly')
+ax.scatter(df_o3_dm8a['Forecast Mean'],df_o3_dm8a['FB [%]'],c=colors, marker = 'D',label='DM8A')
 ax.legend()
 #ax.scatter(df_o3_tot['Mean'],df_o3_tot['FB'],c=colors, marker = 'o',label='')
 
@@ -144,15 +148,15 @@ plt.grid(b=None, which='major', axis='y')
 line_lim = 70
 # Criteria lines
 criteria = 30
-graph(lambda x: 70*(np.power(0.3, x))+criteria, (0,line_lim),'black','-.','Criteria') # Top
-graph(lambda x: -70*(np.power(0.3, x))-criteria, (0,line_lim),'black','-.','') # Bottom
+graph(lambda x: 70*(np.power(0.3, x))+criteria, (0,line_lim),'black',criteria_ls,'Criteria') # Top
+graph(lambda x: -70*(np.power(0.3, x))-criteria, (0,line_lim),'black',criteria_ls,'') # Bottom
 
 # Goal lines
 goal = 15
-graph(lambda x: 70*(np.power(0.3, x))+goal, (0,line_lim),'black','--','Goal') # Top
-graph(lambda x: -70*(np.power(0.3, x))-goal, (0,line_lim),'black','--','') # Bottom
+graph(lambda x: 70*(np.power(0.3, x))+goal, (0,line_lim),'black',goal_ls,'Goal') # Top
+graph(lambda x: -70*(np.power(0.3, x))-goal, (0,line_lim),'black',goal_ls,'') # Bottom
 
-ax.text(-0.13, 1.08,'A',fontsize = 20, ha='right', va='center', transform=ax.transAxes)
+#ax.text(-0.13, 1.08,'A',fontsize = 20, ha='right', va='center', transform=ax.transAxes)
 
 legend  = plt.legend(prop={'size': 14},loc = 'upper left')
 fig.savefig(outputdir + '/airpact_bugle_version_o3.png' ,bbox_inches='tight')

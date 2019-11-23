@@ -143,7 +143,7 @@ g = pd.DataFrame(['Forecast Mean', 'Observation Mean', 'MB','ME','FB [%]','FE [%
 g.index = ['Forecast Mean', 'Observation Mean', 'MB','ME','FB [%]','FE [%]',"NMB [%]", "NME [%]", "RMSE", "R^2 [-]",'Forecast 98th','Observation 98th']
 g = g.drop(0,1)
 
-species = ['PM2.5','OZONE','CO','NO2']
+species = ['PM2.5','OZONE']#,'CO','NO2']
 for pollutant in species:
     if pollutant == 'PM2.5':
         abrv = 'PM2.5'
@@ -155,7 +155,7 @@ for pollutant in species:
         abrv = 'O3'
         unit = '(ppb)'
         y_max = 70
-        t_title = ' O3 Max Daily 8-Hour Average'
+        t_title = ' 2019 DM8A Ozone'
         s_title = t_title
     if pollutant == 'CO':
         abrv = 'CO'
@@ -245,7 +245,7 @@ for pollutant in species:
 
     # Set plot parameters
     mpl.rcParams['font.family'] = 'calibri'  # the font used for all labelling/text
-    mpl.rcParams['font.size'] = 10.0
+    mpl.rcParams['font.size'] = 20.0
     mpl.rcParams['xtick.major.size']  = 10
     mpl.rcParams['xtick.major.width'] = 2
     mpl.rcParams['xtick.minor.size']  = 5
@@ -356,7 +356,8 @@ for pollutant in species:
     ax.set_ylabel('Modeled '+abrv+' '+unit)
     ax.set_xlabel('Observed '+abrv+' '+unit)        
     ax.set_title(s_title) 
-    plt.legend()
+    plt.legend([''])
+    ax.get_legend().remove()
     ax.set_ylim(0,axismax) #axismax
     ax.set_xlim(0,axismax)
     fig.autofmt_xdate()
@@ -407,7 +408,8 @@ for pollutant in species:
     ax.set_ylabel('1.33km '+abrv+' '+unit)
     ax.set_xlabel('4km '+abrv+' '+unit)        
     ax.set_title(s_title) 
-    plt.legend()
+    plt.legend([''])
+    ax.get_legend().remove()
     ax.set_ylim(0,axismax) #axismax
     ax.set_xlim(0,axismax)
     fig.autofmt_xdate()

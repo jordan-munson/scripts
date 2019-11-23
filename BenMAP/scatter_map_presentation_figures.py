@@ -36,7 +36,20 @@ plotDir = inputDir+'plots/'
 stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
 shp_name = r'E:\Research\Benmap\benmap_shapefile_output/Krewski.shp'
 
-
+# Set plot parameters
+dpi = 300
+mpl.rcParams['font.family'] = 'calibri'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 28 # 10 for paper. 28 for presentations
+mpl.rcParams['xtick.major.size']  = 10
+mpl.rcParams['xtick.major.width'] = 2
+mpl.rcParams['xtick.minor.size']  = 5
+mpl.rcParams['xtick.minor.width'] = 1
+mpl.rcParams['ytick.major.size']  = 10
+mpl.rcParams['ytick.major.width'] = 2
+mpl.rcParams['ytick.minor.size']  = 5
+mpl.rcParams['ytick.minor.width'] = 1
+mpl.rcParams['ytick.direction']   = 'in'
+mpl.rcParams['xtick.direction']   = 'in'
 
 # =============================================================================
 # df_table = pd.read_csv(inputDir+'output/df_table.csv').drop('Unnamed: 0',axis=1)
@@ -107,7 +120,7 @@ useproj = projection
 #%%
 for pollutant in pollutants:
     for endpoint in endpoints:
-        fig = plt.figure(figsize=(6,6),dpi=300)
+        fig = plt.figure(figsize=(10,10),dpi=dpi)
         for source,i in zip(['Model','Monitor','DEQ'],[1,2,3]):
             
             #fig, ax = plt.subplots(3, 1, subplot_kw=dict(projection=projection))
@@ -141,7 +154,7 @@ for pollutant in pollutants:
                 d = d.loc[d['Pollutant'] == pollutant].loc[d['Endpoint Group'] == endpoint].loc[d['Col'] == column].loc[d['Row'] == row].reset_index(drop=True)  # .loc[d['Year'] == year]
                 try:
                     d_mon = (d['mon_2016'][0] + d['mon_2017'][1] + d['mon_2018'][2])/3
-                    d_mod = (d['mod_2016'][0] + d['mod_2017'][1]*0.42 + d['mod_2018'][2]*0.42)/3
+                    d_mod = (d['mod_2016'][0] + d['mod_2017'][1] + d['mod_2018'][2])/3
                     d_deq = (d['DEQ'][0] + d['DEQ'][1] + d['DEQ'][2])/3
                     
 # =============================================================================
@@ -221,7 +234,7 @@ for pollutant in pollutants:
 # =============================================================================
 for pollutant in pollutants:
     for endpoint in endpoints:
-        fig = plt.figure(figsize=(6,6),dpi=300)
+        fig = plt.figure(figsize=(10,10),dpi=dpi)
         for source,i in zip(['Model','Monitor','DEQ'],[1,2,3]):
             
             #fig, ax = plt.subplots(3, 1, subplot_kw=dict(projection=projection))
@@ -254,8 +267,8 @@ for pollutant in pollutants:
                 #Locate correct value from df_table
                 d = d.loc[d['Pollutant'] == pollutant].loc[d['Endpoint Group'] == endpoint].loc[d['Col'] == column].loc[d['Row'] == row].reset_index(drop=True)  # .loc[d['Year'] == year]
                 try:
-                    d_mon = d['mon_2018'][2]
-                    d_mod = d['mod_2018'][2]
+                    d_mon = d['mon_2017'][1]
+                    d_mod = d['mod_2017'][1]*0.42
                     d_deq = d['DEQ'][1]
                     
 # =============================================================================
