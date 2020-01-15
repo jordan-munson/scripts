@@ -10,6 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 import matplotlib.dates as mdates
+
 starttime = time.time()
 begin_time = time.time()
 
@@ -34,7 +35,8 @@ begin_time = time.time()
 #Set directory
 inputDir = r'E:/Research/AIRPACT_eval/'
 stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
-ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
+outputDir = r'E:/Research/Benmap/airpact_eval/'
+#ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
 
 exec(open(stat_path).read())
 
@@ -215,12 +217,19 @@ df_com.loc[:,'O3_obs'] = pd.to_numeric(df_com.loc[:,'O3_obs'], errors='coerce')
 df_com.loc[:,'PM2.5_obs'] = pd.to_numeric(df_com.loc[:,'PM2.5_obs'], errors='coerce')
 df_com['datetime'] = pd.to_datetime(df_com['datetime'])
 df_com['AQSID'] = df_com['AQSID'].astype(str)
+
+# =============================================================================
+# Drop data not relavent to BenMAP study
+# =============================================================================
+df_2016 = df_com[pd.to_datetime(df_com['datetime']).dt.year == 2016] # select only 2016
+df_2017 = df_com[pd.to_datetime(df_com['datetime']).dt.year == 2017] # select only 2017
+df_2018 = df_com[pd.to_datetime(df_com['datetime']).dt.year == 2018] # select only 2018
+
+df_com = pd.concat([df_2016,df_2017,df_2018])
+
 # =============================================================================
 # df_aqsid = pd.read_csv(inputDir+'/common_aqsid.csv',dtype=str).drop('Unnamed: 0', axis=1) # load in AQSID that are present for all versions of AIRPACT. This is created later in the script.
 # =============================================================================
-df_aqsid_o3 = pd.read_csv(inputDir+'/o3_aqsid.csv',dtype=str).drop('Unnamed: 0', axis=1) # load in AQSID that are present for all versions of AIRPACT. This is created later in the script.
-df_aqsid_pm = pd.read_csv(inputDir+'/pm_aqsid.csv',dtype=str).drop('Unnamed: 0', axis=1) # load in AQSID that are present for all versions of AIRPACT. This is created later in the script.
-
 
 print('Data loading section done')
 
@@ -228,42 +237,6 @@ stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 stats_com = stats_com.drop(0,1)
 
-#%%
-# =============================================================================
-# Create list of common sites
-# =============================================================================
-
-# create dataframe of common sites
-common_sites = pd.concat([df_aqsid_o3,df_aqsid_pm])
-
-# add pollutant label to sites
-df_aqsid_o3['Pollutant'] = 'Ozone'
-df_aqsid_pm['Pollutant'] = 'PM2.5'
-
-# Load site information
-aqsid = pd.read_csv(inputDir+'aqs_sites.csv')
-aqsid['County Code'] = ["%03d" % n for n in aqsid['County Code'] ]
-aqsid['Site Number'] = ["%04d" % n for n in aqsid['Site Number'] ]
-aqsid['AQSID'] = (aqsid['State Code']).astype(str) + (aqsid['County Code']).astype(str)+(aqsid['Site Number']).astype(str)
-
-# Merge common sites with site information
-common_sites = pd.merge(common_sites,aqsid,on='AQSID')
-
-# drop sites without a site type
-common_sites = common_sites.dropna(subset=['Local Site Name'])
-
-# drop unecessary columns
-common_sites = common_sites.drop(['State Code','County Code','Site Number','Datum','Elevation','Land Use','Site Established Date',
-                                  'Site Closed Date','Met Site State Code','Met Site County Code','Met Site Site Number','Met Site Type','Met Site Distance',
-                                  'Met Site Direction','GMT Offset','Owning Agency','Address','Zip Code','City Name','State Name','County Name','CBSA Name',
-                                  'Tribe Name','Extraction Date'],axis=1)
-
-pm = common_sites.loc[common_sites['Pollutant'] == 'PM2.5']
-print(len(pm))
-pm = pm.reset_index()
-ozone = common_sites.loc[common_sites['Pollutant'] == 'Ozone']
-print(len(ozone))
-ozone = ozone.reset_index()
 #%%
 ##############################################################################
 # Plot the data
@@ -553,43 +526,56 @@ stats_com = stats_com.drop(0,1)
 stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 stats_com = stats_com.drop(0,1)
-settings = ['RURAL', 'SUBURBAN', 'URBAN AND CENTER CITY']
-daymonth = "Month"         
+years = [2016,2017,2018]
+daymonth = 'day'#'Month'         
 pollutant = ['O3','PM2.5']
+
 for species in pollutant:
     da = df_com.copy().dropna(subset=['Location Setting']) # drop data that has no location setting information
     da['AQSID'] = da['AQSID'].astype(str)
-    if species == 'O3':
-        da = pd.merge(da,df_aqsid_o3,on='AQSID')
-    else:
-        da = pd.merge(da,df_aqsid_pm,on='AQSID')
+
     
     fig = plt.figure(dpi=300,figsize=(6.125,7)) # (6.125,7) This is as small as can currently go without having some overlap of labels 14,16 for a presentation size plot
     #fig.suptitle('Monthly Averaged '+str(species),y=0.94,fontsize=27,ha='center') # title
     fig.tight_layout() # spaces the plots out a bit
     
-    for setting,i,abcd in zip(settings,[1,2,3],['(a)','(b)','(c)']):    #list(set(da['Location Setting'])):
+    for year,i,abcd in zip(years,[1,2,3],['(a)','(b)','(c)']):    #list(set(da['Location Setting'])):
         #This section selects only data relevant to the aqs site
-        print('Setting is ' + setting)
-        d = da.loc[da['Location Setting']==setting] # pull data that matches with location setting
+        print('Setting is ' + str(year))
+        d = da.copy()
         
         d=d.reset_index()
-        site_type = d.loc[0,'Location Setting']
         
-        # Determine how many sites are being used
-        temp1 = d.loc[(d['Location Setting'] == setting)].dropna(subset=[species+'_obs'])
-        temp1 = temp1.groupby(['Local Site Name']).count()
-        temp1 = len(temp1.index.get_level_values(0))
-        print(temp1)
-        temp2 = d.loc[(d['Location Setting'] == setting)].dropna(subset=[species+'_mod'])
-        temp2 = temp2.groupby(['Local Site Name']).count()
-        temp2 = len(temp2.index.get_level_values(0))        
-        d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
-        d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
-        #print(dc)
+        # Select specific year of data
+        d=d.set_index('datetime')
+        year = str(year)
+        mask = (d.index > year+'-1-1') & (d.index <= year+'-12-31')
+        d=d.loc[mask]
+                
+# =============================================================================
+#         # Determine how many sites are being used
+#         temp1 = d.loc[(d['Location Setting'] == setting)].dropna(subset=[species+'_obs'])
+#         temp1 = temp1.groupby(['Local Site Name']).count()
+#         temp1 = len(temp1.index.get_level_values(0))
+#         print(temp1)
+#         temp2 = d.loc[(d['Location Setting'] == setting)].dropna(subset=[species+'_mod'])
+#         temp2 = temp2.groupby(['Local Site Name']).count()
+#         temp2 = len(temp2.index.get_level_values(0))        
+#         d=d.ix[:,[species+'_obs',species+'_mod','datetime']]
+#         d['date'] = pd.to_datetime(d['datetime'], infer_datetime_format=True) #format="%m/%d/%y %H:%M")
+#         #print(dc)
+# =============================================================================
+        
+        
+        
+# =============================================================================
+#         Changed to daily values here. To "undo this" comment out the MD8A portion, change the "resample" to 'M'
+#         reset the 'set_ylim', then comment out the 'linewidth' and 'alpha' portion of the plotting line. Simple-ish
+#         Code could be written to allow both to plot at the same time, but for now this is simpler.
+# =============================================================================
         
         d=d.ix[:,[species+'_obs',species+'_mod','datetime']] # new for the daily conversion
-        d = d.set_index('datetime') 
+        #d = d.set_index('datetime') 
         
         #Calculate mb and fb
         #dc = d.groupby(d.date.dt.year)
@@ -604,49 +590,64 @@ for species in pollutant:
                 avg_8hr_o3 = d.rolling(8,min_periods=6).mean()
                 times = avg_8hr_o3.index.values - pd.Timedelta('8h')
                 avg_8hr_o3.index.values[:] = times
-                d = avg_8hr_o3.resample('D').max().dropna()
+                d = avg_8hr_o3.resample('D', convention='start').max()#.dropna(subset=['O3_obs','O3_mod'])
+                print(max(d['O3_obs']),max(d['O3_mod']))
             else:
                 d = d.resample('D', convention='start').mean() # this was the original line for the monthly plot, just change to monthly
+                print(max(d['PM2.5_obs']),max(d['PM2.5_mod']))
         else:
             d = d.resample('M', convention='start').mean()
         #fig,ax=plt.subplots(1,1, figsize=(12,4)) #Set figure dimensions
         
         #Plot
         ax = fig.add_subplot(3,1,i) # set subplots
-        d.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'red'],linewidth=.3,alpha=0.7)
+        d.ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'red'])#,linewidth=.3,alpha=0.7)
         
         plt.xticks(rotation='horizontal')
         if species == 'PM2.5':
             ax.set_ylabel('PM$_{2.5}$ [\u03BCg m$^{-3}$]')
-            ax.set_ylim(0,25) # (0,25)          35 for daily
+            ax.set_ylim(0,50) # (0,25)      130 for daily
             height = 20 # Height of annotations in graphs
             spc = 1.2 # Space the annotations are moved up and down
-            plt.legend(['Observation','Forecast'],prop={'size': 8},loc=2)
+            plt.legend(['AQS','AIRPACT'])
         else:
             ax.set_ylabel('Ozone [ppb]')
-            ax.set_ylim(0,50) # (0,50)           80 for daily
+            ax.set_ylim(0,120) # (0,50)    80 for daily
             height=10
             spc = 2
-            plt.legend(['Observation','Forecast'],prop={'size': 8},loc=3)
+            
+            
         
-        ax.set_xlim('2009-1-1','2018-12-31')
+            
+            
+            
+        if i == 1 or i ==3:
+            ax.set_ylabel('')
+        if i ==1:
+            plt.legend(['AQS','AIRPACT'])
+        else:
+            ax.get_legend().remove()
+        
+        ax.set_xlim(str(year)+'-1-1',str(year)+'-12-31')
         
         # For the minor ticks, use no labels; default NullFormatter.
         months = mdates.MonthLocator()
-        ax.xaxis.set_minor_locator(months)
-        ax.set_xlabel(' ')    
+        #ax.xaxis.set_major_locator(months)
+        
+        ax.set_xlabel('')    
         # remove zero on y axis to prevent overlap with year on x axis
         yticks = ax.yaxis.get_major_ticks() 
         yticks[0].label1.set_visible(False)
 
-        ax.set_title(abcd + ' ' + str(site_type))
+        ax.set_title(year+' '+abcd)
        # plt.legend(prop={'size': 20},loc=2)
         sze = 10 #size of annotation text
         
 # =============================================================================
 #         plt.grid(True)    # Add grid lines to make graph interpretation easier
+#         ax.grid(False)
 # =============================================================================
-        ax.grid(False)
+        
         #text_height = 0.061
         text_height = 0.01 # 0.005 almost works
         x1 = 0.429
@@ -657,61 +658,20 @@ for species in pollutant:
         t2 = (x2-x1)/2+x1
         t3 = (x3-x2)/2+x2
         
-        if i == 3:
-            # Create Airpact version change annotation. First commented out section is for having site number on side       
-            #ax.annotate('AP3',xy=(0.07,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,text_height),va='center',color='red',size='x-small') # Left Arrow AP3 # previous height of 0.061 for the xytext
-            #ax.annotate('AP3',xy=(0.35,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.2,text_height),va='center',color='red',size='x-small') # Right Arrow AP3            
-            #ax.annotate('AP4',xy=(0.35,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.45,text_height),va='center',color='red',size='x-small') # Left Arrow AP4
-            #ax.annotate('AP4',xy=(0.55,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.45,text_height),va='center',color='red',size='x-small') # Right Arrow AP4    
-            #ax.annotate('AP5',xy=(0.55,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.68,text_height),va='center',color='red',size='x-small') # Left Arrow AP5
-            #ax.annotate('AP5',xy=(0.82,0.05),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(.68,text_height),va='center',color='red',size='x-small') # Right Arrow AP5
-        
-            ax.annotate('AP3',xy=(0.07,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Left Arrow AP3 # previous height of 0.061 for the xytext
-            ax.annotate('AP3',xy=(x1,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t1,text_height),va='center',color='red',size='x-small') # Right Arrow AP3
-            
-            ax.annotate('AP4',xy=(x1,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Left Arrow AP4
-            ax.annotate('AP4',xy=(x2,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t2,text_height),va='center',color='red',size='x-small') # Right Arrow AP4
-    
-            ax.annotate('AP5',xy=(x2,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Left Arrow AP5
-            ax.annotate('AP5',xy=(x3,text_height),arrowprops=dict(facecolor='red',shrink=0.05),xycoords='figure fraction',xytext=(t3,text_height),va='center',color='red',size='x-small') # Right Arrow AP5
-        
-# =============================================================================
-#         # Add significant event annotations to plots
-#         ax.annotate('Species Increased',xy=('2010-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2010-7-1',height-spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-#         ax.annotate('12km to 4km',xy=('2012-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2012-7-1',height),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km       
-#         ax.annotate('Switch to WRF 3.4.1',xy=('2012-10-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2012-10-1',height+spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-#         ax.annotate('MOVES replaces MOBILE6',xy=('2013-10-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2013-10-1',height+spc*2),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-#         ax.annotate('Canadian Fire Incorporated',xy=('2015-7-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2015-7-1',height-spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-#         ax.annotate('Switch to WRF 3.7.1',xy=('2015-11-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2015-11-1',height),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-#         ax.annotate('Increased Layers',xy=('2016-4-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2016-4-1',height+spc),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-#         ax.annotate('Updated Road Dust Emissions',xy=('2016-12-1',1),arrowprops=dict(arrowstyle='-',color='red'),xytext=('2016-12-1',height+spc*2),color='red',size='x-small',horizontalalignment='center', verticalalignment='top',fontsize=sze) # 12km to 4km
-# 
-# =============================================================================
 
-        #ax.text(1.01, 0.4,'# of Observation sites '+str(temp1),fontsize = 12, ha='right', va='center', transform=ax.transAxes)  
-# =============================================================================
-#         ax.text(0.95, 0.92,'# of Observation sites '+str(temp1), ha='right', va='center', transform=ax.transAxes) 
-# =============================================================================
-                
-# =============================================================================
-#         letter_horz = 1.048
-#         if i == 1:
-#             ax.text(letter_horz, 0.5,'(a)', ha='right', va='center', transform=ax.transAxes)  
-#         if i == 2:
-#             ax.text(letter_horz, 0.5,'(b)', ha='right', va='center', transform=ax.transAxes)          
-#         if i == 3:
-#             ax.text(letter_horz, 0.5,'(c)', ha='right', va='center', transform=ax.transAxes)  
-# =============================================================================
+   
         plt.subplots_adjust(bottom=0.01,top=0.95)
         #Calculate Statistics
         try:
+            if species =='O3':
+                d.dropna(subset=['O3_obs','O3_mod'])
             #Run stats functions
             aq_stats = stats(d, species+'_mod', species+'_obs')
         
         # aq_stats.columns = aq_stats.columns.str.replace(abrv+'_AP5_4km', '4km ' + site_nameinfo)     
    
             # Merge stats into single dataframe
-            aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + site_type)    
+            aq_stats.columns = aq_stats.columns.str.replace(species+'_mod', species+' ' + year)    
             stats_com = pd.merge(stats_com, aq_stats, how = 'inner', left_index = True, right_index = True)     
             
             #Drop some stats to put on plots
@@ -726,9 +686,9 @@ for species in pollutant:
             #ax.text(0.15,-0.15, aq_stats, ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='beige', edgecolor='black', boxstyle='round'))
     try:
         if species == 'O3':
-            plt.savefig(inputDir+'/plots/monthly/O3_monthly_sitetype_common.png',  pad_inches=0.1, bbox_inches='tight')
+            plt.savefig(outputDir+'/plots/monthly/O3_monthly.png',  pad_inches=0.1, bbox_inches='tight')
         else:
-            plt.savefig(inputDir+'/plots/monthly/PM_monthly_sitetype_common.png',  pad_inches=0.1, bbox_inches='tight')
+            plt.savefig(outputDir+'/plots/monthly/PM_monthly.png',  pad_inches=0.1, bbox_inches='tight')
         plt.show()
         plt.close()
     except(FileNotFoundError):
@@ -769,23 +729,15 @@ stats_ozone_suburban.name = 'Ozone Suburban'
 # # Diurnal yearly plots
 # =============================================================================
     
-years = [2009,2010,2011,2012,2013,2014,2015,2016,2017,2018]    
+years = [2016,2017,2018]    
 pollutant = ['O3','PM2.5']
-settings = ['RURAL', 'SUBURBAN', 'URBAN AND CENTER CITY']
+settings = ['URBAN AND CENTER CITY','RURAL','SUBURBAN']
 
 for species in pollutant:
     da = df_com.copy().dropna(subset=['Location Setting'])
-    da['AQSID'] = da['AQSID'].astype(str)
-    
-    if species == 'O3': # only use sites common
-        da = pd.merge(da,df_aqsid_o3,on='AQSID')
-    else:
-        da = pd.merge(da,df_aqsid_pm,on='AQSID')
-    settings = ['RURAL', 'SUBURBAN', 'URBAN AND CENTER CITY']
     for setting in settings:    #list(set(da['Location Setting'])):
-        print(setting)
         for year in years:       
-            d = da.loc[da['Location Setting']==setting] # select site specific data
+            d = da.loc[df_com['Location Setting']==setting]
         
             d.loc[:,species+'_mod'] = pd.to_numeric(d.loc[:,species+'_mod'], errors='coerce')
             d=d.reset_index()
@@ -806,7 +758,7 @@ for species in pollutant:
                 ax.set_ylim(0,20)
                 
             b=d.groupby(d.index.hour).std()
-            d.groupby(d.index.hour).mean().ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['red', 'red'], label=['Observation', 'Model'])
+            d.groupby(d.index.hour).mean().ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'red'], label=['Observation', 'Model'])
             ax.set_title(str(site_type) + ' '+year)
         
             if species == 'PM2.5':
@@ -824,7 +776,7 @@ for species in pollutant:
             x = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
             #ax.text(0.95,1.03,'Site type: '+str(site_type),ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='white', edgecolor='black', boxstyle='round'))
             plt.fill_between(x, c[species+'_mod'], e[species+'_mod'], facecolor='red', edgecolor='black',alpha = 0.1, label=['Std. Dev.']) #Model
-            plt.fill_between(x, c[species+'_obs'], e[species+'_obs'], facecolor='red', edgecolor='black',alpha = 0.1, label=['Std. Dev.']) #Obs
+            plt.fill_between(x, c[species+'_obs'], e[species+'_obs'], facecolor='black', edgecolor='black',alpha = 0.1, label=['Std. Dev.']) #Obs
             ax.legend(['Observation', 'Model', 'Std. Dev.'], fontsize=10)
             ax.grid(False)
             
@@ -876,38 +828,29 @@ for species in pollutant:
                 # Save diurnal plots
                 try:
                     if species == 'O3':
-                        plt.savefig(inputDir+'/plots/diurnal/'+'O3_diurnal_'+site_type+'_'+year+'_common.png',  pad_inches=0.1, bbox_inches='tight')
+                        plt.savefig(outputDir+'/plots/diurnal/'+'O3_diurnal_'+site_type+'_'+year+'.png',  pad_inches=0.1, bbox_inches='tight')
                     else:
-                        plt.savefig(inputDir+'/plots/diurnal/'+'PM_diurnal_'+site_type+'_'+year+'_common.png',  pad_inches=0.1, bbox_inches='tight')
+                        plt.savefig(outputDir+'/plots/diurnal/'+'PM_diurnal_'+site_type+'_'+year+'.png',  pad_inches=0.1, bbox_inches='tight')
                 except(FileNotFoundError):
-                    print('file not found error')
                     pass
+                plt.show()
                 plt.close()
 
             except (ZeroDivisionError):
-                print('zero division error')
                 pass
             
             print(species+  ' '+ year+' '+site_type)
-# =============================================================================
-#     # Attempt to run ffmpeg not working
-#     os.chdir('G:/Research/Urbanova_Jordan')
-#     if species == 'O3':
-#         check_call(['ffmpeg', '-y', '-framerate','1', '-i',inputDir+'/plots/diurnal/O3_diurnal_'+site_type+'_%04.png','-b:v','5000k', inputDir+'/plots/diurnal/O3_diurnal_'+site_type+'animation.gif'])
-#     else:
-#         check_call(['ffmpeg','-y',  '-framerate','1', '-i',inputDir+'plots/diurnal/PM_diurnal_'+site_type+'_%04.png','-b:v','5000k', inputDir+'plots/diurnal/PM_diurnal_'+site_type+'animation.gif'])
-#     print('Videos made')        
-# =============================================================================
+
 
  
 # Save stats           
-stats_pm_rural.T.to_csv(inputDir+'/stats/PM_rural_common.csv')   
-stats_pm_urban.T.to_csv(inputDir+'/stats/PM_urban_common.csv')   
-stats_pm_suburban.T.to_csv(inputDir+'/stats/PM_suburban_common.csv')   
+stats_pm_rural.T.to_csv(outputDir+'/stats/PM_rural.csv')   
+stats_pm_urban.T.to_csv(outputDir+'/stats/PM_urban.csv')   
+stats_pm_suburban.T.to_csv(outputDir+'/stats/PM_suburban.csv')   
 
-stats_ozone_rural.T.to_csv(inputDir+'/stats/O3_rural_common.csv')   
-stats_ozone_urban.T.to_csv(inputDir+'/stats/O3_urban_common.csv')   
-stats_ozone_suburban.T.to_csv(inputDir+'/stats/O3_suburban_common.csv')     
+stats_ozone_rural.T.to_csv(outputDir+'/stats/O3_rural.csv')   
+stats_ozone_urban.T.to_csv(outputDir+'/stats/O3_urban.csv')   
+stats_ozone_suburban.T.to_csv(outputDir+'/stats/O3_suburban.csv')     
 #%%
             
 stats_pm_rural.name = 'PM2.5 Rural'
@@ -989,7 +932,7 @@ for dataframe in stat_list:
     par3.tick_params(axis='y', colors=p4.get_color(), **tkw)
     ax.tick_params(axis='x', **tkw)
     ax.grid(False)
-    plt.savefig(inputDir+'/plots/stats/'+dataframe.name+'_stats_common.png',  pad_inches=0.1, bbox_inches='tight')
+    plt.savefig(outputDir+'/plots/stats/'+dataframe.name+'_stats.png',  pad_inches=0.1, bbox_inches='tight')
     plt.show()
     plt.close()
 
@@ -1005,26 +948,27 @@ setting =['total']
 versions = ['AP-3','AP-4','AP-5','Total'] #List versions
 stats_all = pd.DataFrame() # statistics for each station
 pollutant = ['O3','PM2.5','O3_hourly','PM_hourly']
-
+aqsid_o3 = []
+aqsid_pm = []
 # =============================================================================
 # stats_com = pd.DataFrame(['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"])
 # stats_com.index = ['MB','ME',"RMSE",'FB','FE',"NMB", "NME", "r_squared"]
 # stats_com = stats_com.drop(0,1)
 # =============================================================================
-for version in versions:
+for version,year in zip(versions,years):
     print(version)
     # Set date range used based of versions
     if version == 'AP-3':
-        start_date ='2009-05-01'
-        end_date = '2012-12-31'
-    elif version == 'AP-4':
-        start_date ='2013-01-01'
-        end_date = '2015-12-31'
-    elif version == 'AP-5':
         start_date ='2016-01-01'
+        end_date = '2016-12-31'
+    elif version == 'AP-4':
+        start_date ='2017-01-01'
+        end_date = '2017-12-31'
+    elif version == 'AP-5':
+        start_date ='2018-01-01'
         end_date = '2018-12-31'
     elif version == 'Total':
-        start_date ='2009-05-01'
+        start_date ='2016-01-01'
         end_date = '2018-12-31'
         
     # Locate correct site model data
@@ -1034,8 +978,7 @@ for version in versions:
     df_mod1 = df_mod1.reset_index(drop=True)
     df_mod1['version'] = version
     
-    df_mod1['AQSID'] = df_mod1['AQSID'].astype(str)
-        
+    
     # If there is no site data, this skips the site and moves to the next
     '''
     try:
@@ -1048,35 +991,26 @@ for version in versions:
     
     for species in pollutant:
         print(species)
-        
-        if species == 'O3': # only use sites common
-            x = pd.merge(df_mod1,df_aqsid_o3,on='AQSID')
+        if species == 'O3':
+            if version == 'AP-3':
+                aqsid_o3_ap3 = pd.DataFrame(df_mod1.dropna(subset = ['O3_obs','O3_mod'])['AQSID'].unique(),columns = ['AQSID'])
+            if version == 'AP-4':
+                aqsid_o3_ap4 = pd.DataFrame(df_mod1.dropna(subset = ['O3_obs','O3_mod'])['AQSID'].unique(),columns = ['AQSID'])
+            if version == 'AP-5':
+                aqsid_o3_ap5 = pd.DataFrame(df_mod1.dropna(subset = ['O3_obs','O3_mod'])['AQSID'].unique(),columns = ['AQSID'])
         else:
-            x = pd.merge(df_mod1,df_aqsid_pm,on='AQSID')
-            
-# =============================================================================
-#         # section below creates the "common" AQSID dataframes. Necessary to keep in case new data is ever introduced
-#         if species == 'O3':
-#             if version == 'AP-3':
-#                 aqsid_o3_ap3 = pd.DataFrame(df_mod1.dropna(subset = ['O3_obs','O3_mod'])['AQSID'].unique(),columns = ['AQSID'])
-#             if version == 'AP-4':
-#                 aqsid_o3_ap4 = pd.DataFrame(df_mod1.dropna(subset = ['O3_obs','O3_mod'])['AQSID'].unique(),columns = ['AQSID'])
-#             if version == 'AP-5':
-#                 aqsid_o3_ap5 = pd.DataFrame(df_mod1.dropna(subset = ['O3_obs','O3_mod'])['AQSID'].unique(),columns = ['AQSID'])
-#         else:
-#             if version == 'AP-3':
-#                 aqsid_pm_ap3 = pd.DataFrame(df_mod1.dropna(subset = ['PM2.5_mod','PM2.5_obs'])['AQSID'].unique(),columns = ['AQSID'])
-#             if version == 'AP-4':
-#                 aqsid_pm_ap4 = pd.DataFrame(df_mod1.dropna(subset = ['PM2.5_mod','PM2.5_obs'])['AQSID'].unique(),columns = ['AQSID'])
-#             if version == 'AP-5':
-#                 aqsid_pm_ap5 = pd.DataFrame(df_mod1.dropna(subset = ['PM2.5_mod','PM2.5_obs'])['AQSID'].unique(),columns = ['AQSID'])
-#                 
-# =============================================================================
+            if version == 'AP-3':
+                aqsid_pm_ap3 = pd.DataFrame(df_mod1.dropna(subset = ['PM2.5_mod','PM2.5_obs'])['AQSID'].unique(),columns = ['AQSID'])
+            if version == 'AP-4':
+                aqsid_pm_ap4 = pd.DataFrame(df_mod1.dropna(subset = ['PM2.5_mod','PM2.5_obs'])['AQSID'].unique(),columns = ['AQSID'])
+            if version == 'AP-5':
+                aqsid_pm_ap5 = pd.DataFrame(df_mod1.dropna(subset = ['PM2.5_mod','PM2.5_obs'])['AQSID'].unique(),columns = ['AQSID'])
                 
-        x['species'] = species
+                
+        df_mod1['species'] = species
         var_name = str(species+'_obs')
         
-        x=x.ix[:,[species+'_obs',species+'_mod','datetime']]
+        x=df_mod1.copy().ix[:,[species+'_obs',species+'_mod','datetime']]
         x = x.set_index('datetime') # Set datetime column as index
         
         #var_units = mw_data['UNITS'][var_name]
@@ -1135,24 +1069,24 @@ for version in versions:
         stats_T = stats_combined.T # transpose index and columns
         #stats_T['lat'] = lat_mw
         #stats_T['lon'] = lon_mw
-        stats_T['version'] = version
+        stats_T['version'] = year
         stats_T['unit'] = var_units
         stats_T['species'] = species
         stats_all = stats_all.append(stats_T)
 
 stats_all = stats_all.reset_index()        
-stats_all.to_csv(inputDir+'/stats/aqs_version_stats_common.csv')
+stats_all.to_csv(outputDir+'/stats/aqs_version_stats.csv')
+#print(stats_all['FB'],stats_all['FE'])
 print('stats_all')
 print(stats_all)
 
-# =============================================================================
-# # last section of the "common" creation here.
-# aqsid_o3 = pd.merge(aqsid_o3_ap3,aqsid_o3_ap4)
-# aqsid_o3 = pd.merge(aqsid_o3,aqsid_o3_ap5).to_csv(inputDir+'/o3_aqsid.csv')
-# 
-# aqsid_pm = pd.merge(aqsid_pm_ap3,aqsid_pm_ap4)
-# aqsid_pm = pd.merge(aqsid_pm,aqsid_pm_ap5).to_csv(inputDir+'/pm_aqsid.csv')
-# =============================================================================
+aqsid_o3 = pd.merge(aqsid_o3_ap3,aqsid_o3_ap4)
+aqsid_o3 = pd.merge(aqsid_o3,aqsid_o3_ap5)
+aqsid_o3.to_csv(outputDir+'/o3_aqsid.csv')
+
+aqsid_pm = pd.merge(aqsid_pm_ap3,aqsid_pm_ap4)
+aqsid_pm = pd.merge(aqsid_pm,aqsid_pm_ap5)
+aqsid_pm.to_csv(outputDir+'/pm_aqsid.csv')
 
 # =============================================================================
 # aqsid_o3_pm = pd.merge(aqsid_pm,aqsid_o3,left_index=True, right_index=True, how = 'left')
@@ -1191,18 +1125,12 @@ stats_ozone_suburban.name = 'Ozone Suburban'
 
 # monthly stats
     
-years = [2009,2010,2011,2012,2013,2014,2015,2016,2017,2018]
+years = [2016,2017,2018]
 months = [1,2,3,4,5,6,7,8,9,10,11,12]    
 pollutant = ['O3','PM2.5']
 
 for species in pollutant:
     da = df_com.copy().dropna(subset=['Location Setting'])
-    da['AQSID'] = da['AQSID'].astype(str)
-    if species == 'O3': # only use sites common
-        da = pd.merge(da,df_aqsid_o3,on='AQSID')
-    else:
-        da = pd.merge(da,df_aqsid_pm,on='AQSID')
-        
     for setting in settings:    #list(set(da['Location Setting'])):
         if species == 'O3':
             var_units = 'ppb'
@@ -1217,7 +1145,7 @@ for species in pollutant:
                 version = 'AP-5'
                 
             for month in months:
-                d = da.loc[da['Location Setting']==setting]
+                d = da.loc[df_com['Location Setting']==setting]
                 
                 d.loc[:,species+'_mod'] = pd.to_numeric(d.loc[:,species+'_mod'], errors='coerce')
                 d=d.reset_index()
@@ -1323,13 +1251,13 @@ stats_ozone_urban = stats_ozone_urban.T
 stats_ozone_suburban = stats_ozone_suburban.T
 
 # Save stats           
-stats_pm_rural.to_csv(inputDir+'/stats/PM_rural_monthly_common.csv')   
-stats_pm_urban.to_csv(inputDir+'/stats/PM_urban_monthly_common.csv')   
-stats_pm_suburban.to_csv(inputDir+'/stats/PM_suburban_monthly_common.csv')   
+stats_pm_rural.to_csv(outputDir+'/stats/PM_rural_monthly.csv')   
+stats_pm_urban.to_csv(outputDir+'/stats/PM_urban_monthly.csv')   
+stats_pm_suburban.to_csv(outputDir+'/stats/PM_suburban_monthly.csv')   
 
-stats_ozone_rural.to_csv(inputDir+'/stats/O3_rural_monthly_common.csv')   
-stats_ozone_urban.to_csv(inputDir+'/stats/O3_urban_monthly_common.csv')   
-stats_ozone_suburban.to_csv(inputDir+'/stats/O3_suburban_monthly_common.csv')  
+stats_ozone_rural.to_csv(outputDir+'/stats/O3_rural_monthly.csv')   
+stats_ozone_urban.to_csv(outputDir+'/stats/O3_urban_monthly.csv')   
+stats_ozone_suburban.to_csv(outputDir+'/stats/O3_suburban_monthly.csv')  
 
 #%%
 #########################
@@ -1367,6 +1295,7 @@ for species in pollutant:
 
 
     for dataframe,i,abc in zip(stat_list,[1,2,3],['(a)','(b)','(c)']):
+        
         d=dataframe
         d.index= pd.to_datetime(d.index,yearfirst=True)
         ax = fig.add_subplot(3,1,i)
@@ -1446,28 +1375,105 @@ for species in pollutant:
     #     plt.grid(True)
     # =============================================================================
         ax.grid(False)
-    plt.savefig(inputDir+'/plots/stats/'+species+'_monthly_stats_common.png',  pad_inches=0.1, bbox_inches='tight')
+    plt.savefig(outputDir+'/plots/stats/'+species+'_monthly_stats.png',  pad_inches=0.1, bbox_inches='tight')
     plt.show()
     plt.close()
         
-# =============================================================================
-#         # Plot r^2
-#         fig,ax=plt.subplots(1,1, figsize=(12,4))
-#         ax.set_title(str(dataframe.name)+' $r^2$')
-#         p4, = ax.plot(d[axis4], 'g-', label = '$r^2$')
-#         ax.set_ylim(0,1)
-#         ax.set_ylabel('$r^2$')
-#         ax.yaxis.label.set_color(p4.get_color())
-#         ax.tick_params(axis='y', colors=p4.get_color(), **tkw)
-#     # =============================================================================
-#     #     plt.grid(True)
-#     # =============================================================================
-#         ax.grid(False)
-#         plt.savefig(inputDir+'/plots/stats/'+dataframe.name+'_monthly_r2_stats.png',  pad_inches=0.1, bbox_inches='tight')
-#         plt.show()
-#         plt.close()
-# =============================================================================
+    # =============================================================================
+    #     # Plot r^2
+    #     fig,ax=plt.subplots(1,1, figsize=(12,4))
+    #     ax.set_title(str(dataframe.name)+' $r^2$')
+    #     p4, = ax.plot(d[axis4], 'g-', label = '$r^2$')
+    #     ax.set_ylim(0,1)
+    #     ax.set_ylabel('$r^2$')
+    #     ax.yaxis.label.set_color(p4.get_color())
+    #     ax.tick_params(axis='y', colors=p4.get_color(), **tkw)
+    # # =============================================================================
+    # #     plt.grid(True)
+    # # =============================================================================
+    #     ax.grid(False)
+    #     plt.savefig(inputDir+'/plots/stats/'+dataframe.name+'_monthly_r2_stats.png',  pad_inches=0.1, bbox_inches='tight')
+    #     plt.show()
+    #     plt.close()
+    # =============================================================================
 #%%
+# =============================================================================
+# Yearly diurnal
+# =============================================================================
+for species in pollutant:
+    da = df_com.copy().dropna(subset=['Location Setting'])
+    fig = plt.figure(dpi=300,figsize=(6.125,7))
+    
+    for year,i,abcd in zip(years,[1,2,3],['(a)','(b)','(c)']):  
+        ax = fig.add_subplot(3,1,i) # set subplots
+        d = da.copy()
+    
+        d.loc[:,species+'_mod'] = pd.to_numeric(d.loc[:,species+'_mod'], errors='coerce')
+        d=d.reset_index()
+        d.drop('AQSID',1)
+
+        d=d.set_index('datetime')
+        year = str(year)
+        mask = (d.index > year+'-1-1') & (d.index <= year+'-12-31')
+        d=d.loc[mask]
+        
+        # Set constant limits for plots
+        if species == 'O3':
+            ax.set_ylim(0,60)
+        else:
+            ax.set_ylim(0,15) # 30
+            
+        b=d.groupby(d.index.hour).std()
+        d.groupby(d.index.hour).mean().ix[:,[species+'_obs', species+'_mod']].plot(kind='line', style='-', ax=ax, color=['black', 'red'], label=['Observation', 'Model'])
+        ax.set_title(year+' '+abcd)
+    
+
+            
+        
+        d = d.groupby(d.index.hour).mean()
+        e = b
+        c = d-b
+        e = d+b
+        x = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
+        #ax.text(0.95,1.03,'Site type: '+str(site_type),ha='center', va='center', transform=ax.transAxes, fontsize = 10, bbox=dict(facecolor='white', edgecolor='black', boxstyle='round'))
+        if species == 'O3':
+            plt.fill_between(x, c[species+'_mod'], e[species+'_mod'], facecolor='red', edgecolor='black',alpha = 0.1, label=['Std. Dev.']) #Model
+            plt.fill_between(x, c[species+'_obs'], e[species+'_obs'], facecolor='black', edgecolor='black',alpha = 0.1, label=['Std. Dev.']) #Obs
+        
+        ax.grid(False)
+        
+        # Set legend only on first plot
+        if i == 1:
+            ax.legend(['AQS', 'AIRPACT', 'Std. Dev.'])
+        else:
+            ax.get_legend().remove()
+        
+        # set y label only on second plot
+        if i ==2:
+            if species == 'PM2.5':
+                ax.set_ylabel('PM$_{2.5}$ [\u03BCg m$^{-3}$]')
+            else:
+                ax.set_ylabel('Ozone (ppb)')
+
+        # set x label only on last plot
+        if i == 3:
+            ax.set_xlabel('Mean Diurnal (hours)')
+        else:
+            ax.set_xlabel('')
+
+    fig.tight_layout() # spaces the plots out a bit
+    # Save diurnal plots
+    try:
+        if species == 'O3':
+            plt.savefig(outputDir+'/plots/diurnal/'+'O3_diurnal.png',  pad_inches=0.1, bbox_inches='tight')
+        else:
+            plt.savefig(outputDir+'/plots/diurnal/'+'PM_diurnal.png',  pad_inches=0.1, bbox_inches='tight')
+    except(FileNotFoundError):
+        pass
+    plt.show()
+    plt.close()
+
+
 end_time = time.time()
 print("Run time was %s minutes"%(round((end_time-begin_time)/60)))
 print('done')

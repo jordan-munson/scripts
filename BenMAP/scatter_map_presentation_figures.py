@@ -295,7 +295,7 @@ for pollutant in pollutants:
                 if pollutant == 'PM2.5':
                     multiplier = 1000 # 1000
                 else:
-                    multiplier = 2000 # 1000
+                    multiplier = 3000 # 2000
                     
                 num_users = name #countries[name]
                 if source == 'Model':
@@ -310,7 +310,8 @@ for pollutant in pollutants:
                     im = ax.add_geometries(country.geometry, projection,
                                 facecolor=cmap(d_deq/d_pop*multiplier),alpha=alpha)
                     title = source
-                    
+                   
+            #ax.set_ylim(0,0.025)
             sm = ax.imshow(np.arange(100).reshape((10, 10))/multiplier,cmap=cmap)
             #sm = plt.cm.ScalarMappable(cmap=cmap,norm=plt.Normalize(1))
             #sm = plt.plot(0,0.001)
@@ -338,7 +339,7 @@ for pollutant in pollutants:
             ax.add_feature(cartopy.feature.COASTLINE, edgecolor='gray')
             ax.add_feature(cartopy.feature.BORDERS, edgecolor='gray')
         fig.tight_layout() 
-        plt.savefig(plotDir + 'maps/2018_'+pollutant+'_'+endpoint+'_map.png',bbox_inches = 'tight',pad_inches = 0)
+        plt.savefig(plotDir + 'maps/2017_'+pollutant+'_'+endpoint+'_map.png',bbox_inches = 'tight',pad_inches = 0)
         plt.show()
         plt.close()
 #%%

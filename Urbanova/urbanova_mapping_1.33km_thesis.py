@@ -31,16 +31,16 @@ import pickle
 base_dir = '/data/lar/users/jmunson/'
 data_dir = '/data/lar/projects/Urbanova/'
 grid_dir_urb = '/data/lar/projects/Urbanova/2018/2018011100/MCIP37/'
-grid_dir_4km='/data/airpact5/AIRRUN/2018/2018011100/MCIP37/'
+grid_dir_4km='/data/lar/projects/airpact5/AIRRUN/2018/2018011100/MCIP37/'
 urb_path = '/data/lar/projects/Urbanova/'
 airpact_path = '/data/airpact5/saved/'
 
 start_year = 2019
-start_month = '02'
+start_month = '07'
 start_day = 1
 
 end_year = 2019
-end_month = '02'
+end_month = '07'
 #end_day = monthrange(end_year, end_month)[1]
 end_day = 1
 

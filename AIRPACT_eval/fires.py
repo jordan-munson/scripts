@@ -18,20 +18,18 @@ stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
 # Setup
 # =============================================================================
 # Set plot parameters
-mpl.rcParams['font.family'] = 'sans-serif'  # the font used for all labelling/text
-# =============================================================================
-# mpl.rcParams['font.size'] = 24.0
-# mpl.rcParams['xtick.major.size']  = 10
-# mpl.rcParams['xtick.major.width'] = 2
-# mpl.rcParams['xtick.minor.size']  = 5
-# mpl.rcParams['xtick.minor.width'] = 1
-# mpl.rcParams['ytick.major.size']  = 10
-# mpl.rcParams['ytick.major.width'] = 2
-# mpl.rcParams['ytick.minor.size']  = 5
-# mpl.rcParams['ytick.minor.width'] = 1
-# mpl.rcParams['ytick.direction']   = 'in'
-# mpl.rcParams['xtick.direction']   = 'in'
-# =============================================================================
+mpl.rcParams['font.family'] = 'calibri'  # the font used for all labelling/text
+mpl.rcParams['font.size'] = 10.0
+mpl.rcParams['xtick.major.size']  = 10
+mpl.rcParams['xtick.major.width'] = 2
+mpl.rcParams['xtick.minor.size']  = 5
+mpl.rcParams['xtick.minor.width'] = 1
+mpl.rcParams['ytick.major.size']  = 10
+mpl.rcParams['ytick.major.width'] = 2
+mpl.rcParams['ytick.minor.size']  = 5
+mpl.rcParams['ytick.minor.width'] = 1
+mpl.rcParams['ytick.direction']   = 'in'
+mpl.rcParams['xtick.direction']   = 'in'
 
 states = ['WA','OR','ID','MT']#,'CA']
 #states = ['NATION']
@@ -98,9 +96,11 @@ ax.fill_between(fires.index,0,fires.Fires,alpha = 0.05, color='black')
 ax.set_ylabel('Acres Burned/1000')
 ax.set_ylim(0,fire_max)
 ax.set_xticklabels(years)
-ax.legend(loc='center left', bbox_to_anchor=(legend_x, 0.1)).remove() # Places legend outside of plot to the right
-
-ax.legend(loc='center left', bbox_to_anchor=(legend_x, 0.9)) # Places legend outside of plot to the right
+# =============================================================================
+# ax.legend(loc='center left', bbox_to_anchor=(legend_x, 0.1)).remove() # Places legend outside of plot to the right
+# 
+# ax.legend(loc='center left', bbox_to_anchor=(legend_x, 0.9)) # Places legend outside of plot to the right
+# =============================================================================
 fig.tight_layout()
 plt.savefig(inputDir + 'plots/fire/decadal_acres_burned.png')
 

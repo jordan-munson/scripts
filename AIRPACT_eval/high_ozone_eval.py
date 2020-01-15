@@ -391,10 +391,37 @@ for species in pollutant:
         table_pm_epa = table_pm_epa.T
         table_pm_epa = contingency_epa.rename(columns={'a':'Hits','b':'False Alarms','c':'Misses'}).T.append(table_pm_epa)
         
-
-
-
-
+#%%
+for species in pollutant:
+    print(species)
+    if species =='O3':
+        df = df_ozone
+    else:
+        df = df_pm
+    for version in versions:
+        if version == 'AP3':
+            start_date = '2009-01-01'
+            end_date = '2012-12-31'
+        if version == 'AP4':
+            start_date = '2013-01-01'
+            end_date = '2015-12-31'
+        if version == 'AP5':
+            start_date = '2016-01-01'
+            end_date = '2018-12-31'
+            
+        mask = (df.index > start_date) & (df.index <= end_date)
+        d=df.loc[mask]
+        
+        d_good = d.loc[d[species+'_obs_AQI#'] == 1]
+        d_good = d_good[species+'_obs_AQI#'].sum()
+        
+        d_moderate = d.loc[d[species+'_obs_AQI#'] == 2]
+        d_moderate = d_moderate[species+'_obs_AQI#'].sum()
+                                
+        d_usg = d.loc[d[species+'_obs_AQI#'] == 3]
+        d_usg = d_usg[species+'_obs_AQI#'].sum()    
+                                
+        print(d_good,d_moderate, d_usg)
 
 
 
