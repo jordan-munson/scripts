@@ -7,11 +7,11 @@ Created on Thu Oct 24 14:35:07 2019
 import numpy as np
 from   netCDF4 import Dataset
 
-inputDir = r'E:/Research/Ports/combined_ncdf/'
+inputDir = r'G:/Research/Ports/combined_ncdf/'
 
 
 for pollutant in ['PM2.5','O3']:
-    outFile   = r'E:/Research/Ports/input_to_benmap/Ports_benmap_' + pollutant + '.csv' # output file name
+    outFile   = r'G:/Research/Ports/input_to_benmap/Ports_benmap_' + pollutant + '.csv' # output file name
 
     for month in ['Jan','Apr','Jul']:#,'Oct']:
     

@@ -22,8 +22,8 @@ begin_time = time.time()
 # =============================================================================
 
 #Set directory
-inputDir = r'E:/Research/AIRPACT_eval/'
-stat_path = r'E:/Research/scripts/Urbanova/statistical_functions.py'
+inputDir = r'G:/Research/AIRPACT_eval/'
+stat_path = r'G:/Research/scripts/Urbanova/statistical_functions.py'
 #ben_path = r'E:/Research/scripts/AIRPACT_eval/meteorology/Met_functions_for_Ben.py'
 
 df_aqsid_o3 = pd.read_csv(inputDir+'/o3_aqsid.csv',dtype=str).drop('Unnamed: 0', axis=1) # load in AQSID that are present for all versions of AIRPACT. This is created later in the script.
@@ -388,7 +388,7 @@ for species in pollutant:
         print(species)
         var_name = str(species+'_obs')
         
-        x=df_mod1.copy().ix[:,[species+'_obs',species+'_mod','datetime','AQSID']]
+        x=df_mod1.copy().loc[:,[species+'_obs',species+'_mod','datetime','AQSID']] # I changed "ix" to "loc"
         x = x.set_index('datetime') # Set datetime column as index
         
         #var_units = mw_data['UNITS'][var_name]
@@ -421,7 +421,9 @@ for species in pollutant:
     
         unit_list = 'FB (%)'
 
-        m.drawcounties()
+# =============================================================================
+#         m.drawcounties()
+# =============================================================================
         m.drawcoastlines()
         m.drawstates()
         m.drawcountries()
