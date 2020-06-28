@@ -296,14 +296,6 @@ lats = []
 lons = []
 
 
-# =============================================================================
-# m = Basemap(projection='merc',
-#               #lat_0=lat, lon_0=lon,
-#               llcrnrlat=40.5, urcrnrlat=49.5,
-#               llcrnrlon=-125, urcrnrlon=-109,
-#               area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
-# =============================================================================
-
 # Calculate stats for each site and add to list
 pollutant = ['O3','PM2.5']#,'O3_hourly','PM2.5_hourly']
 #pollutant = ['O3_hourly','PM2.5_hourly']
@@ -675,9 +667,9 @@ for species in pollutant:
             plt.legend(bbox_to_anchor=(1.08, 1.3), loc='upper left',handles=markers,labelspacing=1) 
             
     # overall colorbar  
-    cb_ax = fig.add_axes([0.115, 0.2, 0.8, 0.02])
+    cb_ax = fig.add_axes([0.115, 0.25, 0.8, 0.02])
     cbar = fig.colorbar(plotted_figure, cax=cb_ax,orientation = 'horizontal')
-    ax[i-1].text(-.568, -.5,'FB [%]' ,ha='right', va='center', transform=ax[i-1].transAxes)
+    ax[i-1].text(-.568, -.2,'FB [%]' ,ha='right', va='center', transform=ax[i-1].transAxes)
     
     plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map_common.png',  pad_inches=0.1, bbox_inches='tight')
     plt.show()
@@ -703,11 +695,6 @@ used_AQSID = list(set(df_com['AQSID']))
 lats = []
 lons = []
 
-m = Basemap(projection='merc',
-              #lat_0=lat, lon_0=lon,
-              llcrnrlat=40.5, urcrnrlat=49.5,
-              llcrnrlon=-125, urcrnrlon=-109,
-              area_thresh=1000)# setting area_thresh doesn't plot lakes/coastlines smaller than threshold
 
 # Calculate stats for each site and add to list
 pollutant = ['O3','PM2.5']#,'O3_hourly','PM2.5_hourly']
@@ -717,7 +704,7 @@ versions = ['difference'] #List versions
 df_com['AQSID'] = df_com['AQSID'].astype(str) # For some reason some of these are int64, this makes everything a string
 
 for species in pollutant:
-    fig = plt.figure(dpi=300,figsize=(3,3))
+    fig, ax = plt.subplots(1,1,subplot_kw={'projection': ccrs.Mercator()}, dpi=300)
     #fig.tight_layout() # spaces the plots out a bit
     for version in versions:
         print(version)
@@ -742,12 +729,12 @@ for species in pollutant:
             if species == 'O3_hourly' or species == 'O3':
                 temp1 = pd.merge(temp1,df_aqsid_o3,on='AQSID')
                 temp2 = pd.merge(temp2,df_aqsid_o3,on='AQSID')
-                abc = '(a)'
+                abc = ''
                 #sze_scale = 2 # 0.7
             else:
                 temp1 = pd.merge(temp1,df_aqsid_pm,on='AQSID')
                 temp2 = pd.merge(temp2,df_aqsid_pm,on='AQSID')
-                abc = '(b)'
+                abc = ''
                 #sze_scale = 1 # 0.7
                 
             
@@ -774,7 +761,7 @@ for species in pollutant:
         print(species)
         var_name = str(species+'_obs')
         
-        x=df_mod1.copy().ix[:,[species+'_obs',species+'_mod','datetime','AQSID']]
+        x=df_mod1.copy().loc[:,[species+'_obs',species+'_mod','datetime','AQSID']]
         x = x.set_index('datetime') # Set datetime column as index
         
         #var_units = mw_data['UNITS'][var_name]
@@ -805,18 +792,32 @@ for species in pollutant:
         # =============================================================================
         #     fig, ax = plt.subplots(figsize=(3,3.5),dpi=200) # Original mehtod
         # =============================================================================
-        ax = fig.add_subplot(1,1,i)
+# =============================================================================
+#         ax = fig.add_subplot(1,1,i)
+# =============================================================================
 # =============================================================================
 #         ax.set_title(abc)
 # =============================================================================
         
     
+        #ax[0,i] = plt.axes(projection=ccrs.LambertConformal()) #Mercator
+        ax.set_extent([-125, -109, 40.5, 49.5]) 
+        #ax[i-1].set_global()
+        
+        #ax.stock_img()
+        
+        ax.add_feature(cfeature.LAND) 
+        ax.add_feature(cfeature.LAKES)
+        ax.add_feature(cfeature.RIVERS)
+        ax.add_feature(cfeature.OCEAN)
+        ax.add_feature(cfeature.COASTLINE)
+        ax.add_feature(cfeature.STATES)
+        ax.add_feature(cfeature.BORDERS, linestyle=':')
+        ax.coastlines()
+    
         unit_list = 'FB (%)'
+        ax.set_title(abc)
 
-        m.drawcounties()
-        m.drawcoastlines()
-        m.drawstates()
-        m.drawcountries()
         cmap = plt.get_cmap('seismic')
         if version == 'difference':
             
@@ -898,13 +899,16 @@ for species in pollutant:
                     aq_stats = aq_stats1-aq_stats # FE getting larger shows an increased error, larger FB shows AP-5 has increased over predictions
     
                             #Mapping
-                    x, y = m(lon, lat)
+                    x = d['Longitude'][0]
+                    y = d['Latitude'][0]
+
                     marker_shape = 'o'
                     #marker_color = 'r'
                     sp = 4 # Fractional Bias
                     spp = 4 # FE # Change this if you want the size to correlate to a different statistic
-                    size = 70 #abs(sze_scale*aq_stats[species+'_mod'][spp])
-                    plotted_figure = m.scatter(x, y, marker=marker_shape,c = aq_stats[species+'_mod'][sp],ax=ax, s = size,cmap=cmap)
+                    size = 100 #Set at 70 for the basemap version
+                    color = float(aq_stats[species+'_mod'][sp])
+                    plotted_figure = ax.scatter(np.reshape(x,-1), np.reshape(y,-1), marker=marker_shape,c = np.reshape(color,-1), s = size,cmap=cmap, transform=ccrs.Geodetic())#,ax=ax)
                     
                     if species == 'O3_hourly' or species == 'O3':
                         plotted_figure.set_clim(-15,15) # -50, 50
@@ -944,9 +948,9 @@ for species in pollutant:
 # =============================================================================
             
     # overall colorbar  
-    cb_ax = fig.add_axes([0.115, 0.1, 0.8, 0.02])
+    cb_ax = fig.add_axes([0.17, 0.02, 0.67, 0.02])
     cbar = fig.colorbar(plotted_figure, cax=cb_ax,orientation = 'horizontal')
-    ax.text(0.60, -.3,'FE [%]' ,ha='right', va='center', transform=ax.transAxes)
+    ax.text(0.525, -0.05,'FE [%]' ,ha='right', va='center', transform=ax.transAxes)
     
     plt.savefig(inputDir+'/plots/bias_maps/'+species+'_bias_map_difference_common.png',  pad_inches=0.1, bbox_inches='tight')
     plt.show()
